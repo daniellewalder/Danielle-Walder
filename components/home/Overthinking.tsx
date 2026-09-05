@@ -59,16 +59,18 @@ export async function Overthinking() {
       <div className="mt-7 grid grid-cols-[1.4fr_1fr] items-start gap-11 tablet:grid-cols-1 tablet:gap-7">
         <article className="flex min-w-0 flex-col gap-4">
           <ImageSlot
-            image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: null }}
+            image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: lead.imageUrl }}
             sizes="(max-width: 1024px) 100vw, 55vw"
             className="h-[340px] rounded-block"
           />
           <h3 className="font-serif text-[46px] leading-[1.02] text-espresso tablet:text-[38px] mobile:text-[30px]">
             <EssayTitle entry={lead} className="text-espresso" />
           </h3>
-          <p className="max-w-standfirst font-sans text-[16.5px] leading-[1.5] text-warmgray">
-            {lead.dek}
-          </p>
+          {lead.dek ? (
+            <p className="max-w-standfirst font-sans text-[16.5px] leading-[1.5] text-warmgray">
+              {lead.dek}
+            </p>
+          ) : null}
         </article>
 
         <div className="min-w-0">

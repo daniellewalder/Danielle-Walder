@@ -88,7 +88,7 @@ export default async function ReadPage() {
 
             <div className="mt-5 flex flex-col gap-5">
               <ImageSlot
-                image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: null }}
+                image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: lead.imageUrl }}
                 sizes="(max-width: 1024px) 100vw, 55vw"
                 className="h-[300px] rounded-block mobile:h-[220px]"
               />
@@ -100,7 +100,9 @@ export default async function ReadPage() {
                 >
                   {lead.title}
                 </h2>
-                <p className="font-sans text-[16.5px] leading-[1.55] text-warmgray">{lead.dek}</p>
+                {lead.dek ? (
+                  <p className="font-sans text-[16.5px] leading-[1.55] text-warmgray">{lead.dek}</p>
+                ) : null}
                 <p className="font-sans text-[14px] font-semibold text-espresso">
                   {readPage.byline}
                 </p>
@@ -137,7 +139,9 @@ export default async function ReadPage() {
                   <h3 className="font-serif text-[24px] leading-[1.16] text-espresso mobile:text-[20px]">
                     {entry.title}
                   </h3>
-                  <p className="font-sans text-[15px] leading-[1.55] text-warmgray">{entry.dek}</p>
+                  {entry.dek ? (
+                    <p className="font-sans text-[15px] leading-[1.55] text-warmgray">{entry.dek}</p>
+                  ) : null}
                   <ReadLink entry={entry} />
                 </article>
               </li>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ImageSlot } from '@/components/ui/ImageSlot'
 import { readPage } from '@/lib/content/pages'
 import { getEssay, getEssaySlugs } from '@/lib/essays'
 
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${essay.title} — Overthinking Real Estate`,
-    description: essay.dek,
+    description: essay.dek ?? undefined,
     // Substack published it first. The canonical points there so the two
     // copies are not competing in search.
     alternates: essay.substackUrl ? { canonical: essay.substackUrl } : undefined,
@@ -44,7 +45,9 @@ export default async function EssayPage({ params }: Props) {
           {essay.title}
         </h1>
 
-        <p className="mt-5 font-sans text-[18px] leading-[1.5] text-warmgray">{essay.dek}</p>
+        {essay.dek ? (
+          <p className="mt-5 font-sans text-[18px] leading-[1.5] text-warmgray">{essay.dek}</p>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-hairline pt-5">
           <span className="font-sans text-[14px] font-semibold text-espresso">
@@ -64,6 +67,16 @@ export default async function EssayPage({ params }: Props) {
           ) : null}
         </div>
       </header>
+
+      {/* The cover Danielle attached on Substack. Omitted entirely if absent. */}
+      {essay.imageUrl ? (
+        <ImageSlot
+          image={{ label: '[ADD ESSAY IMAGE]', alt: essay.title, src: essay.imageUrl }}
+          priority
+          sizes="(max-width: 1024px) 100vw, 68ch"
+          className="mx-auto mt-10 h-[360px] max-w-measure rounded-block mobile:h-[220px]"
+        />
+      ) : null}
 
       {/*
         Sanitised server-side in lib/essays/sanitize.ts against an allow-list —

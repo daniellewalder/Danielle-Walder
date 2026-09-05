@@ -6,6 +6,8 @@ export interface FeedEntry {
   publishedAt: string | null
   /** Raw post HTML from content:encoded. NEVER render without sanitising. */
   contentHtml: string | null
+  /** The post's cover image, from the feed's enclosure. */
+  imageUrl: string | null
 }
 
 const TIMEOUT_MS = 5000
@@ -19,6 +21,26 @@ const parser = new XMLParser({
   cdataPropName: false,
   processEntities: true,
 })
+
+/**
+ * Substack attaches the post's cover image as an enclosure. Only image types
+ * are taken, and only over http(s) — never a data: or javascript: URL.
+ */
+function imageFromEnclosure(enclosure: unknown): string | null {
+  const list = Array.isArray(enclosure) ? enclosure : enclosure ? [enclosure] : []
+
+  for (const item of list) {
+    if (!item || typeof item !== 'object') continue
+    const record = item as Record<string, unknown>
+    const type = record['@_type']
+    const url = record['@_url']
+    if (typeof type !== 'string' || !type.startsWith('image/')) continue
+    if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) continue
+    return url
+  }
+
+  return null
+}
 
 function asText(value: unknown): string | null {
   if (typeof value === 'string') return value.trim() || null
@@ -71,6 +93,7 @@ export async function fetchSubstackEntries(feedUrl: string): Promise<FeedEntry[]
           publishedAt: asText(item.pubDate),
           // Substack puts the full post here for free posts, truncated for paid.
           contentHtml: asText(item['content:encoded']),
+          imageUrl: imageFromEnclosure(item.enclosure),
         },
       ]
     })

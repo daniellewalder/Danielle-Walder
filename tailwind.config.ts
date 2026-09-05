@@ -126,6 +126,9 @@ const config: Config = {
         // mark plus the hamburger there rather than wrapping into a ragged
         // second row. Raise this if the nav ever gets shorter again.
         navstack: { max: '1120px' },
+        // Between the collapse point and a wide desktop the full seven-item
+        // row needs tighter spacing and slightly smaller type to survive.
+        navtight: { max: '1400px' },
       },
     },
   },

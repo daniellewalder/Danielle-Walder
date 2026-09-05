@@ -5,8 +5,8 @@ import { fetchSubstackEntries } from './substack'
 
 export interface EssayEntry {
   title: string
-  /** Danielle's standfirst. Curated, never taken from feed HTML. */
-  dek: string
+  /** Danielle's standfirst, when she has written one. Never from feed HTML. */
+  dek: string | null
   /** On-site route, when the feed gave us the post. Null otherwise. */
   slug: string | null
   /** The original on Substack. Always the canonical source. */
@@ -17,6 +17,8 @@ export interface EssayEntry {
   contentHtml: string | null
   /** Paid posts arrive truncated; the page says so rather than pretending. */
   truncated: boolean
+  /** The cover image Danielle attached on Substack, when the feed carries one. */
+  imageUrl: string | null
 }
 
 export interface EssayResult {
@@ -47,42 +49,54 @@ function slugFromUrl(url: string): string | null {
 /**
  * The single seam between the site and Overthinking Real Estate.
  *
- * Essays are written on Substack. This reads the public feed and renders them
- * here as well, with the original always credited and linked, and the canonical
- * tag pointing back to Substack. Post HTML is sanitised before it is ever put
- * on a page — see ./sanitize.ts. Deks stay Danielle's; feed descriptions are
- * never used.
+ * THE FEED IS THE SOURCE OF TRUTH. Whatever Danielle publishes on Substack
+ * appears here on the next revalidation, without anyone touching the repo —
+ * that is the whole point, so this must never be driven by a hardcoded list.
+ *
+ * Her curated deks are merged in by title where she has written one. An essay
+ * without a dek simply shows none; nothing is invented to fill the gap. The
+ * curated list is used as the entire content only when the feed is
+ * unreachable, so the page is never empty.
+ *
+ * Post HTML is sanitised before it can reach a page — see ./sanitize.ts.
  */
 export async function getEssays(): Promise<EssayResult> {
   const feed = substackFeedUrl ? await fetchSubstackEntries(substackFeedUrl) : null
-  const byTitle = new Map((feed ?? []).map((item) => [normalise(item.title), item]))
-  let matched = false
+  const dekByTitle = new Map(curatedEssays.map((e) => [normalise(e.title), e.dek]))
 
-  const toEntry = (essay: CuratedEssay): EssayEntry => {
-    const match = byTitle.get(normalise(essay.title))
-    if (match) matched = true
+  if (feed && feed.length > 0) {
+    const entries: EssayEntry[] = feed.map((item) => {
+      const contentHtml = item.contentHtml ? sanitizeEssayHtml(item.contentHtml) : null
 
-    const contentHtml = match?.contentHtml ? sanitizeEssayHtml(match.contentHtml) : null
+      return {
+        title: item.title,
+        dek: dekByTitle.get(normalise(item.title)) ?? null,
+        // An on-site page exists only when there is real content behind it.
+        slug: contentHtml ? slugFromUrl(item.url) : null,
+        substackUrl: item.url,
+        publishedAt: item.publishedAt,
+        contentHtml,
+        truncated: item.contentHtml ? looksTruncated(item.contentHtml) : false,
+        imageUrl: item.imageUrl,
+      }
+    })
 
-    return {
-      title: essay.title,
-      dek: essay.dek,
-      // An on-site page exists only when there is real content to put on it.
-      slug: contentHtml && match ? slugFromUrl(match.url) : null,
-      substackUrl: match?.url ?? substackUrl,
-      publishedAt: match?.publishedAt ?? null,
-      contentHtml,
-      truncated: match?.contentHtml ? looksTruncated(match.contentHtml) : false,
-    }
+    return { lead: entries[0] ?? null, more: entries.slice(1), source: 'feed' }
   }
 
-  const entries = curatedEssays.map(toEntry)
+  // Feed unreachable. Show Danielle's curated titles rather than an empty page.
+  const fallback: EssayEntry[] = curatedEssays.map((essay) => ({
+    title: essay.title,
+    dek: essay.dek,
+    slug: null,
+    substackUrl,
+    publishedAt: null,
+    contentHtml: null,
+    truncated: false,
+    imageUrl: null,
+  }))
 
-  return {
-    lead: entries[0] ?? null,
-    more: entries.slice(1),
-    source: matched ? 'feed' : 'curated',
-  }
+  return { lead: fallback[0] ?? null, more: fallback.slice(1), source: 'curated' }
 }
 
 /** One essay by its on-site slug, or null when there is no such page. */

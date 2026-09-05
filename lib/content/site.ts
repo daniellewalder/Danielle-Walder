@@ -12,44 +12,60 @@ export const siteName = 'danielle walder'
 export const navWordmark = 'danielle walder real estate'
 
 /**
- * Primary navigation. `Read` keeps the editorial treatment from the approved
- * design — Kalnia, wine — because it is the way into Overthinking Real Estate.
+ * Primary navigation — Danielle's labels, lowercase, in her order.
+ *
+ * Labels and routes are deliberately different things. The public route
+ * vocabulary stays /read, /search, /tuesday-test, /homes, /sold, /about and
+ * /contact; the nav calls them what she calls them.
+ *
+ * Every destination is a real page. `listings` and `sold` land on quiet pages
+ * with no property data yet — honest, but thin until the RealScout listings
+ * widget and verified sold data arrive.
  */
 export const navLinks = [
-  { label: 'Search Homes', href: '/search' },
-  { label: 'The Tuesday Test', href: '/tuesday-test' },
-  { label: 'About Danielle', href: '/about' },
+  { label: 'search', href: '/search' },
+  { label: 'listings', href: '/homes' },
+  { label: 'sold', href: '/sold' },
 ] as const
 
-export const readLink = { label: 'Read', href: '/read' }
+/** Sits mid-row, set in Kalnia and wine — it reads as a voice, not a nav item. */
+export const readLink = { label: 'overthinking real estate', href: '/read' }
 
-/** The publication wordmark, always lowercase — it reads as a voice. */
+/** The rest of the row, after the publication. */
+export const navLinksAfter = [
+  { label: 'quizzes', href: '/tuesday-test' },
+  { label: 'about', href: '/about' },
+] as const
+
+/** The publication wordmark in the footer, always lowercase. */
 export const publicationWordmark = { label: 'overthinking real estate', href: '/read' }
 
-export const navCta = { label: 'Say Hello', href: '/contact' }
+export const navCta = { label: 'say hello', href: '/contact' }
 
 export const startHereLinks = [
-  { label: 'Search Homes', href: '/search' },
-  { label: 'Take the Tuesday Test', href: '/tuesday-test' },
-  { label: 'Explore LA, Actually', href: '/la-actually' },
-  { label: "What's My Home Worth?", href: '/contact' },
+  { label: 'search homes', href: '/search' },
+  { label: 'take the tuesday test', href: '/tuesday-test' },
+  { label: 'explore la, actually', href: '/la-actually' },
+  { label: "what's my home worth?", href: '/contact' },
 ] as const
 
 export const footerGroups = [
   {
     heading: 'Explore',
     links: [
-      { label: 'Read', href: '/read' },
-      { label: 'LA, Actually', href: '/la-actually' },
-      { label: 'The Tuesday Test', href: '/tuesday-test' },
+      { label: 'overthinking real estate', href: '/read' },
+      { label: 'la, actually', href: '/la-actually' },
+      { label: 'quizzes', href: '/tuesday-test' },
     ],
   },
   {
     heading: 'Work with me',
     links: [
-      { label: 'Search Homes', href: '/search' },
-      { label: 'About Danielle', href: '/about' },
-      { label: 'Say Hello', href: '/contact' },
+      { label: 'search', href: '/search' },
+      { label: 'listings', href: '/homes' },
+      { label: 'sold', href: '/sold' },
+      { label: 'about', href: '/about' },
+      { label: 'say hello', href: '/contact' },
     ],
   },
 ] as const
