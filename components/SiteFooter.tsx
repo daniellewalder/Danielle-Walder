@@ -41,18 +41,27 @@ export function SiteFooter() {
           </nav>
 
           {/*
-            Legally required on every page, and still placeholders pending
-            confirmation from Danielle's office and compliance team. Rendered
-            exactly as supplied — the licence string carries its own label.
-            Never add equal-housing, REALTOR(R), privacy, accessibility, or any
-            other disclosure language that has not been supplied and verified;
-            see the launch blockers in README.md.
+            Legally required on every page. Rendered verbatim as supplied by
+            the brokerage — never reword, re-case, or reformat. Never add any
+            further disclosure language that has not been supplied and
+            verified; see the launch blockers in README.md.
           */}
-          <div className="flex flex-col gap-[10px] font-sans text-[13px] text-onbrown-fine">
-            <span>{legal.brokerage}</span>
-            <span>{legal.license}</span>
-          </div>
+          <p className="font-sans text-[13px] leading-[1.5] text-onbrown-body">
+            {legal.brokerageLine}
+          </p>
         </div>
+
+        {/*
+          The approved brokerage disclosure. Both this and the broker line
+          above use --on-brown-body (#DACFC4) rather than the fine-print tone
+          (#A8998C): legally required text has to be legible, and #A8998C on
+          brown is 4.13:1, under AA for text this size. #DACFC4 is 7.46:1 and
+          is the token the handoff reserves for text on brown. Both are locked
+          palette values — no new colour was introduced.
+        */}
+        <p className="max-w-measure border-t border-onbrown-rule pt-6 font-sans text-[13px] leading-[1.6] text-onbrown-body">
+          {legal.disclosure}
+        </p>
       </div>
     </footer>
   )

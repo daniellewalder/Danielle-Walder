@@ -51,25 +51,17 @@ export const footerGroups = [
 ] as const
 
 /**
- * LAUNCH BLOCKER. Legally required on every page, and deliberately still
- * placeholders.
+ * Supplied and approved by Danielle's brokerage. Legally required on every
+ * page and rendered VERBATIM — do not reword, re-case, reformat, abridge, or
+ * split these strings, and do not update the copyright year by inference.
  *
- * Danielle's affiliation is Coldwell Banker Realty, but the name that must
- * appear here is the responsible broker's licensed name, and the licence
- * number shown must be her confirmed California DRE number. Both have to be
- * confirmed with her office and compliance team before they are displayed, so
- * neither is rendered yet.
- *
- * When those are confirmed, replace these two values verbatim. `license` is
- * rendered exactly as supplied and must carry its own label (for example
- * "DRE #01234567") — do not prefix or reformat it in the footer.
- *
- * Add NOTHING else here without approved wording from her brokerage: no office
- * name or address, no broker licence number, no logo, no Equal Housing
- * Opportunity or REALTOR® wording, no privacy policy, terms, accessibility
- * statement, or any other legal disclosure. Supplied and verified, or absent.
+ * Add NOTHING beyond what is here without new approved wording from her
+ * brokerage: no office name or address, no logo, no additional Equal Housing
+ * Opportunity or REALTOR(R) wording, no privacy policy, terms, or
+ * accessibility statement. Supplied and verified, or absent.
  */
 export const legal = {
-  brokerage: '[BROKERAGE — TO BE SUPPLIED]',
-  license: '[DRE # — TO BE SUPPLIED]',
+  brokerageLine: 'COLDWELL BANKER RESIDENTIAL | CA DRE# 00616212',
+  disclosure:
+    'The property information herein is derived from various sources that may include, but not be limited to, county records and the Multiple Listing Service, and it may include approximations. Although the information is believed to be accurate, it is not warranted and you should not rely upon it without personal verification. Not intended as a solicitation if your property is already listed by another broker. Affiliated real estate agents are independent contractor sales associates, not employees. \u00a92026 Coldwell Banker. All Rights Reserved. Coldwell Banker and the Coldwell Banker logos are trademarks of Coldwell Banker Real Estate LLC. The Coldwell Banker\u00ae System is comprised of company owned offices which are owned by a subsidiary of Anywhere Advisors LLC and franchised offices which are independently owned and operated. The Coldwell Banker System fully supports the principles of the Fair Housing Act and the Equal Opportunity Act.',
 }
