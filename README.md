@@ -10,13 +10,12 @@ Tailwind CSS.
 
 | # | Blocker | Where |
 |---|---|---|
-| 1 | **`/homes` is in the nav as "listings" and has no listings.** The fix is Danielle's RealScout **Your Listings** embed snippet, wired like the other widgets. Do not substitute invented listings, a mock adapter, or a different integration. | `app/homes/page.tsx` |
-| 2 | **`/sold` is in the nav as "sold" and has no sold properties.** Needs verified sold data from Danielle. Nothing may be invented, and there is no widget for this yet. | `app/sold/page.tsx` |
-| 3 | **RealScout runtime behaviour is unverified.** The widgets are wired and the markup is correct, but no one has watched them run in a real browser. See "RealScout" below for the exact checklist. | `components/realscout/` |
-| 4 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
-| 5 | **Photography.** `[ADD DANIELLE PHOTO]` appears on the homepage hero, the homepage About block, and `/about`. | `lib/content/` |
-| 6 | **Favicon is a temporary technical icon** — a plain cream square with no glyph, added only so the app does not emit a favicon 404. Replace before launch. | `app/icon.svg` |
-| 7 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
+| 1 | **`/sold` is in the nav as "sold" and has no sold properties.** Needs verified sold data from Danielle. Nothing may be invented, and there is no widget for this yet. | `app/sold/page.tsx` |
+| 2 | **RealScout runtime behaviour is unverified.** The widgets are wired and the markup is correct, but no one has watched them run in a real browser. See "RealScout" below for the exact checklist. | `components/realscout/` |
+| 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
+| 4 | **Photography.** `[ADD DANIELLE PHOTO]` appears on the homepage hero, the homepage About block, and `/about`. | `lib/content/` |
+| 5 | **Favicon is a temporary technical icon** — a plain cream square with no glyph, added only so the app does not emit a favicon 404. Replace before launch. | `app/icon.svg` |
+| 6 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
 
 ### Supplied and live
 
@@ -78,8 +77,8 @@ not show up locally, `rm -rf .next` and restart.
 | `/la-actually` | LA, Actually — editorial landing page |
 | `/about` | About Danielle |
 | `/contact` | Say Hello — contact form |
-| `/homes` | **In the nav as "listings". Empty — blocker 1** |
-| `/sold` | **In the nav as "sold". Empty — blocker 2** |
+| `/homes` | In the nav as "listings". **RealScout Your Listings**, live |
+| `/sold` | In the nav as "sold". **Empty — blocker 1** |
 | `/api/contact` | Contact handler. Returns 503 when no endpoint is configured |
 
 Redirects (308): `/overthinking-real-estate/*` → `/read` · `/quizzes/*` →
@@ -157,6 +156,7 @@ palette tokens from Danielle's own embed snippets:
 | Simple Search | homepage hero |
 | Advanced Search | `/search` |
 | Home Value | `/home-valuation` |
+| Your Listings | `/homes` |
 
 RealScout's drop shadow is switched off on all three — the design system has no
 shadows. Width is controlled here, not in RealScout's dashboard: each component
@@ -169,8 +169,20 @@ on this site or redirect to a RealScout-hosted experience; and any
 login/signup behaviour the widgets introduce. A redirect would also decide
 whether RealScout's paid branding tier is worth buying.
 
-`/homes` is intended to use RealScout's **Your Listings** widget. That snippet
-has not been supplied yet — blocker 1.
+**Your Listings** on `/homes` carries Danielle's exact configuration — agent
+id, `sort-order="STATUS_AND_SIGNIFICANT_CHANGE"`, the full
+`listing-status="For Sale,For Rent,In Contract,Sold,Rented"`, and
+`property-types="SFR,MF,TC,LAL,MOBILE,OTHER"`. Do not trim or reorder them.
+Unlike the other three it fills the content width rather than sitting in a
+capped container, because listing cards need the room.
+
+Its divider colour, `rgb(101, 141, 172)` / `#658DAC`, is **the one deliberate
+exception to the locked palette** — Danielle asked for it explicitly. Do not
+"correct" it to a palette token.
+
+Note the status list includes Sold and Rented, so `/homes` already surfaces
+sold work. That may make a separate `/sold` page redundant — a question for
+Danielle, not something to change unilaterally.
 
 ## Images
 

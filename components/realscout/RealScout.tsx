@@ -87,3 +87,39 @@ export function HomeValue({ className = '' }: { className?: string }) {
     </>
   )
 }
+
+/**
+ * Danielle's own MLS listings, straight from RealScout.
+ *
+ * Every attribute below is preserved exactly as supplied: the agent id, the
+ * sort order, the full listing-status set, and the property types. Do not
+ * trim or reorder them — this is what she configured in RealScout.
+ *
+ * The divider colour is likewise hers, verbatim. Note it is rgb(101, 141, 172)
+ * / #658DAC, which is NOT in the locked palette; it ships because she asked
+ * for it explicitly, and it is the single deliberate exception.
+ *
+ * This widget fills the content width rather than sitting in a capped
+ * container — listing cards need the room, and RealScout lays them out.
+ */
+export function YourListings({ className = '' }: { className?: string }) {
+  return (
+    <>
+      <Script />
+      <style>{`
+        realscout-your-listings {
+          --rs-listing-divider-color: rgb(101, 141, 172);
+          width: 100%;
+        }
+      `}</style>
+      <div className={`${slot} min-h-[320px] ${className}`}>
+        <realscout-your-listings
+          agent-encoded-id={realScoutAgentId}
+          sort-order="STATUS_AND_SIGNIFICANT_CHANGE"
+          listing-status="For Sale,For Rent,In Contract,Sold,Rented"
+          property-types="SFR,MF,TC,LAL,MOBILE,OTHER"
+        />
+      </div>
+    </>
+  )
+}

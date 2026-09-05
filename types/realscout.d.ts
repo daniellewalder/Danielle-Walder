@@ -17,6 +17,11 @@ declare module 'react' {
         'remove-title'?: string
         'remove-subtitle'?: string
       }
+      'realscout-your-listings': RealScoutElement & {
+        'sort-order'?: string
+        'listing-status'?: string
+        'property-types'?: string
+      }
     }
   }
 }
