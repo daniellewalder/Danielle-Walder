@@ -4,14 +4,54 @@ Personal real estate site for Danielle Walder, a Los Angeles agent, and home of
 her publication *Overthinking Real Estate*. Next.js (App Router) + TypeScript +
 Tailwind CSS.
 
-## 🚨 Launch blockers
+## 🚨 Blocks public launch
 
-**The site must not go on a public domain until these are resolved.**
+**Do not put this on a public domain until all three are resolved.**
 
-| # | Blocker | Where |
-|---|---|---|
-| 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies, which makes this a real public-launch requirement. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. | not yet created |
-| 2 | **RealScout runtime behaviour is unverified.** All four widgets are wired and the markup is correct, but nobody has watched them run in a real browser. DOM structure and a clean build are not evidence of runtime behaviour. See "RealScout" below. | `components/realscout/` |
+| # | Blocker |
+|---|---|
+| 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies, which makes this a genuine public-launch requirement. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. |
+| 2 | **RealScout has not been observed working in a real browser.** Search and listings are public core functionality, so all four widgets must be watched running before launch. DOM structure and a clean build are not evidence of runtime behaviour. Checklist below. |
+| 3 | **Visible `[ADD DANIELLE PHOTO]` placeholders.** The site must not launch publicly with literal placeholders on the homepage hero, the homepage About block, or `/about`. The conditional `[ADD ESSAY IMAGE]` fallback does **not** block launch as long as real Substack cover images are loading. |
+
+## Real-browser testing
+
+Four RealScout integrations. **None can be verified from a build environment** —
+`em.realscout.com` is blocked there, so the custom elements never upgrade.
+
+| Widget | Page |
+|---|---|
+| Simple Search | homepage hero |
+| Advanced Search | `/search` |
+| Home Value | `/home-valuation` |
+| Your Listings | `/homes` |
+
+For **each** of the four, confirm:
+
+- [ ] it actually renders
+- [ ] desktop sizing and layout
+- [ ] mobile sizing and layout
+- [ ] the interaction actually works
+- [ ] where search / results / interactions open
+- [ ] whether the user stays on this domain or moves to RealScout
+- [ ] whether a login or signup gate appears
+- [ ] exactly what information a lead is asked to provide
+- [ ] whether SMS / text-message opt-in or disclaimer language appears
+
+Separately, and **not inferable from this repo**:
+
+- [ ] Danielle confirms the appropriate **TCR / SMS opt-in setting inside her
+      RealScout account** before lead-capture functionality is distributed
+      publicly. Do not assume this from the code — it is an account setting.
+
+## Polish before sharing
+
+Not broken functionality and not compliance. Finish before the link goes out:
+
+- **Favicon** is a plain cream square with no glyph, present only so the app
+  does not emit a 404. Replace with an approved asset.
+- **No Open Graph / social share image.** Deliberately not declared rather than
+  fabricated. Without one, a pasted link shows no preview card.
 
 ### Supplied and live
 
@@ -29,22 +69,11 @@ own agent licence, `00616212` is the brokerage's. The brokerage line and the
 disclosure are rendered **verbatim** — do not reword, re-case, reformat,
 abridge, or split them, and do not update the copyright year by inference.
 
-### Content still needed
+### Content Danielle still needs to supply
 
-- **Photography** — `[ADD DANIELLE PHOTO]` on the homepage hero, the homepage
-  About block, and `/about`. A fourth placeholder, `[ADD ESSAY IMAGE]`, appears
-  only if a Substack post has no cover image; her posts do, so it should not be
-  seen in practice.
-- **Sold data**, if `/sold` is ever to return to the nav.
-
-### Polish before sharing publicly
-
-Not broken and not compliance — finish before the link goes out:
-
-- **Favicon** is a plain cream square with no glyph, present only so the app
-  does not emit a 404. Replace with an approved asset.
-- **No Open Graph / social share image.** Deliberately not declared rather than
-  fabricated.
+- **Photography** — the three `[ADD DANIELLE PHOTO]` slots above. This is
+  launch blocker 3.
+- **Sold data**, only if `/sold` is ever to return to the nav.
 
 ### Supplied but deliberately not rendered
 

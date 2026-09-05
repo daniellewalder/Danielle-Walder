@@ -4,6 +4,35 @@ Personal real estate site for Danielle Walder, LA agent. Three jobs: get people 
 
 Full design spec: `design_handoff/README.md`. Read it before building any new page.
 
+## Site identity — standing rule
+
+**This is deliberately not a generic real-estate-agent website.**
+
+RealScout search, listings, valuation, contact details, and brokerage
+compliance material are necessary infrastructure. They are not the identity of
+the site. RealScout is plumbing; it does not get to dictate the information
+architecture.
+
+The site combines Danielle Walder Real Estate with *Overthinking Real Estate*,
+quizzes such as The Tuesday Test, guides and decision resources, LA, Actually,
+future interactive tools, and Danielle's point of view on real estate,
+economics, sociology, risk, technology, and decision-making. **Someone should
+have a reason to visit, read, explore, or use the site when they are not trying
+to hire an agent.** Those things are first-class parts of the product, not blog
+content parked underneath the IDX.
+
+Do not let future work gradually collapse this into the conventional agent
+template: hero → IDX search → listings → sales proof → testimonials → contact.
+
+And do not compensate for that restraint by inventing authority. Never imply
+transaction volume, luxury-market dominance, rankings, awards, years of
+experience, testimonials, sold history, neighborhood expertise she has not
+supplied, high-profile clients, or transaction outcomes — and never reach for
+"white glove", "elevated", "bespoke", or the rest of the luxury-agent register.
+
+Her credibility comes from useful work, real experience, intelligence, taste,
+clarity, and a recognisable point of view. Build things that earn it.
+
 ## Standing rules
 
 **The design system is locked.** Colors, typefaces, and the type scale were approved after multiple rounds. Never introduce a color, typeface, radius, or shadow that isn't in `tokens.css`. If something seems to need a new value, it needs a different composition of existing values instead.
