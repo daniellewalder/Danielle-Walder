@@ -22,11 +22,15 @@ export const readPage = {
   readCta: 'Read on Substack',
   readOnSiteCta: 'Read the essay',
 
-  /** Copy for an individual essay page. */
+  /**
+   * Copy for an individual essay page. Every essay links to the original, so a
+   * post the feed delivers only in part still has an obvious way through. The
+   * site never infers whether a post is subscriber-only — there is no reliable
+   * signal for it, and guessing would put a false claim about her own writing
+   * on the page.
+   */
   essay: {
     originalCta: 'Read the original on Substack',
-    truncatedNote:
-      'This is a subscriber post, so only the opening appears here. The full essay is on Substack.',
   },
 
   moreLabel: 'More to overthink',

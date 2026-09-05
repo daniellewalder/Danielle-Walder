@@ -10,43 +10,43 @@ Tailwind CSS.
 
 | # | Blocker | Where |
 |---|---|---|
-| 1 | **Danielle's own agent licence number is not displayed.** The footer carries the responsible broker's line, `COLDWELL BANKER RESIDENTIAL \| CA DRE# 00616212`. Her personal licence (`02253356`) is not shown. California requires a licensee to disclose their own licence number on solicitation material, so **confirm with her office whether her agent number must also appear** — then supply the exact string and it goes in verbatim. | `lib/content/site.ts` → `legal` |
-| 2 | **The live Substack feed is unverified.** The publication is `https://daniellewalder.substack.com`, so the feed and subscribe links are correct. The feed could not be exercised from the build sandbox, which blocks all outbound requests — **confirm on the first deploy** that `/read` shows real publish dates. Until it does, entries fall back to Danielle's curated titles linking to the publication, which is a correct page either way. | `lib/config.ts` |
-| 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the contact form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
-| 4 | **Photography.** Every image is a labelled `[ADD DANIELLE PHOTO]` / `[ADD ESSAY IMAGE]` slot. | `lib/content/` |
-| 5 | **Favicon is a temporary technical icon** — a plain cream square, deliberately with no glyph or mark, added only so the app does not emit a favicon 404. **Replace with an approved asset before launch.** | `app/icon.svg` |
-| 6 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
+| 1 | **`/homes` is in the nav as "listings" and has no listings.** The fix is Danielle's RealScout **Your Listings** embed snippet, wired like the other widgets. Do not substitute invented listings, a mock adapter, or a different integration. | `app/homes/page.tsx` |
+| 2 | **`/sold` is in the nav as "sold" and has no sold properties.** Needs verified sold data from Danielle. Nothing may be invented, and there is no widget for this yet. | `app/sold/page.tsx` |
+| 3 | **RealScout runtime behaviour is unverified.** The widgets are wired and the markup is correct, but no one has watched them run in a real browser. See "RealScout" below for the exact checklist. | `components/realscout/` |
+| 4 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
+| 5 | **Photography.** `[ADD DANIELLE PHOTO]` appears on the homepage hero, the homepage About block, and `/about`. | `lib/content/` |
+| 6 | **Favicon is a temporary technical icon** — a plain cream square with no glyph, added only so the app does not emit a favicon 404. Replace before launch. | `app/icon.svg` |
+| 7 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
 
 ### Supplied and live
 
 | Value | Where |
 |---|---|
-| Responsible broker — `COLDWELL BANKER RESIDENTIAL \| CA DRE# 00616212` | `lib/content/site.ts`; footer on every page, verbatim |
-| Coldwell Banker–approved website disclosure | same; footer on every page, verbatim |
+| Agent licence — `Danielle Walder \| CA DRE# 02253356` | `lib/content/site.ts`, footer on every page |
+| Responsible broker — `COLDWELL BANKER RESIDENTIAL \| CA DRE# 00616212` | same |
+| Coldwell Banker–approved disclosure | same, rendered verbatim |
 | Public email — homes@daniellewalder.com | `lib/config.ts`; mailto on `/contact` |
-| Substack publication — `https://daniellewalder.substack.com` | `lib/config.ts`; drives `/read`, the homepage essays, and the real `/subscribe` link |
+| Substack publication — `https://daniellewalder.substack.com` | `lib/config.ts` |
+| RealScout agent id — `QWdlbnQtMzA0MjM2` | `lib/config.ts`; public embed id, not a credential |
 
-The brokerage line and the disclosure are rendered **verbatim**. Do not reword,
-re-case, reformat, abridge, or split them, and do not update the copyright year
-by inference — a new year needs newly approved text.
+The two licence numbers are **not interchangeable**: `02253356` is Danielle's
+own agent licence, `00616212` is the brokerage's. The brokerage line and the
+disclosure are rendered **verbatim** — do not reword, re-case, reformat,
+abridge, or split them, and do not update the copyright year by inference.
 
 ### Supplied but deliberately not rendered
 
-Held here rather than placed on the site:
-
-- **Danielle's agent licence** — `02253356`. Held pending confirmation that it
-  must appear alongside the broker's line. See blocker 1.
 - **Phone** — `(847) 899-9604`, and **service areas**, *Beverly Hills | Hancock
   Park*. Neither has an approved home in the design.
 
 ### Not to be invented, ever
 
-The footer now carries exactly the disclosure the brokerage approved, and
-nothing beyond it. Office names and addresses, brokerage logos, any further
-Equal Housing Opportunity or REALTOR® wording, privacy policies, terms,
-accessibility statements, social links, credentials, awards, years of
-experience, listings, prices, statistics, transaction outcomes, and
-testimonials are supplied and verified, or they are absent.
+The footer carries exactly the disclosure the brokerage approved and nothing
+beyond it. Office names and addresses, brokerage logos, any further Equal
+Housing Opportunity or REALTOR® wording, privacy policies, terms, accessibility
+statements, social links, credentials, awards, years of experience, listings,
+prices, statistics, transaction outcomes, and testimonials are supplied and
+verified, or they are absent.
 
 ## Getting started
 
@@ -58,79 +58,141 @@ npm run lint
 npm run typecheck
 ```
 
-Copy `.env.example` to `.env.local`. Every value is optional — with none set the
-site still builds and every page renders honestly.
+Copy `.env.example` to `.env.local`. Every value is an optional override — the
+public defaults are committed in `lib/config.ts`, so the site works on any
+deploy with no dashboard setup.
+
+Next caches feed fetches for the revalidation window. If a content change does
+not show up locally, `rm -rf .next` and restart.
 
 ## Routes
 
 | Route | What it is |
 |---|---|
-| `/` | Homepage |
-| `/read` | *Overthinking Real Estate* archive. Reads the Substack RSS feed, links out |
-| `/search` | IDX-ready shell. No filters, map, or results — none exist yet |
-| `/tuesday-test` | The Tuesday Test landing page with a static, non-interactive preview |
+| `/` | Homepage. Hero carries a **real RealScout Simple Search field** |
+| `/read` | *Overthinking Real Estate*, as an editorial front page |
+| `/read/[slug]` | Full essay, rendered on-site from the Substack feed |
+| `/search` | Home search — **RealScout Advanced Search**, live |
+| `/home-valuation` | **RealScout Home Value**, live. No longer redirects anywhere |
+| `/tuesday-test` | The Tuesday Test landing page, static non-interactive preview |
 | `/la-actually` | LA, Actually — editorial landing page |
 | `/about` | About Danielle |
 | `/contact` | Say Hello — contact form |
-| `/homes`, `/sold` | Intentional empty states. **Not linked from nav, footer, or homepage**, and excluded from the sitemap |
-| `/api/contact` | Contact handler. Refuses with 503 when no endpoint is configured |
+| `/homes` | **In the nav as "listings". Empty — blocker 1** |
+| `/sold` | **In the nav as "sold". Empty — blocker 2** |
+| `/api/contact` | Contact handler. Returns 503 when no endpoint is configured |
 
 Redirects (308): `/overthinking-real-estate/*` → `/read` · `/quizzes/*` →
-`/tuesday-test` · `/listings/*` → `/search` · `/home-valuation` → `/contact`
+`/tuesday-test` · `/listings/*` → `/search`
+
+### Labels vs routes
+
+The nav shows Danielle's words; the routes stay clean. They are deliberately
+different and both are approved:
+
+| Nav label | Route |
+|---|---|
+| search | `/search` |
+| listings | `/homes` |
+| sold | `/sold` |
+| overthinking real estate | `/read` |
+| quizzes | `/tuesday-test` |
+| about | `/about` |
+| say hello | `/contact` |
+
+Do not reintroduce `/overthinking-real-estate`, `/quizzes`, or `/listings` as
+public routes — they redirect.
 
 ## The honesty rules this codebase follows
 
 Every visible link and button resolves to a working page, a verified external
 URL, or an honest non-interactive state. Specifically:
 
-- **No fake search.** `/search` has no input, filters, or map. The hero has no
-  search field — a text box that cannot search is fake functionality, so the
-  hero action is a `Search Homes` link.
-- **No fake quiz.** The Tuesday Test preview options are styled `<li>` text.
-  They are not buttons, links, inputs, or focusable, they carry no hover state,
-  and nothing is selected, scored, or saved.
-- **No fake form submission.** With no endpoint, the contact form hides its
+- **Search is real.** The homepage hero and `/search` both run RealScout IDX
+  widgets. The hero field was absent through earlier builds precisely because a
+  box that cannot search is fake functionality; it returned when it could.
+- **No fake quiz.** The Tuesday Test preview options are styled `<li>` text —
+  not buttons, links, inputs, or focusable, with no hover state. Nothing is
+  selected, scored, or saved.
+- **No fake form submission.** With no endpoint the contact form hides its
   submit control and says so. `/api/contact` returns 503 rather than a false
-  success. There is no newsletter form at all — subscribing goes to Substack.
+  success. There is no newsletter form — subscribing goes to Substack.
+- **No inferred claims about content.** The site does not guess whether a
+  Substack post is subscriber-only. There is no reliable signal, and a wrong
+  guess would put a false statement about Danielle's writing on her own site.
 - **No invented content.** No listings, addresses, prices, property photos,
-  statistics, transaction outcomes, testimonials, credentials, awards, or
-  neighborhood claims appear anywhere. Sections without verified data are not
-  rendered rather than filled with placeholders.
+  statistics, transaction outcomes, testimonials, credentials, or neighbourhood
+  claims appear anywhere.
 - **No broken links.** Verified by a crawl of every route on every build.
 
-## Overthinking Real Estate feed
+## Overthinking Real Estate
 
-Essays live on Substack and stay there — nothing is migrated into the repo.
+Essays are written on Substack and also rendered here.
 
-`lib/essays/index.ts` is the seam. It fetches the publication's public RSS feed
-server-side (`fast-xml-parser`, 5s timeout, `revalidate: 1800`), and falls back
-to the four verified titles on any failure — non-200, malformed XML, empty feed,
-or unreachable host. Failures are logged server-side and never shown to a
-visitor. Titles, permalinks, and dates only ever come from the feed; nothing is
-invented, and a feed item without a link is dropped rather than rendered.
+`lib/essays/index.ts` is the seam, and **the feed is the source of truth** —
+whatever Danielle publishes appears on the next revalidation with its own page,
+with no repo edit. This must never be driven by a hardcoded list. Her curated
+deks in `lib/content/essays.ts` are merged in by title where she has written
+one; a post without one shows no dek rather than an invented one. The curated
+list is the whole list only when the feed is unreachable, so the page is never
+empty.
 
-In fallback mode with no `SUBSTACK_URL`, titles render as plain text — not as
-links to nowhere.
+- Fetched server-side with `fast-xml-parser`, 5s timeout, `revalidate: 1800`.
+- Post HTML comes from `content:encoded` and is **sanitised** in
+  `lib/essays/sanitize.ts` against an allow-list before it can reach a page.
+  Never render feed HTML without it.
+- Cover images come from the feed's `<enclosure>`, image types over http(s)
+  only.
+- Each essay page sets `rel=canonical` to the Substack original and links to
+  it. Essay routes stay out of the sitemap for the same reason.
+- Feed `<description>` is never rendered — it is arbitrary HTML.
 
-## Listings
+## RealScout IDX
 
-`components/listings/ListingCard.tsx` and `SoldCard.tsx` are kept intentionally
-and are **not rendered anywhere**. See `components/listings/README.md`. The mock
-adapter that used to feed them has been deleted; do not reintroduce placeholder
-property data.
+Three widgets, all in `components/realscout/RealScout.tsx`, themed with locked
+palette tokens from Danielle's own embed snippets:
+
+| Widget | Page |
+|---|---|
+| Simple Search | homepage hero |
+| Advanced Search | `/search` |
+| Home Value | `/home-valuation` |
+
+RealScout's drop shadow is switched off on all three — the design system has no
+shadows. Width is controlled here, not in RealScout's dashboard: each component
+fills a capped container, because a fixed pixel width from their config
+overflows narrow screens. The script loads only on pages that use a widget.
+
+**Not yet verified in a real browser.** Before launch, confirm on the deployed
+preview: each of the three widgets renders; mobile sizing; whether results stay
+on this site or redirect to a RealScout-hosted experience; and any
+login/signup behaviour the widgets introduce. A redirect would also decide
+whether RealScout's paid branding tier is worth buying.
+
+`/homes` is intended to use RealScout's **Your Listings** widget. That snippet
+has not been supplied yet — blocker 1.
+
+## Images
+
+Local assets go through `next/image` and are optimised. **Remote images do
+not** — they render as a plain `<img>`. This is deliberate: `next/image` throws
+a hard runtime error on any hostname missing from `next.config.ts`, essay
+covers come from whatever host Substack happens to use, and a crashed page is a
+far worse trade than an unoptimised image. Do not reintroduce a hostname
+allowlist.
 
 ## Design tokens
 
 `tailwind.config.ts` carries the locked palette, the four typefaces, the
 letter-spacing values, and the radii. `app/tokens.css` holds the same values as
-CSS custom properties. Both mirror `design_handoff/tokens.css`, which is the
-source of truth. See `CLAUDE.md` for the standing rules.
+CSS custom properties. Both mirror `design_handoff/tokens.css`, the source of
+truth. See `CLAUDE.md` for the standing rules.
 
 Image placeholder labels are Ink Soft `#6B5F55` on sand `#E3DBCB`.
 
 ## Responsive
 
-Three approved breakpoints: desktop, `tablet` ≤1024px, `mobile` ≤640px, plus
-`navstack` ≤900px where the nav row stops fitting and collapses to the mark plus
-a hamburger. Verified free of horizontal overflow at 320, 375, 768, 900, 1024,
-and 1440px.
+Breakpoints: `tablet` ≤1024px, `mobile` ≤640px, plus `navstack` ≤1120px where
+the nav collapses to the mark and a hamburger, and `navtight` ≤1400px where the
+seven-item row tightens to stay on one line. Verified free of horizontal
+overflow at 320, 375, 640, 768, 900, 1024, 1120, 1200, 1280 and 1440px.

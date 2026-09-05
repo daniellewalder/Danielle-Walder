@@ -9,11 +9,13 @@ export const metadata: Metadata = {
 }
 
 /**
- * An intentional empty state so direct visitors do not hit a 404. Not linked
- * from navigation, the footer, or the homepage.
+ * LAUNCH BLOCKER — this page is reached from the nav and the footer as "sold",
+ * and it has no sold properties on it.
  *
  * No sold properties, addresses, prices, photography, or transaction outcomes
- * appear here until Danielle supplies verified information.
+ * may appear here until Danielle supplies verified data. Do not invent any,
+ * and do not reach for a mock adapter — the previous one was deleted on
+ * purpose. Until then this page is not launch-ready.
  */
 export default function SoldPage() {
   return (

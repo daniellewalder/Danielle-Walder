@@ -71,9 +71,13 @@ export const footerGroups = [
 ] as const
 
 /**
- * Supplied and approved by Danielle's brokerage. Legally required on every
- * page and rendered VERBATIM — do not reword, re-case, reformat, abridge, or
- * split these strings, and do not update the copyright year by inference.
+ * Supplied by Danielle and approved by her brokerage. Legally required on
+ * every page and rendered VERBATIM — do not reword, re-case, reformat,
+ * abridge, or split these strings, and do not update the copyright year by
+ * inference.
+ *
+ * Two licence numbers, and they are not interchangeable: 02253356 is
+ * Danielle's own agent licence, 00616212 is the responsible brokerage's.
  *
  * Add NOTHING beyond what is here without new approved wording from her
  * brokerage: no office name or address, no logo, no additional Equal Housing
@@ -81,6 +85,9 @@ export const footerGroups = [
  * accessibility statement. Supplied and verified, or absent.
  */
 export const legal = {
+  /** Danielle's own California licence, supplied by her. */
+  agentLine: 'Danielle Walder | CA DRE# 02253356',
+  /** The responsible broker. CA DRE# 00616212 is the brokerage's licence. */
   brokerageLine: 'COLDWELL BANKER RESIDENTIAL | CA DRE# 00616212',
   disclosure:
     'The property information herein is derived from various sources that may include, but not be limited to, county records and the Multiple Listing Service, and it may include approximations. Although the information is believed to be accurate, it is not warranted and you should not rely upon it without personal verification. Not intended as a solicitation if your property is already listed by another broker. Affiliated real estate agents are independent contractor sales associates, not employees. \u00a92026 Coldwell Banker. All Rights Reserved. Coldwell Banker and the Coldwell Banker logos are trademarks of Coldwell Banker Real Estate LLC. The Coldwell Banker\u00ae System is comprised of company owned offices which are owned by a subsidiary of Anywhere Advisors LLC and franchised offices which are independently owned and operated. The Coldwell Banker System fully supports the principles of the Fair Housing Act and the Equal Opportunity Act.',

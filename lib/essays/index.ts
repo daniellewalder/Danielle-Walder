@@ -1,6 +1,6 @@
 import { substackFeedUrl, substackUrl } from '@/lib/config'
 import { curatedEssays, type CuratedEssay } from '@/lib/content/essays'
-import { looksTruncated, sanitizeEssayHtml } from './sanitize'
+import { sanitizeEssayHtml } from './sanitize'
 import { fetchSubstackEntries } from './substack'
 
 export interface EssayEntry {
@@ -15,8 +15,6 @@ export interface EssayEntry {
   publishedAt: string | null
   /** Sanitised post HTML, when the feed carried it. */
   contentHtml: string | null
-  /** Paid posts arrive truncated; the page says so rather than pretending. */
-  truncated: boolean
   /** The cover image Danielle attached on Substack, when the feed carries one. */
   imageUrl: string | null
 }
@@ -76,7 +74,6 @@ export async function getEssays(): Promise<EssayResult> {
         substackUrl: item.url,
         publishedAt: item.publishedAt,
         contentHtml,
-        truncated: item.contentHtml ? looksTruncated(item.contentHtml) : false,
         imageUrl: item.imageUrl,
       }
     })
@@ -92,7 +89,6 @@ export async function getEssays(): Promise<EssayResult> {
     substackUrl,
     publishedAt: null,
     contentHtml: null,
-    truncated: false,
     imageUrl: null,
   }))
 

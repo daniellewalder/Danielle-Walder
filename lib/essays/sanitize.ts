@@ -54,13 +54,3 @@ const options: sanitizeHtml.IOptions = {
 export function sanitizeEssayHtml(html: string): string {
   return sanitizeHtml(html, options)
 }
-
-/**
- * Rough guard for paywalled posts, whose feed content arrives truncated. Not
- * exact — Substack gives no reliable marker — so the essay page always offers
- * the original as well.
- */
-export function looksTruncated(html: string): boolean {
-  const text = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} }).trim()
-  return text.length < 900
-}

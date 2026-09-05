@@ -34,8 +34,9 @@ Full design spec: `design_handoff/README.md`. Read it before building any new pa
 
 ## Architecture notes
 
-- URL is the source of truth for search and listing filters — results must be shareable and work with back/forward.
-- Listings come from an IDX/MLS feed, not the CMS. Build against the mock adapter; swapping to a real feed should be one file. See the IDX section of the README before promising MLS-wide search.
+- **Search and home valuation are RealScout IDX web components**, not something built here. They live in `components/realscout/RealScout.tsx` and are configured from embed snippets Danielle supplies. There is no listing data in this repo and no mock adapter — the old one was deleted deliberately. Never invent listings to fill a page.
+- **Essays come from the Substack RSS feed, and the feed is the source of truth.** Whatever Danielle publishes appears on the next revalidation without a repo edit. Never drive the essay list from a hardcoded array. Post HTML is sanitised in `lib/essays/sanitize.ts` before it can reach a page.
+- **Remote images bypass `next/image`** and render as a plain `<img>`. `next/image` hard-crashes on any hostname not in `next.config.ts`, and feed images come from hosts we do not control. Do not reintroduce a hostname allowlist.
 - No global state library. Local component state and URL params are enough.
 - Don't add a component library whose visual defaults fight the brand.
 
@@ -44,10 +45,12 @@ Full design spec: `design_handoff/README.md`. Read it before building any new pa
 - `design_handoff/` — the original bundle, unchanged. `README.md` there is the design spec; read it before building any new page.
 - `tailwind.config.ts` and `app/tokens.css` — the tokens, mirroring `design_handoff/tokens.css`. Change nothing here without changing that.
 - `lib/content/` — all copy. Edit copy there, not in components.
-- `lib/essays/` — the Overthinking Real Estate seam. Essays live on Substack and are read from its RSS feed; they are never migrated into the repo.
+- `lib/essays/` — the Overthinking Real Estate seam: feed fetch, sanitiser, and the merge with Danielle's curated deks.
+- `lib/config.ts` — the one place env is read, plus committed public defaults. **Never put a secret here.**
+- `components/realscout/` — the three IDX widgets.
 - `components/home/` — one component per homepage section, in page order.
 - `components/ui/` — `ImageSlot` (the labelled empty photo slot), `PageHeader`, `CtaLink`, `Badge`.
-- `components/listings/` — kept but unwired. See the README in that folder.
+- `components/listings/` — unwired card patterns. `/homes` will be fed by RealScout, not by these. See the README in that folder.
 - Launch blockers are the table at the top of the root `README.md`.
 
 ## Standing rule: never ship fake functionality
@@ -58,13 +61,26 @@ to the mocks.
 
 - A control that cannot do its job does not ship as a control. No search input
   without a search, no form without an endpoint, no quiz answers without a quiz.
+  The hero search field was absent until RealScout made it real.
 - A section without verified data is **not rendered** — not filled with
   placeholder or invented content. That covers listings, sold properties,
   prices, photography, statistics, transaction outcomes, and testimonials.
 - Never invent credentials, awards, years of experience, brokerage names, DRE
   numbers, or legal, privacy, and equal-housing language. These are supplied and
   verified, or they are absent.
+- **Never infer a claim about Danielle's content.** The site does not guess
+  whether a Substack post is subscriber-only or anything else about it. A wrong
+  guess puts a false statement about her own writing on her own site.
+- **Never guess an external value** — a hostname, an endpoint, an id, an API
+  shape. If it was not observed in the repo, in a snippet Danielle supplied, or
+  on the deployed site, ask her. A guessed hostname in `next.config.ts` once
+  crashed every page carrying an essay image.
 - Bracketed placeholders (`[ADD DANIELLE PHOTO]`) are for content Danielle will
   supply. They are not a licence to ship a broken interaction.
-- The public route vocabulary is `/read`, `/search`, `/tuesday-test`, `/about`,
-  `/contact`. Do not reintroduce `/overthinking-real-estate` or `/quizzes`.
+- **Public routes:** `/`, `/read`, `/read/[slug]`, `/search`, `/home-valuation`,
+  `/tuesday-test`, `/la-actually`, `/about`, `/contact`, `/homes`, `/sold`.
+  `/overthinking-real-estate`, `/quizzes` and `/listings` redirect and must not
+  come back as real routes.
+- **Nav labels are not routes.** The nav says Danielle's words — search,
+  listings, sold, overthinking real estate, quizzes, about, say hello — while
+  the URLs stay clean. Both are approved; do not "fix" one to match the other.

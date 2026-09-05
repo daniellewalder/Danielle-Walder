@@ -89,12 +89,6 @@ export default async function EssayPage({ params }: Props) {
       />
 
       <footer className="mx-auto mt-12 max-w-measure border-t border-hairline pt-7">
-        {essay.truncated ? (
-          <p className="font-sans text-[16px] leading-[1.6] text-warmgray">
-            {readPage.essay.truncatedNote}
-          </p>
-        ) : null}
-
         {essay.substackUrl ? (
           <a
             href={essay.substackUrl}

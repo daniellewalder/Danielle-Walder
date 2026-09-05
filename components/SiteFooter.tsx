@@ -46,9 +46,10 @@ export function SiteFooter() {
             further disclosure language that has not been supplied and
             verified; see the launch blockers in README.md.
           */}
-          <p className="font-sans text-[13px] leading-[1.5] text-onbrown-body">
-            {legal.brokerageLine}
-          </p>
+          <div className="flex flex-col gap-[6px] font-sans text-[13px] leading-[1.5] text-onbrown-body">
+            <span>{legal.agentLine}</span>
+            <span>{legal.brokerageLine}</span>
+          </div>
         </div>
 
         {/*

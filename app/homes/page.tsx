@@ -9,11 +9,15 @@ export const metadata: Metadata = {
 }
 
 /**
- * An intentional empty state so direct visitors do not hit a 404. Not linked
- * from navigation, the footer, or the homepage.
+ * LAUNCH BLOCKER — this page is reached from the nav and the footer as
+ * "listings", and it has no listings on it.
  *
- * No listings, addresses, prices, photography, or property data of any kind
- * appear here until Danielle supplies verified information.
+ * The fix is Danielle's RealScout "Your Listings" widget, which she will
+ * supply as an embed snippet. Wire that in here, the same way /search and
+ * /home-valuation use components/realscout/RealScout.tsx. Do NOT substitute
+ * invented listings, a mock adapter, or a different integration to make the
+ * page look finished — the previous mock adapter was deleted on purpose.
+ * Until the widget is connected, this page is not launch-ready.
  */
 export default function HomesPage() {
   return (
