@@ -59,5 +59,15 @@ export const contactEmail = clean(process.env.CONTACT_EMAIL) ?? 'homes@daniellew
  */
 export const contactFormEndpoint = clean(process.env.CONTACT_FORM_ENDPOINT)
 
+/**
+ * RealScout IDX. The agent id is a public embed identifier — it appears in the
+ * page source by design and is not a credential.
+ */
+export const realScoutAgentId =
+  clean(process.env.REALSCOUT_AGENT_ID) ?? 'QWdlbnQtMzA0MjM2'
+
+export const realScoutScriptSrc =
+  'https://em.realscout.com/widgets/realscout-web-components.umd.js'
+
 /** Canonical origin, used for sitemap and robots. */
 export const siteUrl = clean(process.env.NEXT_PUBLIC_SITE_URL) ?? 'https://daniellewalder.com'

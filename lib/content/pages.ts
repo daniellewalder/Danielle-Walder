@@ -84,8 +84,8 @@ export const searchPage = {
   heading: 'Start with what you know.',
   intro:
     'A neighborhood, a budget, a non-negotiable, or a vague feeling that you need more trees. The search gets more useful once you know what you are actually trying to solve for.',
-  placeholderLabel: 'future mls / idx search',
-  placeholderNote: 'Full property search will be powered by an MLS/IDX provider.',
+  /** Screen-reader label for the embedded RealScout search. */
+  searchLabel: 'Home search',
   links: [
     { label: 'The Tuesday Test', href: '/tuesday-test' },
     { label: 'LA, Actually', href: '/la-actually' },

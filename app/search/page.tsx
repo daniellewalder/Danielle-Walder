@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { realScoutAgentId, realScoutScriptSrc } from '@/lib/config'
 import { searchPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
@@ -9,32 +9,49 @@ export const metadata: Metadata = {
 }
 
 /**
- * An IDX-ready shell, not a search page.
+ * Home search, powered by RealScout's IDX web components.
  *
- * There are no filter controls, no map, no results, and no input of any kind:
- * every one of those would imply a search that does not exist yet. The reserved
- * area is clearly labelled as the future MLS/IDX mount point.
+ * The widget is themed with locked palette tokens only — blue ink for type,
+ * mid sage for the field border. Its default drop shadow is switched off:
+ * the design system has no shadows.
+ *
+ * Width is handled here rather than in RealScout's config. The component is
+ * told to fill its container and the container is capped, so it is exactly
+ * 688px on a laptop and fluid on a phone instead of overflowing.
  */
 export default function SearchPage() {
   return (
     <>
-      <PageHeader
-        eyebrow={searchPage.eyebrow}
-        heading={searchPage.heading}
-        intro={searchPage.intro}
-      />
+      {/* React hoists and de-duplicates this, so it loads once, on this page only. */}
+      <script src={realScoutScriptSrc} type="module" async />
 
-      <section aria-labelledby="idx-placeholder" className="wrap pt-12 mobile:pt-8">
-        <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-block bg-blue-field px-10 py-16 text-center mobile:min-h-[220px] mobile:px-6 mobile:py-12">
-          <h2
-            id="idx-placeholder"
-            className="text-[12px] font-bold uppercase tracking-kicker text-blue-deep"
-          >
-            {searchPage.placeholderLabel}
-          </h2>
-          <p className="max-w-[420px] font-sans text-[16px] leading-[1.5] text-blue-deep">
-            {searchPage.placeholderNote}
+      <style>{`
+        realscout-simple-search {
+          --rs-ss-font-primary-color: #24425a;
+          --rs-ss-searchbar-border-color: #a9ae7f;
+          --rs-ss-box-shadow: none;
+          --rs-ss-widget-width: 100% !important;
+        }
+      `}</style>
+
+      <header className="wrap pt-14 mobile:pt-10">
+        <div className="border-b border-hairline pb-11 mobile:pb-8">
+          <p className="eyebrow">{searchPage.eyebrow}</p>
+          <h1 className="mt-4 font-display text-section leading-none text-espresso tablet:text-section-tablet mobile:text-section-mobile">
+            {searchPage.heading}
+          </h1>
+          <p className="mt-6 max-w-measure font-sans text-[19px] leading-[1.45] text-warmgray mobile:text-[17px]">
+            {searchPage.intro}
           </p>
+        </div>
+      </header>
+
+      {/* Blue owns search and tools. */}
+      <section aria-label={searchPage.searchLabel} className="wrap pt-12 mobile:pt-8">
+        <div className="rounded-block bg-blue-field px-10 py-14 mobile:px-5 mobile:py-8">
+          <div className="mx-auto w-full max-w-[688px]">
+            <realscout-simple-search agent-encoded-id={realScoutAgentId} />
+          </div>
         </div>
       </section>
 
