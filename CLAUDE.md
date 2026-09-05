@@ -44,7 +44,27 @@ Full design spec: `design_handoff/README.md`. Read it before building any new pa
 - `design_handoff/` — the original bundle, unchanged. `README.md` there is the design spec; read it before building any new page.
 - `tailwind.config.ts` and `app/tokens.css` — the tokens, mirroring `design_handoff/tokens.css`. Change nothing here without changing that.
 - `lib/content/` — all copy. Edit copy there, not in components.
-- `lib/listings/` — the listing source seam. `index.ts` picks the adapter; `mock-adapter.ts` is what runs today.
-- `components/home/` — one component per homepage section, named and ordered as in the spec.
-- `components/ui/ImageSlot.tsx` — the labelled empty photo slot. Giving an `ImageRef` a `src` is the whole of "add a real photo".
-- Project setup, placeholders still outstanding, and the two deviations from the handoff are written up in the root `README.md`.
+- `lib/essays/` — the Overthinking Real Estate seam. Essays live on Substack and are read from its RSS feed; they are never migrated into the repo.
+- `components/home/` — one component per homepage section, in page order.
+- `components/ui/` — `ImageSlot` (the labelled empty photo slot), `PageHeader`, `CtaLink`, `Badge`.
+- `components/listings/` — kept but unwired. See the README in that folder.
+- Launch blockers are the table at the top of the root `README.md`.
+
+## Standing rule: never ship fake functionality
+
+Every visible link and button must resolve to a working page, a verified
+external URL, or an honest non-interactive state. This outranks visual fidelity
+to the mocks.
+
+- A control that cannot do its job does not ship as a control. No search input
+  without a search, no form without an endpoint, no quiz answers without a quiz.
+- A section without verified data is **not rendered** — not filled with
+  placeholder or invented content. That covers listings, sold properties,
+  prices, photography, statistics, transaction outcomes, and testimonials.
+- Never invent credentials, awards, years of experience, brokerage names, DRE
+  numbers, or legal, privacy, and equal-housing language. These are supplied and
+  verified, or they are absent.
+- Bracketed placeholders (`[ADD DANIELLE PHOTO]`) are for content Danielle will
+  supply. They are not a licence to ship a broken interaction.
+- The public route vocabulary is `/read`, `/search`, `/tuesday-test`, `/about`,
+  `/contact`. Do not reintroduce `/overthinking-real-estate` or `/quizzes`.

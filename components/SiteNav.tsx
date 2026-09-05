@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { navCta, navLinks, overthinkingLink, siteName } from '@/lib/content/site'
+import { navCta, navLinks, readLink, siteName } from '@/lib/content/site'
 
 /**
- * Nav is not sticky in the approved design. If it is ever made sticky it stays
- * on cream with the hairline — no shadow, no blur.
+ * Nav is not sticky in the approved design. It collapses to the mark plus a
+ * hamburger below 900px, where the full row stops fitting on one line.
  */
 export function SiteNav() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -42,18 +42,11 @@ export function SiteNav() {
 
         {/* Wide screens: the full row. */}
         <div className="flex items-center gap-[18px] whitespace-nowrap tablet:gap-[14px] navstack:hidden">
-          {navLinks.slice(0, 3).map((link) => (
-            <Link key={link.href} href={link.href} className={plainLink}>
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href={overthinkingLink.href}
-            className="font-serif text-[16.5px] text-wine hover:text-wine-pressed"
-          >
-            {overthinkingLink.label}
+          {/* Read keeps the editorial treatment — it is the way into ORE. */}
+          <Link href={readLink.href} className="font-serif text-[16.5px] text-wine hover:text-wine-pressed">
+            {readLink.label}
           </Link>
-          {navLinks.slice(3).map((link) => (
+          {navLinks.map((link) => (
             <Link key={link.href} href={link.href} className={plainLink}>
               {link.label}
             </Link>
@@ -101,29 +94,19 @@ export function SiteNav() {
           </div>
 
           <div className="flex flex-col">
-            {navLinks.slice(0, 3).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileNavOpen(false)}
-                className="flex min-h-[56px] items-center font-mark text-[28px] font-semibold tracking-utility text-espresso lowercase hover:text-wine"
-              >
-                {link.label}
-              </Link>
-            ))}
             <Link
-              href={overthinkingLink.href}
+              href={readLink.href}
               onClick={() => setMobileNavOpen(false)}
               className="flex min-h-[56px] items-center font-serif text-[28px] text-wine hover:text-wine-pressed"
             >
-              {overthinkingLink.label}
+              {readLink.label}
             </Link>
-            {navLinks.slice(3).map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileNavOpen(false)}
-                className="flex min-h-[56px] items-center font-mark text-[28px] font-semibold tracking-utility text-espresso lowercase hover:text-wine"
+                className="flex min-h-[56px] items-center font-mark text-[28px] font-semibold tracking-utility text-espresso hover:text-wine"
               >
                 {link.label}
               </Link>

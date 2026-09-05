@@ -1,100 +1,63 @@
-import type { Essay, Quiz, Stat, Testimonial } from '@/lib/types'
+import { tuesdayTestPage } from '@/lib/content/pages'
 
 /**
- * Homepage copy. Everything bracketed is placeholder and stays bracketed until
- * Danielle supplies real text — never write filler in her voice.
+ * Homepage copy.
+ *
+ * No statistics, testimonials, listings, or transaction outcomes appear on the
+ * homepage until Danielle supplies verified figures — those sections are not
+ * rendered rather than filled with placeholders.
  */
 
 export const hero = {
-  headline: '[HERO HEADLINE]',
-  intro: '[INTRO COPY]',
-  searchPlaceholder: 'where are you looking?',
-  searchCta: 'search homes',
+  eyebrow: 'Los Angeles real estate, with a counterpoint',
+  headline: 'A home is never just a home.',
+  intro:
+    'It is a commute, a Tuesday night, a monthly payment, a neighborhood, a negotiation, and the particular life you want to have once the keys are yours.',
+  primaryCta: { label: 'Search Homes', href: '/search' },
+  secondaryCta: { label: 'Read Overthinking Real Estate', href: '/read' },
   portrait: {
-    label: 'Danielle',
-    alt: 'Danielle Walder — hero portrait',
+    label: '[ADD DANIELLE PHOTO]',
+    alt: 'Danielle Walder',
     src: null,
   },
 }
 
 export const about = {
   headline: "hi, I'm Danielle",
-  copy: "[ABOUT COPY — two or three sentences on how you work and what you're actually good at]",
+  copy: "I'm a Los Angeles real-estate agent and the person behind Overthinking Real Estate. I help people make big housing decisions with local context, honest analysis, and the recognition that buying a home is never only about the house.",
   portrait: {
-    label: 'Danielle',
-    alt: 'Danielle Walder — portrait',
+    label: '[ADD DANIELLE PHOTO]',
+    alt: 'Danielle Walder',
     src: null,
   },
-  stats: [
-    { value: '[SALES VOLUME]', label: 'closed' },
-    { value: '[TRANSACTIONS]', label: 'homes' },
-    { value: '[YEARS]', label: 'years in LA' },
-  ] satisfies Stat[],
-  primaryCta: { label: '[CTA]', href: '/contact' },
-  secondaryCta: { label: 'more about me', href: '/about' },
+  primaryCta: { label: "Tell me what you're trying to figure out", href: '/contact' },
+  secondaryCta: { label: 'More about me', href: '/about' },
 }
 
-export const leadEssay: Essay = {
-  slug: 'the-cost-per-tuesday',
-  title: 'The Cost Per Tuesday',
-  standfirst: '[STANDFIRST]',
-  kicker: 'essay',
-  image: {
-    label: 'Essay',
-    alt: 'The Cost Per Tuesday — essay image',
-    src: null,
-  },
+export const overthinking = {
+  eyebrow: 'the reading part',
+  title: 'Overthinking Real Estate',
+  moreLabel: 'Read everything',
 }
 
-export const essayList: Essay[] = [
-  {
-    slug: 'everybody-says-they-want-a-deal',
-    title: 'Everybody Says They Want a Deal.',
-    kicker: 'essay',
-  },
-  {
-    slug: 'who-actually-has-access-to-your-transaction',
-    title: 'Who Actually Has Access to Your Transaction?',
-    kicker: 'essay',
-  },
-  {
-    slug: 'is-the-kitchen-actually-outdated',
-    title: 'Is the Kitchen Actually Outdated, or Are You Just Tired of Looking at It?',
-    kicker: 'essay',
-  },
-]
-
-export const homepageQuiz: Quiz = {
-  slug: 'what-kind-of-buyer-are-you',
-  title: '[QUIZ TITLE]',
-  intro: '[QUIZ INTRO]',
-  questions: [
-    {
-      id: 'q1',
-      label: '[QUESTION 1]',
-      answers: [
-        { id: 'a', label: '[ANSWER A]' },
-        { id: 'b', label: '[ANSWER B]' },
-        { id: 'c', label: '[ANSWER C]' },
-        { id: 'd', label: '[ANSWER D]' },
-      ],
-    },
-  ],
-}
-
-export const testimonial: Testimonial = {
-  quote: '[CLIENT QUOTE]',
-  client: '[CLIENT]',
-  neighborhood: '[NEIGHBORHOOD]',
+/**
+ * The homepage Tuesday Test block. Copy comes from the page itself so the two
+ * never drift. The preview options are styled text — never interactive.
+ */
+export const tuesdayTest = {
+  badge: 'the tuesday test',
+  heading: tuesdayTestPage.heading,
+  intro: tuesdayTestPage.intro,
+  cta: { label: 'Take the Tuesday Test', href: '/tuesday-test' },
+  preview: tuesdayTestPage.preview,
 }
 
 export const newsletter = {
   /** Mixed-typeface headline is intentional — keep the two halves separate. */
   headlineMark: 'one letter, twice a month.',
   headlineSerif: 'occasionally a house.',
-  placeholder: 'your email',
-  cta: 'subscribe',
-  success: "You're in. First letter lands in a couple of weeks.",
-  invalid: 'That email does not look right — check it and try again.',
-  failure: 'Something went wrong on our end. Try again in a moment.',
+  body: 'Overthinking Real Estate is published on Substack.',
+  cta: 'Subscribe on Substack',
+  /** Shown until SUBSTACK_URL is set. No email field, no fake form. */
+  pending: 'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
 }

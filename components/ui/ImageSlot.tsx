@@ -19,9 +19,10 @@ interface ImageSlotProps {
 }
 
 /**
- * Until real photos exist, this renders a labelled empty rectangle. Never fill
- * it with stock or generated photography — a visible empty slot is honest, a
- * stock kitchen is a lie about the listing.
+ * Until real photos exist, this renders a labelled empty rectangle: the slot
+ * name in Ink Soft (#6B5F55) on sand (#E3DBCB). Never fill it with stock or
+ * generated photography — a visible empty slot is honest, a stock kitchen is a
+ * lie about the listing.
  */
 export function ImageSlot({ image, className = '', sizes, priority, hoverScale }: ImageSlotProps) {
   const scale = hoverScale
@@ -47,7 +48,7 @@ export function ImageSlot({ image, className = '', sizes, priority, hoverScale }
         >
           <span
             aria-hidden="true"
-            className="text-[12px] font-bold uppercase tracking-kicker text-taupe"
+            className="text-[12px] font-bold uppercase tracking-kicker text-warmgray"
           >
             {image.label}
           </span>

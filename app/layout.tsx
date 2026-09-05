@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Figtree, Kalnia, Rozha_One, Unbounded } from 'next/font/google'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteNav } from '@/components/SiteNav'
+import { siteUrl } from '@/lib/config'
 import './globals.css'
 
 /* Four typefaces. No more. */
@@ -35,9 +36,12 @@ const figtree = Figtree({
 })
 
 export const metadata: Metadata = {
-  title: 'danielle walder — Los Angeles real estate',
-  description:
-    'Los Angeles agent Danielle Walder — current listings, past sales, and the newsletter Overthinking Real Estate.',
+  metadataBase: new URL(siteUrl),
+  title: 'Danielle Walder — Overthinking Real Estate',
+  description: 'Los Angeles real estate, housing decisions, and Overthinking Real Estate.',
+  // No Open Graph or Twitter image is declared: no real source asset exists
+  // yet, and fabricating one is not an option. Add it with the approved
+  // artwork before public launch.
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
