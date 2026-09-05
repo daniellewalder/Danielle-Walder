@@ -121,10 +121,11 @@ const config: Config = {
         // desktop values in the spec are what a class states plainly.
         tablet: { max: '1024px' },
         mobile: { max: '640px' },
-        // The nav row stops fitting on one line below ~900px, well before the
-        // mobile breakpoint. It collapses to the mark plus the hamburger there
-        // rather than wrapping into a ragged second row.
-        navstack: { max: '900px' },
+        // The nav row stops fitting on one line below ~1120px — the wordmark
+        // carries "real estate" and the links sit at 16px. It collapses to the
+        // mark plus the hamburger there rather than wrapping into a ragged
+        // second row. Raise this if the nav ever gets shorter again.
+        navstack: { max: '1120px' },
       },
     },
   },

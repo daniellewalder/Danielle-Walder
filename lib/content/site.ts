@@ -5,7 +5,11 @@
  * its destination exists.
  */
 
+/** The footer lockup and page titles. */
 export const siteName = 'danielle walder'
+
+/** The nav wordmark carries the full mark. */
+export const navWordmark = 'danielle walder real estate'
 
 /**
  * Primary navigation. `Read` keeps the editorial treatment from the approved

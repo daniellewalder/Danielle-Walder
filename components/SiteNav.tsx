@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { navCta, navLinks, readLink, siteName } from '@/lib/content/site'
+import { navCta, navLinks, navWordmark, readLink } from '@/lib/content/site'
 
 /**
  * Nav is not sticky in the approved design. It collapses to the mark plus a
@@ -28,22 +28,22 @@ export function SiteNav() {
     }
   }, [mobileNavOpen])
 
-  const plainLink = 'font-sans text-[14.5px] font-medium text-espresso hover:text-wine'
+  const plainLink = 'font-sans text-[16px] font-medium text-espresso hover:text-wine'
 
   return (
     <nav aria-label="Primary" className="wrap pt-[26px]">
-      <div className="flex items-center justify-between gap-7 border-b border-hairline pb-[18px]">
+      <div className="flex items-center justify-between gap-9 border-b border-hairline pb-[22px]">
         <Link
           href="/"
-          className="whitespace-nowrap font-mark text-[18px] font-semibold tracking-utility text-espresso lowercase hover:text-wine"
+          className="whitespace-nowrap font-mark text-[26px] font-semibold leading-[1.05] tracking-utility text-espresso lowercase hover:text-wine tablet:text-[22px] mobile:max-w-[62%] mobile:whitespace-normal mobile:text-[18px]"
         >
-          {siteName}
+          {navWordmark}
         </Link>
 
         {/* Wide screens: the full row. */}
-        <div className="flex items-center gap-[18px] whitespace-nowrap tablet:gap-[14px] navstack:hidden">
+        <div className="flex items-center gap-[26px] whitespace-nowrap tablet:gap-[18px] navstack:hidden">
           {/* Read keeps the editorial treatment — it is the way into ORE. */}
-          <Link href={readLink.href} className="font-serif text-[16.5px] text-wine hover:text-wine-pressed">
+          <Link href={readLink.href} className="font-serif text-[18px] text-wine hover:text-wine-pressed">
             {readLink.label}
           </Link>
           {navLinks.map((link) => (
@@ -53,7 +53,7 @@ export function SiteNav() {
           ))}
           <Link
             href={navCta.href}
-            className="rounded-button bg-brown px-5 py-[11px] font-sans text-[14.5px] font-semibold text-onbrown hover:bg-wine"
+            className="rounded-button bg-brown px-6 py-[13px] font-sans text-[15px] font-semibold text-onbrown hover:bg-wine"
           >
             {navCta.label}
           </Link>
@@ -80,8 +80,8 @@ export function SiteNav() {
           className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-cream px-gutter-mobile pb-10 pt-[26px]"
         >
           <div className="flex items-center justify-between border-b border-hairline pb-[18px]">
-            <span className="font-mark text-[18px] font-semibold tracking-utility text-espresso lowercase">
-              {siteName}
+            <span className="font-mark text-[18px] font-semibold leading-[1.05] tracking-utility text-espresso lowercase">
+              {navWordmark}
             </span>
             <button
               type="button"

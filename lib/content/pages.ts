@@ -4,21 +4,52 @@
  * no credentials, awards, years, brokerage, licence, statistics, or outcomes.
  */
 
+/**
+ * /read — the Overthinking Real Estate archive, set as an editorial front page.
+ * All copy is Danielle's, verbatim from her design.
+ */
 export const readPage = {
-  eyebrow: 'the reading part',
-  title: 'Overthinking Real Estate',
-  /** Live feed: each title below is a real permalink. */
+  headline: 'Where every take gets a counter.',
+  eyebrow: 'essays by danielle walder',
   intro:
-    'Long-form essays on how real estate actually works. Published on Substack — every piece below opens there.',
+    'Original essays about homes, money, Los Angeles, identity, class, status, technology, privacy, risk, behavioral economics, and the strange things people do around housing.',
+  latestLabel: 'the latest',
+  byline: 'By Danielle Walder',
+  /** Publish dates come from the live feed or not at all — never invented. */
+  essayKicker: 'essay',
+  datePlaceholder: '[PUBLISH DATE]',
+  readCta: 'Read on Substack',
+  moreLabel: 'More to overthink',
+
   /**
-   * Feed unavailable but the publication URL is known, so titles link to the
-   * publication rather than to a specific piece. The wording must not promise
-   * otherwise.
+   * A recurring editorial feature. Danielle's own bracketed placeholder, kept
+   * visible exactly as it appears in her design until she writes the first one.
    */
-  fallbackIntro: 'Long-form essays on how real estate actually works. Published on Substack — open the publication to read them.',
-  /** No publication URL at all: titles render as plain text. */
-  offlineNote: 'Essays are published on Substack. The link goes live as soon as the publication is connected.',
-  subscribeCta: 'Subscribe on Substack',
+  counter: {
+    label: 'the counter',
+    body: '[A concise counterargument or complication of the featured essay goes here.]',
+  },
+
+  /** Blue owns this band. */
+  helpBand: {
+    heading: 'Need help with the real-life version?',
+    body: 'Danielle is a Los Angeles real-estate agent. If you are looking for a home, deciding between neighborhoods, thinking about selling, or need a second opinion on a specific property, that is also part of the work',
+    links: [
+      { label: 'Search homes', href: '/search' },
+      { label: 'How I work', href: '/about' },
+      { label: 'Say hello', href: '/contact' },
+    ],
+  },
+
+  /** The one dark band on this page. */
+  subscribeBand: {
+    heading: 'Get Overthinking Real Estate in your inbox.',
+    body: 'Essays about homes, money, Los Angeles, technology, privacy, status, and the strange ways people make very expensive decisions.',
+    cta: 'Subscribe on Substack',
+    /** Shown instead of the button when no publication URL is configured. */
+    pending:
+      'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
+  },
 }
 
 export const aboutPage = {

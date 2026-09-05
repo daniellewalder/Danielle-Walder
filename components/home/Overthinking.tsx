@@ -5,14 +5,12 @@ import { getEssays, type EssayEntry } from '@/lib/essays'
 
 /**
  * Overthinking Real Estate is a pillar, not a blog link: Kalnia, wine, and its
- * own homepage section. Essays live on Substack and link out — nothing is
- * migrated into the repo, and nothing is invented. An entry without a URL
- * renders as plain text rather than a broken link.
+ * own homepage section. Titles and deks come from Danielle's curated list, and
+ * links open on Substack. An entry with nowhere real to go renders as plain
+ * text rather than a broken link.
  */
 function EssayTitle({ entry, className }: { entry: EssayEntry; className: string }) {
-  if (!entry.url) {
-    return <span className={className}>{entry.title}</span>
-  }
+  if (!entry.url) return <span className={className}>{entry.title}</span>
 
   return (
     <a
@@ -28,10 +26,10 @@ function EssayTitle({ entry, className }: { entry: EssayEntry; className: string
 }
 
 export async function Overthinking() {
-  const { entries } = await getEssays(4)
-  const [lead, ...rest] = entries
-
+  const { lead, more } = await getEssays()
   if (!lead) return null
+
+  const rest = more.slice(0, 3)
 
   return (
     <section aria-labelledby="overthinking" className="wrap pt-[88px] mobile:pt-16">
@@ -60,6 +58,9 @@ export async function Overthinking() {
           <h3 className="font-serif text-[46px] leading-[1.02] text-espresso tablet:text-[38px] mobile:text-[30px]">
             <EssayTitle entry={lead} className="text-espresso" />
           </h3>
+          <p className="max-w-standfirst font-sans text-[16.5px] leading-[1.5] text-warmgray">
+            {lead.dek}
+          </p>
         </article>
 
         <div className="min-w-0">
@@ -73,7 +74,9 @@ export async function Overthinking() {
               <h3 className="font-serif text-[27px] leading-[1.12] text-espresso mobile:text-[22px]">
                 <EssayTitle entry={entry} className="text-espresso" />
               </h3>
-              <span className="text-[12.5px] font-bold uppercase tracking-kicker text-taupe">essay</span>
+              <span className="text-[12.5px] font-bold uppercase tracking-kicker text-taupe">
+                essay
+              </span>
             </article>
           ))}
         </div>
