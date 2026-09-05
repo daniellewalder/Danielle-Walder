@@ -10,14 +10,33 @@ Tailwind CSS.
 
 | # | Blocker | Where |
 |---|---|---|
-| 1 | **Brokerage name and DRE licence number.** Legally required on every page. Currently the calm placeholders `[BROKERAGE — TO BE SUPPLIED]` and `[DRE # — TO BE SUPPLIED]`. | `lib/content/site.ts` → `legal` |
-| 2 | **No other legal or compliance language exists.** There is no equal-housing statement, privacy policy, terms, or accessibility statement, and none has been written or verified. Do not draft these — they must be supplied. | — |
-| 3 | **Substack publication URL.** Until `SUBSTACK_URL` is set, `/read` shows the four verified essay titles as plain text and the newsletter block says the subscribe link is not connected yet. | `.env` |
-| 4 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the contact form renders with no submit control and says delivery is being connected. It never fake-submits. | `.env` |
-| 5 | **Public contact email.** No address is shown anywhere until `CONTACT_EMAIL` is set. None has been invented. | `.env` |
-| 6 | **Photography.** Every image is a labelled `[ADD DANIELLE PHOTO]` / `[ADD ESSAY IMAGE]` slot. | `lib/content/` |
-| 7 | **Favicon is a temporary technical icon** — a plain cream square, deliberately with no glyph or mark, added only so the app does not emit a favicon 404. **Replace with an approved asset before launch.** | `app/icon.svg` |
-| 8 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. Add with approved artwork. | `app/layout.tsx` |
+| 1 | **No brokerage disclosure language.** There is no fair-housing, privacy, terms, accessibility, or licensing statement, and none has been supplied or verified. Nothing has been drafted — this must come from Danielle's broker, verbatim. | `lib/content/site.ts` → `legal` |
+| 2 | **The Substack URL is a profile, not a publication.** `https://substack.com/@daniellewalder` has no publication RSS feed at `/feed`, so `/read` and the homepage render the four verified fallback titles linking to the profile. Supply the publication URL (`name.substack.com` or a custom domain) — or set `SUBSTACK_RSS_URL` — to switch to the live feed. Nothing is broken today. | `lib/config.ts` |
+| 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the contact form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
+| 4 | **Photography.** Every image is a labelled `[ADD DANIELLE PHOTO]` / `[ADD ESSAY IMAGE]` slot. | `lib/content/` |
+| 5 | **Favicon is a temporary technical icon** — a plain cream square, deliberately with no glyph or mark, added only so the app does not emit a favicon 404. **Replace with an approved asset before launch.** | `app/icon.svg` |
+| 6 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
+
+### Supplied and live
+
+| Value | Where |
+|---|---|
+| Brokerage — Coldwell Banker | `lib/content/site.ts`, footer on every page |
+| Licence — CalRE # 02253356 | same; rendered exactly as supplied |
+| Public email — homes@daniellewalder.com | `lib/config.ts`; mailto on `/contact` |
+| Substack profile URL | `lib/config.ts`; see blocker 2 |
+
+### Supplied but not placed
+
+Danielle also supplied a phone number, `(847) 899-9604`, and service areas,
+*Beverly Hills | Hancock Park*. Neither has an approved home in the design, so
+neither is rendered. They are held here rather than being placed unilaterally.
+
+### Not to be invented, ever
+
+Social links, legal and compliance wording, credentials, awards, years of
+experience, listings, prices, statistics, transaction outcomes, and
+testimonials are supplied and verified, or they are absent.
 
 ## Getting started
 

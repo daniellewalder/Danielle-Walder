@@ -1,9 +1,13 @@
 /**
- * Everything the site needs from the environment, read in one place.
+ * Public configuration, and the one place environment variables are read.
  *
- * Each value is optional on purpose: the site must render honestly with none
- * of them set. A missing value never produces a broken link — it produces a
- * quieter, truthful version of the same block. See README launch blockers.
+ * Values here are PUBLIC by definition — a publication URL and a published
+ * contact address, both of which appear in the rendered page anyway. They are
+ * committed as defaults so the site works on any deploy with no dashboard
+ * setup, and every one can still be overridden by an environment variable.
+ *
+ * NEVER put a secret in this file: no form endpoints, API keys, service
+ * tokens, or private inbox credentials. Those are environment-only, always.
  */
 
 function clean(value: string | undefined): string | null {
@@ -11,20 +15,53 @@ function clean(value: string | undefined): string | null {
   return trimmed ? trimmed.replace(/\/+$/, '') : null
 }
 
-/** Substack publication homepage, e.g. https://example.substack.com */
-export const substackUrl = clean(process.env.SUBSTACK_URL)
+/**
+ * Overthinking Real Estate on Substack.
+ *
+ * NOTE: this is a Substack *profile* URL (substack.com/@handle), not a
+ * publication URL (name.substack.com or a custom domain). Profiles do not
+ * expose a publication RSS feed at /feed, so the archive currently renders
+ * from the verified fallback list. Replace with the publication URL — or set
+ * SUBSTACK_RSS_URL directly — to switch /read and the homepage to the live
+ * feed. Nothing breaks in the meantime; see lib/essays/index.ts.
+ */
+export const substackUrl = clean(process.env.SUBSTACK_URL) ?? 'https://substack.com/@daniellewalder'
 
 /** Feed URL. Defaults to the publication's /feed; override for odd setups. */
 export const substackFeedUrl =
   clean(process.env.SUBSTACK_RSS_URL) ?? (substackUrl ? `${substackUrl}/feed` : null)
 
-/** Substack's hosted subscribe page — a real external destination, not a form. */
-export const substackSubscribeUrl = substackUrl ? `${substackUrl}/subscribe` : null
+/**
+ * Where "Subscribe on Substack" goes.
+ *
+ * A publication has a /subscribe page. A profile does not — its subscribe
+ * affordance is on the profile page itself. Appending /subscribe to a profile
+ * URL would ship a broken external link, so it is only appended when the URL
+ * is publication-shaped.
+ */
+function deriveSubscribeUrl(url: string | null): string | null {
+  if (!url) return null
 
-/** Public contact address. Shown as a real mailto only when supplied. */
-export const contactEmail = clean(process.env.CONTACT_EMAIL)
+  try {
+    const { hostname, pathname } = new URL(url)
+    const isProfile = hostname === 'substack.com' || hostname === 'www.substack.com'
+    if (isProfile || pathname !== '/') return url
+    return `${url}/subscribe`
+  } catch {
+    return url
+  }
+}
 
-/** Where the contact form POSTs. Until set, the form states that plainly. */
+export const substackSubscribeUrl =
+  clean(process.env.SUBSTACK_SUBSCRIBE_URL) ?? deriveSubscribeUrl(substackUrl)
+
+/** Published contact address. Public information, safe to commit. */
+export const contactEmail = clean(process.env.CONTACT_EMAIL) ?? 'homes@daniellewalder.com'
+
+/**
+ * Where the contact form POSTs. ENVIRONMENT-ONLY — never commit a default.
+ * Until it is set the form renders without a submit control and says so.
+ */
 export const contactFormEndpoint = clean(process.env.CONTACT_FORM_ENDPOINT)
 
 /** Canonical origin, used for sitemap and robots. */

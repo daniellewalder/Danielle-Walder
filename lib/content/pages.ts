@@ -7,9 +7,16 @@
 export const readPage = {
   eyebrow: 'the reading part',
   title: 'Overthinking Real Estate',
+  /** Live feed: each title below is a real permalink. */
   intro:
     'Long-form essays on how real estate actually works. Published on Substack — every piece below opens there.',
-  /** Shown only when the feed is unavailable and we have no publication URL. */
+  /**
+   * Feed unavailable but the publication URL is known, so titles link to the
+   * publication rather than to a specific piece. The wording must not promise
+   * otherwise.
+   */
+  fallbackIntro: 'Long-form essays on how real estate actually works. Published on Substack — open the publication to read them.',
+  /** No publication URL at all: titles render as plain text. */
   offlineNote: 'Essays are published on Substack. The link goes live as soon as the publication is connected.',
   subscribeCta: 'Subscribe on Substack',
 }

@@ -12,7 +12,14 @@ export const metadata: Metadata = {
 }
 
 export default async function ReadPage() {
-  const { entries } = await getEssays()
+  const { entries, source } = await getEssays()
+
+  // Say only what is true of the links actually rendered below.
+  const intro = !substackUrl
+    ? readPage.offlineNote
+    : source === 'feed'
+      ? readPage.intro
+      : readPage.fallbackIntro
 
   return (
     <>
@@ -21,7 +28,7 @@ export default async function ReadPage() {
         heading={readPage.title}
         headingFont="serif"
         headingClassName="text-wine"
-        intro={substackUrl ? readPage.intro : readPage.offlineNote}
+        intro={intro}
       >
         {substackSubscribeUrl ? (
           <CtaLink href={substackSubscribeUrl} external variant="primary">

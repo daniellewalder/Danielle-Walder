@@ -51,12 +51,18 @@ export const footerGroups = [
 ] as const
 
 /**
- * LAUNCH BLOCKER. Brokerage name and DRE licence number are legally required
- * on every page and are placeholders until Danielle supplies verified details.
- * Do not invent these, and do not add equal-housing, privacy, or any other
- * disclosure language that has not been supplied and verified.
+ * Verified and supplied by Danielle. Legally required on every page.
+ *
+ * `license` carries its own label exactly as supplied — do not prefix it with
+ * "DRE" or reformat it.
+ *
+ * LAUNCH BLOCKER: no brokerage disclosure language has been supplied. Do not
+ * draft or infer any fair-housing, privacy, accessibility, licensing, terms,
+ * or brokerage wording — it is supplied and verified, or it is absent. When
+ * Danielle provides approved text, add it here verbatim and render it in the
+ * footer.
  */
 export const legal = {
-  brokerage: '[BROKERAGE — TO BE SUPPLIED]',
-  dreNumber: '[DRE # — TO BE SUPPLIED]',
+  brokerage: 'Coldwell Banker',
+  license: 'CalRE # 02253356',
 }

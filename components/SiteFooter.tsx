@@ -41,15 +41,14 @@ export function SiteFooter() {
           </nav>
 
           {/*
-            LAUNCH BLOCKER — legally required on every page. These stay as
-            explicit, calm placeholders until Danielle supplies verified
-            brokerage and DRE details. Never invent them, and never add
-            equal-housing, privacy, or other disclosure language that has not
-            been supplied and verified.
+            Legally required on every page. Rendered exactly as supplied — the
+            licence string carries its own label. Never add equal-housing,
+            privacy, or other disclosure language that has not been supplied
+            and verified; see the launch blockers in README.md.
           */}
           <div className="flex flex-col gap-[10px] font-sans text-[13px] text-onbrown-fine">
             <span>{legal.brokerage}</span>
-            <span>{legal.dreNumber}</span>
+            <span>{legal.license}</span>
           </div>
         </div>
       </div>
