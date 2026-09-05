@@ -103,6 +103,24 @@ export const searchPage = {
   ],
 }
 
+/**
+ * /home-valuation. The widget's own title and subtitle are switched off so the
+ * page can set them in Danielle's typefaces.
+ *
+ * The note below is a factual caveat about what an automated estimate is, not
+ * a marketing claim. Replace it with her brokerage's approved wording if they
+ * require specific language for valuation tools.
+ */
+export const homeValuationPage = {
+  eyebrow: "what's my home worth?",
+  heading: "What's my home worth?",
+  note: 'This is an automated estimate, not an appraisal or a comparative market analysis.',
+  followUp: {
+    body: 'An estimate is a starting point. What a home actually sells for depends on condition, timing, and what else is on the market that month.',
+    cta: { label: 'Ask me what it means for your place', href: '/contact' },
+  },
+}
+
 export const tuesdayTestPage = {
   eyebrow: 'the tuesday test',
   heading: 'Will you actually like living there?',

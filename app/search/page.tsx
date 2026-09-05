@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { realScoutAgentId, realScoutScriptSrc } from '@/lib/config'
+import { AdvancedSearch } from '@/components/realscout/RealScout'
 import { searchPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
@@ -8,32 +8,10 @@ export const metadata: Metadata = {
   description: 'Los Angeles home search, and how to start it with what you already know.',
 }
 
-/**
- * Home search, powered by RealScout's IDX web components.
- *
- * The widget is themed with locked palette tokens only — blue ink for type,
- * mid sage for the field border. Its default drop shadow is switched off:
- * the design system has no shadows.
- *
- * Width is handled here rather than in RealScout's config. The component is
- * told to fill its container and the container is capped, so it is exactly
- * 688px on a laptop and fluid on a phone instead of overflowing.
- */
+/** Home search, powered by RealScout's IDX web components. Blue owns tools. */
 export default function SearchPage() {
   return (
     <>
-      {/* React hoists and de-duplicates this, so it loads once, on this page only. */}
-      <script src={realScoutScriptSrc} type="module" async />
-
-      <style>{`
-        realscout-simple-search {
-          --rs-ss-font-primary-color: #24425a;
-          --rs-ss-searchbar-border-color: #a9ae7f;
-          --rs-ss-box-shadow: none;
-          --rs-ss-widget-width: 100% !important;
-        }
-      `}</style>
-
       <header className="wrap pt-14 mobile:pt-10">
         <div className="border-b border-hairline pb-11 mobile:pb-8">
           <p className="eyebrow">{searchPage.eyebrow}</p>
@@ -46,12 +24,9 @@ export default function SearchPage() {
         </div>
       </header>
 
-      {/* Blue owns search and tools. */}
       <section aria-label={searchPage.searchLabel} className="wrap pt-12 mobile:pt-8">
-        <div className="rounded-block bg-blue-field px-10 py-14 mobile:px-5 mobile:py-8">
-          <div className="mx-auto w-full max-w-[688px]">
-            <realscout-simple-search agent-encoded-id={realScoutAgentId} />
-          </div>
+        <div className="rounded-block bg-blue-field px-10 py-12 mobile:px-5 mobile:py-8">
+          <AdvancedSearch />
         </div>
       </section>
 

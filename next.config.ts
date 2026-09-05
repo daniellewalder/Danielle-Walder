@@ -4,18 +4,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   /**
-   * Essay cover images come from Danielle's own Substack posts. Only Substack's
-   * CDN is allowed; everything else next/image will refuse to fetch.
-   */
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'substackcdn.com' },
-      { protocol: 'https', hostname: '**.substackcdn.com' },
-      { protocol: 'https', hostname: '**.substack.com' },
-    ],
-  },
-
-  /**
    * The public route vocabulary is /read, /search, /tuesday-test, /about and
    * /contact. Anything that ever pointed at the old internal routes lands on
    * the right page instead of a 404.
@@ -28,7 +16,6 @@ const nextConfig: NextConfig = {
       { source: '/quizzes/:slug*', destination: '/tuesday-test', permanent: true },
       { source: '/listings', destination: '/search', permanent: true },
       { source: '/listings/:slug*', destination: '/search', permanent: true },
-      { source: '/home-valuation', destination: '/contact', permanent: true },
     ]
   },
 }

@@ -1,3 +1,4 @@
+import { SimpleSearch } from '@/components/realscout/RealScout'
 import { CtaLink } from '@/components/ui/CtaLink'
 import { ImageSlot } from '@/components/ui/ImageSlot'
 import { hero } from '@/lib/content/home'
@@ -6,9 +7,9 @@ import { hero } from '@/lib/content/home'
  * Hero A — Danielle-led. Her portrait, not a house. That was a deliberate,
  * approved decision.
  *
- * There is no search field here. A text input that cannot search is fake
- * functionality, so the interaction is a primary CTA to /search instead. The
- * brown button treatment and the rest of the composition are unchanged.
+ * The search field is RealScout's, so it genuinely searches. It sat empty
+ * through the earlier builds precisely because a box that cannot search is
+ * fake functionality.
  */
 export function Hero() {
   return (
@@ -27,10 +28,13 @@ export function Hero() {
             {hero.intro}
           </p>
 
+          {/*
+            The search field the approved hero always had. It was removed while
+            it could not search; RealScout makes it real, so it is back.
+          */}
+          <SimpleSearch />
+
           <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
-            <CtaLink href={hero.primaryCta.href} variant="primary">
-              {hero.primaryCta.label}
-            </CtaLink>
             <CtaLink href={hero.secondaryCta.href} variant="editorial">
               {hero.secondaryCta.label} &rarr;
             </CtaLink>

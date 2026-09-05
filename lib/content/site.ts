@@ -46,7 +46,7 @@ export const startHereLinks = [
   { label: 'search homes', href: '/search' },
   { label: 'take the tuesday test', href: '/tuesday-test' },
   { label: 'explore la, actually', href: '/la-actually' },
-  { label: "what's my home worth?", href: '/contact' },
+  { label: "what's my home worth?", href: '/home-valuation' },
 ] as const
 
 export const footerGroups = [

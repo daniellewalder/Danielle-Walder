@@ -6,7 +6,16 @@ import { siteUrl } from '@/lib/config'
  * exist so direct visitors do not hit a 404 — they are deliberately not
  * advertised here, in navigation, or on the homepage.
  */
-const routes = ['', '/read', '/search', '/tuesday-test', '/la-actually', '/about', '/contact']
+const routes = [
+  '',
+  '/read',
+  '/search',
+  '/home-valuation',
+  '/tuesday-test',
+  '/la-actually',
+  '/about',
+  '/contact',
+]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()

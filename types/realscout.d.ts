@@ -12,6 +12,11 @@ declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       'realscout-simple-search': RealScoutElement
+      'realscout-advanced-search': RealScoutElement
+      'realscout-home-value': RealScoutElement & {
+        'remove-title'?: string
+        'remove-subtitle'?: string
+      }
     }
   }
 }
