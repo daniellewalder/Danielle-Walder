@@ -11,7 +11,7 @@ Tailwind CSS.
 | # | Blocker | Where |
 |---|---|---|
 | 1 | **Danielle's own agent licence number is not displayed.** The footer carries the responsible broker's line, `COLDWELL BANKER RESIDENTIAL \| CA DRE# 00616212`. Her personal licence (`02253356`) is not shown. California requires a licensee to disclose their own licence number on solicitation material, so **confirm with her office whether her agent number must also appear** — then supply the exact string and it goes in verbatim. | `lib/content/site.ts` → `legal` |
-| 2 | **The Substack URL is a profile, not a publication.** `https://substack.com/@daniellewalder` has no publication RSS feed at `/feed`, so `/read` and the homepage render the four verified fallback titles linking to the profile. Supply the publication URL (`name.substack.com` or a custom domain) — or set `SUBSTACK_RSS_URL` — to switch to the live feed. Nothing is broken today. | `lib/config.ts` |
+| 2 | **The live Substack feed is unverified.** The publication is `https://daniellewalder.substack.com`, so the feed and subscribe links are correct. The feed could not be exercised from the build sandbox, which blocks all outbound requests — **confirm on the first deploy** that `/read` shows real publish dates. Until it does, entries fall back to Danielle's curated titles linking to the publication, which is a correct page either way. | `lib/config.ts` |
 | 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the contact form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
 | 4 | **Photography.** Every image is a labelled `[ADD DANIELLE PHOTO]` / `[ADD ESSAY IMAGE]` slot. | `lib/content/` |
 | 5 | **Favicon is a temporary technical icon** — a plain cream square, deliberately with no glyph or mark, added only so the app does not emit a favicon 404. **Replace with an approved asset before launch.** | `app/icon.svg` |
@@ -24,7 +24,7 @@ Tailwind CSS.
 | Responsible broker — `COLDWELL BANKER RESIDENTIAL \| CA DRE# 00616212` | `lib/content/site.ts`; footer on every page, verbatim |
 | Coldwell Banker–approved website disclosure | same; footer on every page, verbatim |
 | Public email — homes@daniellewalder.com | `lib/config.ts`; mailto on `/contact` |
-| Substack profile URL | `lib/config.ts`; see blocker 2 |
+| Substack publication — `https://daniellewalder.substack.com` | `lib/config.ts`; drives `/read`, the homepage essays, and the real `/subscribe` link |
 
 The brokerage line and the disclosure are rendered **verbatim**. Do not reword,
 re-case, reformat, abridge, or split them, and do not update the copyright year

@@ -16,16 +16,11 @@ function clean(value: string | undefined): string | null {
 }
 
 /**
- * Overthinking Real Estate on Substack.
- *
- * NOTE: this is a Substack *profile* URL (substack.com/@handle), not a
- * publication URL (name.substack.com or a custom domain). Profiles do not
- * expose a publication RSS feed at /feed, so the archive currently renders
- * from the verified fallback list. Replace with the publication URL — or set
- * SUBSTACK_RSS_URL directly — to switch /read and the homepage to the live
- * feed. Nothing breaks in the meantime; see lib/essays/index.ts.
+ * Overthinking Real Estate on Substack — the publication, which is what
+ * exposes the RSS feed at /feed and the hosted subscribe page at /subscribe.
  */
-export const substackUrl = clean(process.env.SUBSTACK_URL) ?? 'https://substack.com/@daniellewalder'
+export const substackUrl =
+  clean(process.env.SUBSTACK_URL) ?? 'https://daniellewalder.substack.com'
 
 /** Feed URL. Defaults to the publication's /feed; override for odd setups. */
 export const substackFeedUrl =
