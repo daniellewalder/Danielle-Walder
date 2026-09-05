@@ -41,10 +41,12 @@ export function SiteFooter() {
           </nav>
 
           {/*
-            Legally required on every page. Rendered exactly as supplied — the
-            licence string carries its own label. Never add equal-housing,
-            privacy, or other disclosure language that has not been supplied
-            and verified; see the launch blockers in README.md.
+            Legally required on every page, and still placeholders pending
+            confirmation from Danielle's office and compliance team. Rendered
+            exactly as supplied — the licence string carries its own label.
+            Never add equal-housing, REALTOR(R), privacy, accessibility, or any
+            other disclosure language that has not been supplied and verified;
+            see the launch blockers in README.md.
           */}
           <div className="flex flex-col gap-[10px] font-sans text-[13px] text-onbrown-fine">
             <span>{legal.brokerage}</span>

@@ -10,7 +10,7 @@ Tailwind CSS.
 
 | # | Blocker | Where |
 |---|---|---|
-| 1 | **No brokerage disclosure language.** There is no fair-housing, privacy, terms, accessibility, or licensing statement, and none has been supplied or verified. Nothing has been drafted — this must come from Danielle's broker, verbatim. | `lib/content/site.ts` → `legal` |
+| 1 | **Brokerage identity and disclosure language are unconfirmed.** Danielle's affiliation is **Coldwell Banker Realty**, but the footer must show the *responsible broker's licensed name* and her *confirmed California DRE licence number* — neither of which is settled, so both remain explicit placeholders. **The final responsible-broker licensed name and the exact Coldwell Banker–approved website disclosure language must be confirmed with her office and compliance team before public launch.** Nothing has been drafted or inferred. | `lib/content/site.ts` → `legal` |
 | 2 | **The Substack URL is a profile, not a publication.** `https://substack.com/@daniellewalder` has no publication RSS feed at `/feed`, so `/read` and the homepage render the four verified fallback titles linking to the profile. Supply the publication URL (`name.substack.com` or a custom domain) — or set `SUBSTACK_RSS_URL` — to switch to the live feed. Nothing is broken today. | `lib/config.ts` |
 | 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the contact form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
 | 4 | **Photography.** Every image is a labelled `[ADD DANIELLE PHOTO]` / `[ADD ESSAY IMAGE]` slot. | `lib/content/` |
@@ -21,20 +21,29 @@ Tailwind CSS.
 
 | Value | Where |
 |---|---|
-| Brokerage — Coldwell Banker | `lib/content/site.ts`, footer on every page |
-| Licence — CalRE # 02253356 | same; rendered exactly as supplied |
 | Public email — homes@daniellewalder.com | `lib/config.ts`; mailto on `/contact` |
 | Substack profile URL | `lib/config.ts`; see blocker 2 |
 
-### Supplied but not placed
+### Supplied but deliberately not rendered
 
-Danielle also supplied a phone number, `(847) 899-9604`, and service areas,
-*Beverly Hills | Hancock Park*. Neither has an approved home in the design, so
-neither is rendered. They are held here rather than being placed unilaterally.
+Held here rather than placed on the site:
+
+- **Brokerage affiliation** — Coldwell Banker Realty. Not displayed: the footer
+  needs the responsible broker's licensed name, which is not the same thing and
+  is not yet confirmed. See blocker 1.
+- **Licence number** — a `CalRE #` value was supplied but is not her confirmed
+  California DRE number, so it is not displayed. See blocker 1.
+- **Phone** — `(847) 899-9604`, and **service areas**, *Beverly Hills | Hancock
+  Park*. Neither has an approved home in the design.
+
+**Do not point the custom domain at this site** until Danielle provides her
+actual California DRE licence number and the approved disclosure wording.
 
 ### Not to be invented, ever
 
-Social links, legal and compliance wording, credentials, awards, years of
+Office names and addresses, broker licence numbers, brokerage logos, Equal
+Housing Opportunity wording, REALTOR® wording, privacy policies, terms,
+accessibility statements, social links, credentials, awards, years of
 experience, listings, prices, statistics, transaction outcomes, and
 testimonials are supplied and verified, or they are absent.
 
