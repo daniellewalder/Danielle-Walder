@@ -37,7 +37,11 @@ export const about = {
 export const overthinking = {
   eyebrow: 'the reading part',
   title: 'Overthinking Real Estate',
-  moreLabel: 'Read everything',
+  /** Masthead dek. Danielle's, from her /read design. */
+  dek: 'Original essays about homes, money, Los Angeles, identity, class, status, technology, privacy, risk, behavioral economics, and the strange things people do around housing.',
+  moreLabel: 'Explore all essays',
+  leadLabel: 'the latest',
+  readCta: 'Read the essay',
 }
 
 /**
@@ -52,12 +56,25 @@ export const tuesdayTest = {
   preview: tuesdayTestPage.preview,
 }
 
-export const newsletter = {
-  /** Mixed-typeface headline is intentional — keep the two halves separate. */
-  headlineMark: 'one letter, twice a month.',
-  headlineSerif: 'occasionally a house.',
-  body: 'Overthinking Real Estate is published on Substack.',
+/**
+ * Subscribing to Overthinking Real Estate — the same publication as the
+ * editorial section above, not a second newsletter product. Copy is Danielle's,
+ * taken from her approved /read design so the two surfaces agree.
+ *
+ * The heading is split so the publication name can carry its own typeface: the
+ * mixed-typeface treatment the handoff asks to keep, now naming the thing it is
+ * actually selling.
+ *
+ * Subscribing happens on Substack. There is no email form here and there must
+ * not be a fake one.
+ */
+export const subscribe = {
+  headingBefore: 'Get',
+  headingPublication: 'Overthinking Real Estate',
+  headingAfter: 'in your inbox.',
+  body: 'Essays about homes, money, Los Angeles, technology, privacy, status, and the strange ways people make very expensive decisions.',
   cta: 'Subscribe on Substack',
   /** Shown until SUBSTACK_URL is set. No email field, no fake form. */
-  pending: 'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
+  pending:
+    'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
 }

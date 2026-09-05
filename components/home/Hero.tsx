@@ -14,8 +14,8 @@ import { hero } from '@/lib/content/home'
 export function Hero() {
   return (
     <header className="wrap pt-[22px]">
-      <div className="grid grid-cols-[1.04fr_0.96fr] items-center gap-[50px] rounded-block bg-blue-field px-[46px] py-[54px] tablet:grid-cols-1 tablet:gap-9 mobile:gap-8 mobile:rounded-[16px] mobile:px-6 mobile:py-8">
-        <div className="flex min-w-0 flex-col gap-[26px]">
+      <div className="grid grid-cols-[1.12fr_0.88fr] items-stretch gap-[56px] overflow-hidden rounded-block bg-blue-field pl-[52px] tablet:grid-cols-1 tablet:gap-9 tablet:px-9 tablet:pb-0 tablet:pt-12 mobile:gap-8 mobile:rounded-[16px] mobile:px-6 mobile:pt-8">
+        <div className="flex min-w-0 flex-col justify-center gap-7 py-16 tablet:py-0 mobile:py-0">
           <p className="text-[11.5px] font-bold uppercase tracking-attribution text-blue-deep">
             {hero.eyebrow}
           </p>
@@ -24,7 +24,7 @@ export function Hero() {
             {hero.headline}
           </h1>
 
-          <p className="max-w-intro font-sans text-[19px] leading-[1.45] text-blue-deep">
+          <p className="max-w-[40ch] font-sans text-[19px] leading-[1.5] text-blue-deep">
             {hero.intro}
           </p>
 
@@ -32,7 +32,7 @@ export function Hero() {
             The search field the approved hero always had. It was removed while
             it could not search; RealScout makes it real, so it is back.
           */}
-          <SimpleSearch />
+          <SimpleSearch className="mt-1 pr-2" />
 
           <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
             <CtaLink href={hero.secondaryCta.href} variant="editorial">
@@ -41,11 +41,18 @@ export function Hero() {
           </div>
         </div>
 
+        {/*
+          Danielle anchors the block. The portrait bleeds to the right and
+          bottom edges rather than floating inside padding — the opening spread
+          should feel composed, not like an image dropped in a box. 20px soft
+          corners on the outer edge, per the photography rule: soft is Danielle
+          and editorial, square is property.
+        */}
         <ImageSlot
           image={hero.portrait}
           priority
-          sizes="(max-width: 1024px) 100vw, 45vw"
-          className="h-[520px] rounded-[4px] tablet:h-[420px] mobile:h-[340px]"
+          sizes="(max-width: 1024px) 100vw, 42vw"
+          className="h-full min-h-[540px] tablet:h-[440px] tablet:min-h-0 mobile:h-[360px]"
         />
       </div>
     </header>

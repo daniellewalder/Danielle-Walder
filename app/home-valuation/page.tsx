@@ -21,7 +21,7 @@ export default function HomeValuationPage() {
 
       <section aria-label="Home value estimate" className="wrap pt-12 mobile:pt-8">
         <div className="rounded-block bg-blue-field px-10 py-12 mobile:px-5 mobile:py-8">
-          <HomeValue />
+          <HomeValue className="max-w-search" />
         </div>
       </section>
 

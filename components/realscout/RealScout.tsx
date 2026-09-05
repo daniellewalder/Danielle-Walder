@@ -18,7 +18,14 @@ function Script() {
   return <script src={realScoutScriptSrc} type="module" async />
 }
 
-/** Reserves height so the page does not jump when the widget upgrades. */
+/**
+ * Reserves height so the page does not jump when the widget upgrades.
+ *
+ * Width constraints belong to the caller, not here. Layering a second
+ * max-width on top of one baked into the component produces two conflicting
+ * Tailwind classes whose winner depends on CSS order rather than class order —
+ * a silent bug. Each call site sets its own.
+ */
 const slot = 'w-full'
 
 export function SimpleSearch({ className = '' }: { className?: string }) {
@@ -33,7 +40,7 @@ export function SimpleSearch({ className = '' }: { className?: string }) {
           --rs-ss-widget-width: 100% !important;
         }
       `}</style>
-      <div className={`${slot} max-w-search min-h-[62px] ${className}`}>
+      <div className={`${slot} min-h-[62px] ${className}`}>
         <realscout-simple-search agent-encoded-id={realScoutAgentId} />
       </div>
     </>
@@ -76,7 +83,7 @@ export function HomeValue({ className = '' }: { className?: string }) {
           --rs-hvw-widget-width: 100% !important;
         }
       `}</style>
-      <div className={`${slot} max-w-search min-h-[180px] ${className}`}>
+      <div className={`${slot} min-h-[180px] ${className}`}>
         {/* Title and subtitle are off; the page sets those in Danielle's type. */}
         <realscout-home-value
           agent-encoded-id={realScoutAgentId}

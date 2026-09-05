@@ -33,6 +33,42 @@ supplied, high-profile clients, or transaction outcomes — and never reach for
 Her credibility comes from useful work, real experience, intelligence, taste,
 clarity, and a recognisable point of view. Build things that earn it.
 
+**Overthinking Real Estate IS the newsletter.** They are one publication, hers,
+published through Substack. Never present a "newsletter" as a second content
+product with its own name, voice, or brand. The homepage carries the editorial
+section and, later, a subscription point for that same publication — framed as
+subscribing to Overthinking Real Estate, not to something else. Subscribing
+happens on Substack; there is no email form here and there must not be a fake
+one.
+
+## Brand target — standing rule
+
+**This is a luxury site. It is not the generic version of one.**
+
+Danielle is a Los Angeles luxury agent, and the site must feel polished,
+expensive, credible and confident enough to represent a serious property. Do
+not read the identity rule above as licence to be casual, indie, or amateur.
+The professionalism comes through taste and execution, never corporate styling.
+
+The target is next-generation LA luxury: editorial, culturally aware,
+sophisticated, feminine without being cute, fun in controlled doses. She should
+read as someone who could represent a very serious property *and* be the person
+you want to text.
+
+- NOT "young agent trying to look established"
+- NOT "quirky editorial person who happens to sell houses"
+- YES "cool, trusted, high-end LA agent with excellent taste, a strong point of
+  view, and an editorial world around her"
+
+Avoid the default LA luxury formula: beige on beige, mansion drone hero,
+black-and-white glamour portrait, serif logo plus thin sans, champagne and keys
+imagery, volume statistics, awards walls, testimonial carousels, aggressive
+lead capture, glossy brokerage template. Looking older and more conservative is
+not the same as looking established.
+
+Luxury is communicated through photography, typography, proportion, restraint,
+confidence and impeccable execution — never through fake proof.
+
 ## Standing rules
 
 **The design system is locked.** Colors, typefaces, and the type scale were approved after multiple rounds. Never introduce a color, typeface, radius, or shadow that isn't in `tokens.css`. If something seems to need a new value, it needs a different composition of existing values instead.
