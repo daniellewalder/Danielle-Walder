@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Rozha+One&family=Kalnia:wght@300;400;500&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #F4F1E2; }
+a { color: #7A1F2E; text-decoration: none; }
+a:hover { color: #513229; }
+</style>
+</helmet>
+
+<div style="background: #F4F1E2; font-family: 'Figtree', system-ui, sans-serif; color: #3B2620; padding: 56px 56px 80px;">
+
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; border-bottom: 1.5px solid #513229; padding-bottom: 22px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #897D6D;">Brand sheet · v2</span>
+      <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 44px; letter-spacing: -0.055em; line-height: 1;">danielle walder</span>
+      <span style="font-family: 'Kalnia', serif; font-size: 22px; color: #7A1F2E;">overthinking real estate</span>
+    </div>
+    <span style="font-size: 13.5px; line-height: 1.5; max-width: 340px; color: #6B5F55;">Palette locked, unchanged from v1. Unbounded is now locked as the Danielle mark. What moved in v2: the shape language has hierarchy instead of one radius everywhere, and photography is allowed to be large and square.</span>
+  </div>
+
+  <div style="padding-top: 44px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: baseline; gap: 14px;"><div style="font-family: 'Rozha One', serif; font-size: 34px;">Color families</div><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7A1F2E; border: 1px solid #C9A9AF; padding: 5px 10px; border-radius: 6px;">locked · unchanged in v2</span></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+
+      <div style="background: #E3DBCB; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-height: 260px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em; color: #513229;">brown</span>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #897D6D;">structure</span>
+        </div>
+        <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1; color: #3B2620;">Dark on light</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #513229;">
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #FBF9F0;"></span>#FBF9F0 &nbsp;paper</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #E3DBCB;"></span>#E3DBCB &nbsp;sand field</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #897D6D;"></span>#897D6D &nbsp;taupe · secondary text</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #513229;"></span>#513229 &nbsp;rustic brown · dark sections</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #3B2620;"></span>#3B2620 &nbsp;espresso · body text</div>
+        </div>
+      </div>
+
+      <div style="background: #D8EBF9; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-height: 260px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em; color: #24425A;">blue</span>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #5C7E96;">hero · search · tools</span>
+        </div>
+        <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1; color: #24425A;">Frosted, calm</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #24425A;">
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #EAF4FC;"></span>#EAF4FC &nbsp;mist</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #D8EBF9;"></span>#D8EBF9 &nbsp;frosted field</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #A8C4DA;"></span>#A8C4DA &nbsp;steel · borders, charts</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #3A5B75;"></span>#3A5B75 &nbsp;deep blue · text on frosted</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #24425A;"></span>#24425A &nbsp;ink blue · headlines on blue</div>
+        </div>
+      </div>
+
+      <div style="background: #FCE6B7; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-height: 260px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em; color: #6A4E12;">butter</span>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #96773A;">about · quizzes · flags</span>
+        </div>
+        <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1; color: #6A4E12;">Warm, not loud</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #6A4E12;">
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #FDF2D8;"></span>#FDF2D8 &nbsp;pale butter</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #FCE6B7;"></span>#FCE6B7 &nbsp;butter field</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #F3D79C;"></span>#F3D79C &nbsp;deep butter · photo tint</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #96773A;"></span>#96773A &nbsp;bronze · labels on butter</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #6A4E12;"></span>#6A4E12 &nbsp;olive brown · text on butter</div>
+        </div>
+      </div>
+
+      <div style="background: #D4D7B5; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-height: 260px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em; color: #4A4B25;">sage</span>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #6B6C38;">editorial · neighborhoods</span>
+        </div>
+        <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1; color: #4A4B25;">Quiet accent</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #4A4B25;">
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #E4E6CE;"></span>#E4E6CE &nbsp;pale sage</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #D4D7B5;"></span>#D4D7B5 &nbsp;sage field</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #A9AE7F;"></span>#A9AE7F &nbsp;mid sage · rules</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #6B6C38;"></span>#6B6C38 &nbsp;olive sage · links, hovers</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #4A4B25;"></span>#4A4B25 &nbsp;deep olive · text on sage</div>
+        </div>
+      </div>
+
+      <div style="background: #EFEADA; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-height: 260px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em; color: #3B2620;">ink accents</span>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #897D6D;">hints only · never a field</span>
+        </div>
+        <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1; color: #7A1F2E;">Deep wine, on neutral</div>
+        <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #3B2620;">
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #7A1F2E;"></span>#7A1F2E &nbsp;deep wine · prices, ORE, one accent word</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #5A1522;"></span>#5A1522 &nbsp;wine pressed · active state only</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #33452F;"></span>#33452F &nbsp;pine ink · links, hovers</div>
+          <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 26px; height: 26px; border-radius: 8px; background: #205A66;"></span>#205A66 &nbsp;petrol ink · data, charts, notes</div>
+          <div style="font-size: 12px; line-height: 1.5; padding-top: 4px; color: #6B5F55;">Inks appear only as type, hairlines or a small badge on a neutral or pale field, darker and cooler than the sage and blue families, so they read as ink, not colour.</div>
+        </div>
+      </div>
+
+      <div style="background: #FBF9F0; border: 1px solid #E3DBCB; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; min-height: 260px;">
+        <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em;">how they combine</span>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 1.5; color: #6B5F55;">
+          <div>One family per section. The section's own dark tone writes on its light field. That's what keeps it monochromatic.</div>
+          <div>Cream is the connective tissue between colored sections. Brown is the only true dark.</div>
+          <div>Deep wine, pine and petrol cross families as ink only; sage and butter never share a block.</div>
+        </div>
+        <div style="display: flex; gap: 8px; padding-top: 4px;">
+          <div style="flex: 1; height: 54px; border-radius: 14px; background: #D8EBF9; color: #24425A; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">Aa</div>
+          <div style="flex: 1; height: 54px; border-radius: 14px; background: #FCE6B7; color: #6A4E12; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">Aa</div>
+          <div style="flex: 1; height: 54px; border-radius: 14px; background: #D4D7B5; color: #4A4B25; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">Aa</div>
+          <div style="flex: 1; height: 54px; border-radius: 14px; background: #E3DBCB; color: #513229; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">Aa</div>
+          <div style="flex: 1; height: 54px; border-radius: 14px; background: #513229; color: #F4F1E2; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">Aa</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="padding-top: 52px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'Rozha One', serif; font-size: 34px;">Typography</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">Unbounded 500/600 · locked</span><span style="font-size: 12px; color: #6B5F55;">name · nav · big statements</span></div>
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 46px; line-height: 0.94; letter-spacing: -0.055em;">danielle walder</div>
+        <div style="font-size: 12.5px; color: #6B5F55; line-height: 1.5;">Always lowercase, tracking −0.05em, never below 16px. Line-height 0.92–0.98 at display sizes. 500 for the nav mark and listing addresses, 600 for hero and section statements.</div>
+      </div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">Rozha One</span><span style="font-size: 12px; color: #6B5F55;">section headers · prices · stats</span></div>
+        <div style="font-family: 'Rozha One', serif; font-size: 50px; line-height: 1;">Now showing, [PRICE]</div>
+        <div style="font-size: 12.5px; color: #6B5F55; line-height: 1.5;">Sentence case, never tracked, never in paragraphs. It exists to be big.</div>
+      </div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">Kalnia 300/400</span><span style="font-size: 12px; color: #6B5F55;">Overthinking Real Estate · quotes · accent words</span></div>
+        <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 38px; line-height: 1.06;">The Cost Per Tuesday</div>
+        <div style="display: flex; flex-direction: column; gap: 3px; border-top: 1px solid #E3DBCB; padding-top: 10px;">
+          <span style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 22px; color: #7A1F2E;">overthinking real estate</span>
+          <span style="font-size: 11.5px; color: #6B5F55;">lowercase — in nav, footer and inline references. Reads as a voice.</span>
+          <span style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 22px; color: #7A1F2E; padding-top: 6px;">Overthinking Real Estate</span>
+          <span style="font-size: 11.5px; color: #6B5F55;">title case — only as the section heading on the homepage and the section landing page. Never larger than Danielle's name on the same screen.</span>
+        </div>
+      </div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">Figtree 400/500/700</span><span style="font-size: 12px; color: #6B5F55;">facts · forms · everything practical</span></div>
+        <div style="font-size: 16px; line-height: 1.55;">[NEIGHBORHOOD] · [BEDS] bd · [BATHS] ba · [SQ FT] sq ft. Body copy sits at 16–19px with 1.45–1.6 line height.</div>
+        <div style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">Labels: 11–12.5px, 700, 0.18em tracked</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding-top: 52px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'Rozha One', serif; font-size: 34px;">Buttons &amp; UI</div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 15px; font-weight: 600;">
+          <span style="background: #513229; color: #F4F1E2; padding: 14px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #7A1F2E;">Primary</span>
+          <span style="border: 1.5px solid #513229; padding: 12.5px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #6B6C38; color: #F4F1E2; border-color: #6B6C38;">Secondary</span>
+          <span style="background: #FCE6B7; color: #6A4E12; padding: 14px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #F3D79C;">Playful</span>
+          <span style="background: #CFD3AE; color: #4A4B25; padding: 11px 20px; border-radius: 10px; font-size: 14px; cursor: pointer;" style-hover="background: #6B6C38; color: #F4F1E2;">Tertiary</span>
+          <span style="border-bottom: 2px solid #6B6C38; color: #6B6C38; padding-bottom: 2px; cursor: pointer;">Text link →</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #F4F1E2; border-radius: 14px; padding: 8px 8px 8px 22px; max-width: 480px;">
+          <span style="flex: 1; font-size: 16px; color: #897D6D;">Input placeholder</span>
+          <span style="background: #513229; color: #F4F1E2; font-size: 15px; font-weight: 600; padding: 13px 22px; border-radius: 10px;">Search</span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">
+          <span style="background: #FCE6B7; color: #6A4E12; padding: 6px 11px; border-radius: 6px;">open sun 2–4</span>
+          <span style="background: #D8EBF9; color: #24425A; padding: 6px 11px; border-radius: 6px;">just listed</span>
+          <span style="background: #D4D7B5; color: #4A4B25; padding: 6px 11px; border-radius: 6px;">in escrow</span>
+          <span style="background: #513229; color: #F4F1E2; padding: 6px 11px; border-radius: 6px;">sold</span>
+        </div>
+        <div style="font-size: 12.5px; line-height: 1.5; color: #6B5F55;">One label per listing at most, and only when it carries real information. Labels sit in the row under the photograph, not floating on top of it.</div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: 'Rozha One', serif; font-size: 34px;">Shape &amp; space</div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 16px; font-size: 13.5px; line-height: 1.55; color: #6B5F55;">
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+          <div style="width: 58px; height: 40px; border-radius: 0; background: #E3DBCB;"></div>
+          <div style="width: 58px; height: 46px; border-radius: 4px; background: #E3DBCB;"></div>
+          <div style="width: 58px; height: 52px; border-radius: 8px; background: #E3DBCB;"></div>
+          <div style="width: 58px; height: 58px; border-radius: 12px; background: #E3DBCB;"></div>
+          <div style="width: 76px; height: 66px; border-radius: 20px; background: #E3DBCB;"></div>
+        </div>
+        <div><strong style="color: #3B2620;">Radii, v2:</strong> 6–8px labels · 10–12px buttons and inputs · 0–4px photography · 20px reserved for the two or three soft color blocks that genuinely need to be containers (hero, about, newsletter). Nothing at 28px any more; no circles, no full pills.</div>
+        <div><strong style="color: #3B2620;">Containers are earned:</strong> most sections are separated by whitespace and a 1px #DCD4C2 hairline rather than a rounded rectangle. If two rounded blocks would sit next to each other, one of them becomes plain cream.</div>
+        <div><strong style="color: #3B2620;">Rhythm:</strong> 40px page gutters, 20–26px between siblings, 72–88px between sections. One full-bleed dark section per page.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding-top: 52px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: baseline; gap: 14px;"><div style="font-family: 'Rozha One', serif; font-size: 34px;">The Danielle mark</div><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7A1F2E; border: 1px solid #C9A9AF; padding: 5px 10px; border-radius: 6px;">Unbounded · locked</span></div>
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px;">
+      <div style="background: #FBF9F0; border: 1px solid #E9E3D2; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 40px; line-height: 0.94; letter-spacing: -0.055em;">danielle walder</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7A1F2E;">display · 600</span><span style="font-size: 12px; color: #6B5F55;">hero, section statements, quiz titles. 40px and up.</span></div>
+      </div>
+      <div style="background: #FBF9F0; border: 1px solid #E9E3D2; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 18px; line-height: 1; letter-spacing: -0.045em;">danielle walder</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7A1F2E;">nav mark · 600</span><span style="font-size: 12px; color: #6B5F55;">18px, tracking −0.045em. The smallest the mark ever goes.</span></div>
+      </div>
+      <div style="background: #FBF9F0; border: 1px solid #E9E3D2; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 17px; line-height: 1.15; letter-spacing: -0.045em;">[listing address]</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #7A1F2E;">utility · 500</span><span style="font-size: 12px; color: #6B5F55;">addresses and short labels only. Never body copy.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding-top: 52px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="font-family: 'Rozha One', serif; font-size: 34px;">Photography</div>
+    <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: stretch;">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px;">
+        <div style="height: 300px; border-radius: 4px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="bs2-arch" shape="rect" placeholder="Architecture"></image-slot></div>
+        <div style="display: grid; grid-template-rows: 1fr 1fr; gap: 14px; min-width: 0;">
+          <div style="border-radius: 4px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="bs2-interior" shape="rect" placeholder="Interior"></image-slot></div>
+          <div style="border-radius: 20px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="bs2-danielle" shape="rect" placeholder="Danielle"></image-slot></div>
+        </div>
+      </div>
+      <div style="background: #FBF9F0; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; line-height: 1.55; color: #6B5F55;">
+        <div><strong style="color: #3B2620;">Property and architecture:</strong> 0–4px corners, large, never smaller than a third of the section. The photograph is the loudest thing on a listing, not the type.</div>
+        <div><strong style="color: #3B2620;">Danielle and editorial:</strong> may take the 20px soft corner. That difference is deliberate — soft corners mean personality, square corners mean property.</div>
+        <div><strong style="color: #3B2620;">Rules:</strong> natural light, no filters, no duotone, no gradient scrims. Vary proportion between neighbors instead of adding treatments. Nothing floats on top of a photo except a real, useful label.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding-top: 52px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div style="background: #D8EBF9; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 10px; color: #24425A;">
+      <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em;">do</div>
+      <div style="font-size: 14px; line-height: 1.6;">Let one family own a section · write dark-on-light within that family · keep the Danielle mark lowercase · put burgundy on prices and the word you want remembered · separate most sections with whitespace and a hairline · let photography be large, square and the loudest thing on the page.</div>
+    </div>
+    <div style="background: #E3DBCB; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 10px; color: #3B2620;">
+      <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.04em;">don't</div>
+      <div style="font-size: 14px; line-height: 1.6;">Stack three color families in one block · set Rozha One in paragraphs · use burgundy as a background · add a fifth typeface · wrap every section in a rounded card · give every photograph the same corner · float badges over listing photos · put drop shadows or gradients on anything · use circles or 999px pills.</div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

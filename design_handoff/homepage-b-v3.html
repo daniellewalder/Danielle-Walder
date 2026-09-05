@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Rozha+One&family=Kalnia:wght@300;400;500&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #F4F1E2; }
+a { color: #7A1F2E; text-decoration: none; }
+a:hover { color: #513229; }
+</style>
+</helmet>
+
+<div style="background: #F4F1E2; font-family: 'Figtree', system-ui, sans-serif; color: #3B2620;">
+
+  <div style="padding: 26px 40px 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 28px; border-bottom: 1px solid #DCD4C2; padding-bottom: 18px;">
+      <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.045em; white-space: nowrap;">danielle walder</span>
+      <div style="display: flex; align-items: center; gap: 18px; font-size: 14.5px; font-weight: 500; white-space: nowrap;">
+        <span style="cursor: pointer;" style-hover="color: #7A1F2E;">search</span>
+        <span style="cursor: pointer;" style-hover="color: #7A1F2E;">listings</span>
+        <span style="cursor: pointer;" style-hover="color: #7A1F2E;">sold</span>
+        <span style="font-family: 'Kalnia', serif; font-size: 16.5px; color: #7A1F2E; cursor: pointer;">overthinking real estate</span>
+        <span style="cursor: pointer;" style-hover="color: #7A1F2E;">quizzes</span>
+        <span style="cursor: pointer;" style-hover="color: #7A1F2E;">about</span>
+        <span style="background: #513229; color: #F4F1E2; padding: 11px 20px; border-radius: 12px; font-weight: 600; cursor: pointer;" style-hover="background: #7A1F2E;">say hello</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 22px 40px 0;">
+    <div style="background: #D8EBF9; border-radius: 20px; padding: 54px 46px; display: grid; grid-template-columns: 1.04fr 0.96fr; gap: 50px; align-items: center;">
+      <div style="display: flex; flex-direction: column; gap: 26px;">
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 66px; line-height: 0.94; letter-spacing: -0.055em; color: #24425A;">[HERO HEADLINE]</div>
+        <div style="font-size: 19px; line-height: 1.45; max-width: 400px; color: #3A5B75;">[INTRO COPY]</div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #FBF9F0; border-radius: 14px; padding: 8px 8px 8px 22px; max-width: 500px;">
+          <span style="flex: 1; font-size: 16.5px; color: #897D6D;">where are you looking?</span>
+          <span style="background: #513229; color: #F4F1E2; font-size: 15px; font-weight: 600; padding: 14px 24px; border-radius: 10px; cursor: pointer;" style-hover="background: #7A1F2E;">search homes</span>
+        </div>
+      </div>
+      <div style="height: 520px; border-radius: 4px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-portrait" shape="rect" placeholder="Danielle"></image-slot></div>
+    </div>
+  </div>
+
+  <div style="padding: 22px 40px 0;">
+    <div style="display: flex; align-items: center; gap: 26px; flex-wrap: wrap; font-size: 14.5px; font-weight: 500; color: #6B5F55; border-bottom: 1px solid #DCD4C2; padding-bottom: 20px;">
+      <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #897D6D;">start here</span>
+      <span style="cursor: pointer;" style-hover="color: #7A1F2E;">map search</span>
+      <span style="cursor: pointer;" style-hover="color: #7A1F2E;">new this week</span>
+      <span style="cursor: pointer;" style-hover="color: #7A1F2E;">open houses</span>
+      <span style="cursor: pointer;" style-hover="color: #7A1F2E;">what I've sold</span>
+      <span style="cursor: pointer;" style-hover="color: #7A1F2E;">what's my home worth</span>
+    </div>
+  </div>
+
+  <div style="padding: 56px 40px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;">
+    <div style="font-family: 'Rozha One', serif; font-size: 54px; line-height: 1;">Now showing</div>
+    <span style="font-size: 15px; font-weight: 600; color: #6B6C38; border-bottom: 2px solid #6B6C38; padding-bottom: 2px; cursor: pointer; white-space: nowrap;">every listing →</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 26px 40px 0;">
+    <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+      <div style="height: 420px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-listing-1" shape="rect" placeholder="Listing"></image-slot></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 17px; letter-spacing: -0.045em;">[LISTING ADDRESS]</span>
+          <span style="font-family: 'Rozha One', serif; font-size: 24px; color: #7A1F2E;">[PRICE]</span>
+        </div>
+        <div style="font-size: 15px; color: #6B5F55;">[NEIGHBORHOOD] · [BEDS] bd · [BATHS] ba · [SQ FT] sq ft</div>
+        <span style="align-self: flex-start; background: #FCE6B7; color: #6A4E12; font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 11px; border-radius: 6px; margin-top: 3px;">open sun 2–4</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+      <div style="height: 420px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-listing-2" shape="rect" placeholder="Listing"></image-slot></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 17px; letter-spacing: -0.045em;">[LISTING ADDRESS]</span>
+          <span style="font-family: 'Rozha One', serif; font-size: 24px; color: #7A1F2E;">[PRICE]</span>
+        </div>
+        <div style="font-size: 15px; color: #6B5F55;">[NEIGHBORHOOD] · [BEDS] bd · [BATHS] ba · [SQ FT] sq ft</div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+      <div style="height: 420px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-listing-3" shape="rect" placeholder="Listing"></image-slot></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px;">
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 17px; letter-spacing: -0.045em;">[LISTING ADDRESS]</span>
+          <span style="font-family: 'Rozha One', serif; font-size: 24px; color: #7A1F2E;">[PRICE]</span>
+        </div>
+        <div style="font-size: 15px; color: #6B5F55;">[NEIGHBORHOOD] · [BEDS] bd · [BATHS] ba · [SQ FT] sq ft</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 76px 40px 0; padding-top: 34px; border-top: 1px solid #DCD4C2; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #897D6D;">past sales</span>
+      <div style="font-family: 'Rozha One', serif; font-size: 40px; line-height: 1;">Sold</div>
+    </div>
+    <span style="font-size: 15px; font-weight: 600; color: #6B6C38; border-bottom: 2px solid #6B6C38; padding-bottom: 2px; cursor: pointer; white-space: nowrap;">everything I've sold →</span>
+  </div>
+  <div style="padding: 22px 40px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+    <div style="display: flex; flex-direction: column; gap: 11px; min-width: 0;">
+      <div style="height: 190px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-sold-1" shape="rect" placeholder="Sold"></image-slot></div>
+      <div style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</div>
+      <div style="font-size: 14px; color: #6B5F55;">[NEIGHBORHOOD] · sold [PRICE]</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 11px; min-width: 0;">
+      <div style="height: 190px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-sold-2" shape="rect" placeholder="Sold"></image-slot></div>
+      <div style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</div>
+      <div style="font-size: 14px; color: #6B5F55;">[NEIGHBORHOOD] · sold [PRICE]</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 11px; min-width: 0;">
+      <div style="height: 190px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-sold-3" shape="rect" placeholder="Sold"></image-slot></div>
+      <div style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</div>
+      <div style="font-size: 14px; color: #6B5F55;">[NEIGHBORHOOD] · sold [PRICE]</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 11px; min-width: 0;">
+      <div style="height: 190px; border-radius: 2px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-sold-4" shape="rect" placeholder="Sold"></image-slot></div>
+      <div style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</div>
+      <div style="font-size: 14px; color: #6B5F55;">[NEIGHBORHOOD] · sold [PRICE]</div>
+    </div>
+  </div>
+
+  <div style="padding: 80px 40px 0;">
+    <div style="background: #FCE6B7; border-radius: 20px; padding: 56px 48px; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 48px; align-items: center;">
+      <div style="height: 420px; border-radius: 20px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-about" shape="rect" placeholder="Danielle"></image-slot></div>
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 50px; line-height: 0.96; letter-spacing: -0.055em; color: #6A4E12;">hi, I'm Danielle</div>
+        <div style="font-size: 18px; line-height: 1.55; max-width: 470px; color: #6A4E12;">[ABOUT COPY — two or three sentences on how you work and what you're actually good at]</div>
+        <div style="display: flex; gap: 40px; flex-wrap: wrap; border-top: 1px solid #EBD3A2; border-bottom: 1px solid #EBD3A2; padding: 20px 0;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'Rozha One', serif; font-size: 32px; line-height: 1; color: #6A4E12;">[SALES VOLUME]</span><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #96773A;">closed</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'Rozha One', serif; font-size: 32px; line-height: 1; color: #6A4E12;">[TRANSACTIONS]</span><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #96773A;">homes</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-family: 'Rozha One', serif; font-size: 32px; line-height: 1; color: #6A4E12;">[YEARS]</span><span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #96773A;">years in LA</span></div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <span style="background: #513229; color: #FCE6B7; font-size: 15px; font-weight: 600; padding: 14px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #7A1F2E;">[CTA]</span>
+          <span style="border: 1.5px solid #513229; font-size: 15px; font-weight: 600; padding: 12.5px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #6B6C38; color: #F4F1E2; border-color: #6B6C38;">more about me</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 88px 40px 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #6B6C38;">the reading part</span>
+      <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 54px; line-height: 1; color: #7A1F2E;">Overthinking Real Estate</div>
+    </div>
+    <span style="font-size: 15px; font-weight: 600; color: #6B6C38; border-bottom: 2px solid #6B6C38; padding-bottom: 2px; cursor: pointer; white-space: nowrap;">read everything →</span>
+  </div>
+  <div style="padding: 28px 40px 0; display: grid; grid-template-columns: 1.4fr 1fr; gap: 44px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="height: 340px; border-radius: 20px; overflow: hidden; width: 100%; min-width: 0;"><image-slot id="shared-ore-lead" shape="rect" placeholder="Essay"></image-slot></div>
+      <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 46px; line-height: 1.02;">The Cost Per Tuesday</div>
+      <div style="font-size: 16.5px; line-height: 1.5; color: #6B5F55; max-width: 460px;">[STANDFIRST]</div>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #DCD4C2; padding: 22px 0;">
+        <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 27px; line-height: 1.12;">Everybody Says They Want a Deal.</div>
+        <span style="font-size: 12.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #897D6D;">essay</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #DCD4C2; padding: 22px 0;">
+        <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 27px; line-height: 1.12;">Who Actually Has Access to Your Transaction?</div>
+        <span style="font-size: 12.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #897D6D;">essay</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #DCD4C2; border-bottom: 1px solid #DCD4C2; padding: 22px 0;">
+        <div style="font-family: 'Kalnia', serif; font-weight: 400; font-size: 27px; line-height: 1.12;">Is the Kitchen Actually Outdated, or Are You Just Tired of Looking at It?</div>
+        <span style="font-size: 12.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #897D6D;">essay</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 88px; background: #513229; color: #F4F1E2; padding: 80px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <span style="align-self: flex-start; background: #FCE6B7; color: #513229; font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 7px 13px; border-radius: 6px;">quiz · [N] questions</span>
+      <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 54px; line-height: 0.94; letter-spacing: -0.055em;">[QUIZ TITLE]</div>
+      <div style="font-size: 17.5px; line-height: 1.5; color: #DACFC4; max-width: 380px;">[QUIZ INTRO]</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #C4B9AC;">[QUESTION 1]</span>
+      <span style="background: #D8EBF9; color: #24425A; font-size: 18px; font-weight: 500; padding: 19px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #FCE6B7; color: #513229;">[ANSWER A]</span>
+      <span style="background: #F4F1E2; color: #513229; font-size: 18px; font-weight: 500; padding: 19px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #FCE6B7;">[ANSWER B]</span>
+      <span style="background: #F4F1E2; color: #513229; font-size: 18px; font-weight: 500; padding: 19px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #FCE6B7;">[ANSWER C]</span>
+      <span style="background: #F4F1E2; color: #513229; font-size: 18px; font-weight: 500; padding: 19px 26px; border-radius: 12px; cursor: pointer;" style-hover="background: #FCE6B7;">[ANSWER D]</span>
+    </div>
+  </div>
+
+  <div style="padding: 88px 40px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center;">
+    <div style="font-family: 'Kalnia', serif; font-weight: 300; font-size: 42px; line-height: 1.2; max-width: 860px;">“[CLIENT QUOTE]”</div>
+    <div style="font-size: 12.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #897D6D;">[CLIENT] · [NEIGHBORHOOD]</div>
+  </div>
+
+  <div style="padding: 0 40px;">
+    <div style="border-top: 1px solid #DCD4C2; padding-top: 44px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 46px; align-items: end;">
+      <div style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 44px; line-height: 0.98; letter-spacing: -0.055em;">one letter, twice a month. <span style="font-family: 'Kalnia', serif; font-weight: 400; letter-spacing: -0.01em; color: #7A1F2E;">occasionally a house.</span></div>
+      <div style="display: flex; align-items: center; gap: 10px; background: #FBF9F0; border: 1px solid #E3DBCB; border-radius: 14px; padding: 8px 8px 8px 22px;">
+        <span style="flex: 1; font-size: 16px; color: #897D6D;">your email</span>
+        <span style="background: #7A1F2E; color: #F4F1E2; font-size: 15px; font-weight: 600; padding: 14px 24px; border-radius: 10px; cursor: pointer;" style-hover="background: #5A1522;">subscribe</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 76px; background: #513229; color: #F4F1E2; padding: 52px 40px 40px; display: flex; flex-direction: column; gap: 34px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap;">
+      <span style="font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 34px; letter-spacing: -0.055em;">danielle walder</span>
+      <span style="font-family: 'Kalnia', serif; font-size: 22px; color: #FCE6B7;">overthinking real estate</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; border-top: 1px solid #6A5347; padding-top: 24px; flex-wrap: wrap;">
+      <div style="display: flex; gap: 22px; font-size: 14px; color: #C4B9AC; flex-wrap: wrap;"><span>search</span><span>listings</span><span>sold</span><span>overthinking real estate</span><span>quizzes</span><span>about</span><span>contact</span></div>
+      <div style="display: flex; gap: 22px; font-size: 13px; color: #A8998C; flex-wrap: wrap;"><span>[BROKERAGE]</span><span>DRE [DRE NUMBER]</span></div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

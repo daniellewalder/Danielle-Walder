@@ -1,0 +1,66 @@
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--espresso);
+    font-family: theme('fontFamily.sans');
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Motion is nearly absent by design: hover is a colour swap, nothing else. */
+  a,
+  button {
+    transition-property: color, background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+
+  /* Never remove outlines — every interactive element keeps a visible ring. */
+  :focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Page gutters: 40px desktop · 32px tablet · 20px mobile. */
+  .wrap {
+    @apply px-gutter tablet:px-gutter-tablet mobile:px-gutter-mobile;
+  }
+
+  /* Uppercase label: Figtree 700, 11.5px, 0.18–0.2em. */
+  .eyebrow {
+    @apply font-sans text-[11.5px] font-bold uppercase tracking-attribution text-taupe;
+  }
+
+  /* "every listing →" / "read everything →" — the sage editorial link. */
+  .more-link {
+    @apply border-b-2 border-sage-olive pb-[2px] font-sans text-[15px] font-semibold text-sage-olive hover:border-sage-deep hover:text-sage-deep;
+  }
+
+  /* Section header row: title left, "more" link right, baselines aligned. */
+  .section-head {
+    @apply flex items-end justify-between gap-6 mobile:flex-col mobile:items-start mobile:gap-3;
+  }
+}

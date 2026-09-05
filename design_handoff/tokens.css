@@ -1,0 +1,127 @@
+/* Danielle Walder — design tokens
+   Palette and type scale are LOCKED and approved. Do not add or alter values. */
+
+:root {
+  /* ---- Brown · structure ---------------------------------- */
+  --cream:        #F4F1E2; /* page background, connective tissue */
+  --paper:        #FBF9F0; /* inputs, cards on cream */
+  --sand:         #E3DBCB; /* secondary field, placeholder blocks */
+  --hairline:     #DCD4C2; /* 1px section dividers */
+  --taupe:        #897D6D; /* secondary text, placeholders */
+  --warm-gray:    #6B5F55; /* body text, secondary */
+  --brown:        #513229; /* the only true dark; dark sections, primary buttons */
+  --espresso:     #3B2620; /* body text */
+
+  /* ---- Blue · hero, search, tools ------------------------- */
+  --blue-mist:    #EAF4FC;
+  --blue-field:   #D8EBF9; /* hero block, quiz answer A */
+  --blue-steel:   #A8C4DA; /* borders, charts */
+  --blue-deep:    #3A5B75; /* body on frosted */
+  --blue-ink:     #24425A; /* headlines on frosted */
+
+  /* ---- Butter · about, quizzes, flags --------------------- */
+  --butter-pale:  #FDF2D8;
+  --butter-field: #FCE6B7; /* about block, badges */
+  --butter-deep:  #F3D79C; /* playful button hover */
+  --butter-rule:  #EBD3A2; /* rules inside butter */
+  --bronze:       #96773A; /* labels on butter */
+  --olive-brown:  #6A4E12; /* text/headlines on butter */
+
+  /* ---- Sage · editorial, neighborhoods -------------------- */
+  --sage-pale:    #E4E6CE;
+  --sage-field:   #D4D7B5;
+  --sage-chip:    #CFD3AE; /* tertiary button */
+  --sage-mid:     #A9AE7F; /* rules */
+  --olive-sage:   #6B6C38; /* text links + hovers site-wide */
+  --olive-deep:   #4A4B25; /* text on sage */
+
+  /* ---- Inks · hints only, never a field ------------------- */
+  --wine:         #7A1F2E; /* prices, ORE wordmark, one accent word */
+  --wine-pressed: #5A1522; /* active state only */
+  --pine-ink:     #33452F;
+  --petrol-ink:   #205A66; /* data, charts, notes */
+
+  /* ---- On dark brown -------------------------------------- */
+  --on-brown:         #F4F1E2;
+  --on-brown-body:    #DACFC4;
+  --on-brown-label:   #C4B9AC;
+  --on-brown-fine:    #A8998C;
+  --on-brown-rule:    #6A5347;
+
+  /* ---- Type ---------------------------------------------- */
+  --font-mark:   'Unbounded', sans-serif;   /* 400 500 600 700 */
+  --font-display:'Rozha One', serif;        /* 400 */
+  --font-serif:  'Kalnia', serif;           /* 300 400 500 */
+  --font-body:   'Figtree', system-ui, sans-serif; /* 300–700 */
+
+  --track-display: -0.055em; /* Unbounded 40px+ */
+  --track-utility: -0.045em; /* Unbounded 16–24px */
+  --track-label:   0.18em;   /* uppercase labels */
+
+  /* ---- Shape --------------------------------------------- */
+  --r-photo:  2px;  /* property photography: 0–4px */
+  --r-badge:  6px;
+  --r-input:  10px;
+  --r-button: 12px;
+  --r-block:  20px; /* hero, about, newsletter, editorial photos only */
+
+  /* ---- Rhythm -------------------------------------------- */
+  --gutter:       40px; /* 32px tablet, 20px mobile */
+  --gap-sibling:  24px; /* 20–26px */
+  --gap-section:  80px; /* 72–88px */
+}
+
+/* Type scale, desktop → mobile
+   hero headline      Unbounded 600  66px / 0.94   →  52  →  40
+   section header     Rozha One      54px / 1.0    →  44  →  34
+   sub header         Rozha One      40px / 1.0    →  34  →  28
+   ORE section        Kalnia 400     54px / 1.0    →  44  →  34
+   lead essay title   Kalnia 400     46px / 1.02   →  38  →  30
+   about headline     Unbounded 600  50px / 0.96   →  42  →  32
+   quiz title         Unbounded 600  54px / 0.94   →  44  →  34
+   newsletter head    Unbounded 600  44px / 0.98   →  36  →  28
+   pull quote         Kalnia 300     42px / 1.2    →  34  →  27
+   essay list title   Kalnia 400     27px / 1.12
+   footer mark        Unbounded 600  34px
+   price              Rozha One      24px
+   stat number        Rozha One      32px
+   nav mark           Unbounded 600  18px / -0.045em   (never smaller)
+   listing address    Unbounded 500  17px / -0.045em
+   intro copy         Figtree 400    19px / 1.45
+   about copy         Figtree 400    18px / 1.55
+   body               Figtree 400    16–17px / 1.5     (never below 16px)
+   meta               Figtree 400    14–15px / 1.5
+   nav / link         Figtree 500|600 14.5–15px
+   label              Figtree 700    11–12.5px / uppercase / 0.14–0.22em
+*/
+
+/* ------------------------------------------------------------------
+   Tailwind — paste into tailwind.config.ts theme.extend
+   ------------------------------------------------------------------
+  colors: {
+    cream: '#F4F1E2', paper: '#FBF9F0', sand: '#E3DBCB',
+    hairline: '#DCD4C2', taupe: '#897D6D', warmgray: '#6B5F55',
+    brown: '#513229', espresso: '#3B2620',
+    blue:   { mist: '#EAF4FC', field: '#D8EBF9', steel: '#A8C4DA', deep: '#3A5B75', ink: '#24425A' },
+    butter: { pale: '#FDF2D8', field: '#FCE6B7', deep: '#F3D79C', rule: '#EBD3A2', bronze: '#96773A', text: '#6A4E12' },
+    sage:   { pale: '#E4E6CE', field: '#D4D7B5', chip: '#CFD3AE', mid: '#A9AE7F', olive: '#6B6C38', deep: '#4A4B25' },
+    wine:   { DEFAULT: '#7A1F2E', pressed: '#5A1522' },
+    pine: '#33452F', petrol: '#205A66',
+    onbrown: { DEFAULT: '#F4F1E2', body: '#DACFC4', label: '#C4B9AC', fine: '#A8998C', rule: '#6A5347' },
+  },
+  fontFamily: {
+    mark:    ['Unbounded', 'sans-serif'],
+    display: ['Rozha One', 'serif'],
+    serif:   ['Kalnia', 'serif'],
+    sans:    ['Figtree', 'system-ui', 'sans-serif'],
+  },
+  letterSpacing: { display: '-0.055em', utility: '-0.045em', label: '0.18em' },
+  borderRadius: { photo: '2px', badge: '6px', input: '10px', button: '12px', block: '20px' },
+  ------------------------------------------------------------------ */
+
+/* Google Fonts
+   Unbounded:wght@400;500;600;700
+   Rozha+One
+   Kalnia:wght@300;400;500
+   Figtree:wght@300;400;500;600;700
+   Self-host via next/font/google in production. */

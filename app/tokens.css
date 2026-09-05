@@ -1,0 +1,65 @@
+/* Danielle Walder — design tokens
+   Mirror of design_handoff/tokens.css. Palette and type scale are LOCKED and
+   approved. Do not add or alter values. Tailwind reads the same numbers from
+   tailwind.config.ts; these custom properties exist for the handful of places
+   a raw CSS value is genuinely clearer (base element styles, focus rings). */
+
+:root {
+  /* ---- Brown · structure ---------------------------------- */
+  --cream:        #F4F1E2;
+  --paper:        #FBF9F0;
+  --sand:         #E3DBCB;
+  --hairline:     #DCD4C2;
+  --taupe:        #897D6D;
+  --warm-gray:    #6B5F55;
+  --brown:        #513229;
+  --espresso:     #3B2620;
+
+  /* ---- Blue · hero, search, tools ------------------------- */
+  --blue-mist:    #EAF4FC;
+  --blue-field:   #D8EBF9;
+  --blue-steel:   #A8C4DA;
+  --blue-deep:    #3A5B75;
+  --blue-ink:     #24425A;
+
+  /* ---- Butter · about, quizzes, flags --------------------- */
+  --butter-pale:  #FDF2D8;
+  --butter-field: #FCE6B7;
+  --butter-deep:  #F3D79C;
+  --butter-rule:  #EBD3A2;
+  --bronze:       #96773A;
+  --olive-brown:  #6A4E12;
+
+  /* ---- Sage · editorial, neighborhoods -------------------- */
+  --sage-pale:    #E4E6CE;
+  --sage-field:   #D4D7B5;
+  --sage-chip:    #CFD3AE;
+  --sage-mid:     #A9AE7F;
+  --olive-sage:   #6B6C38;
+  --olive-deep:   #4A4B25;
+
+  /* ---- Inks · hints only, never a field ------------------- */
+  --wine:         #7A1F2E;
+  --wine-pressed: #5A1522;
+  --pine-ink:     #33452F;
+  --petrol-ink:   #205A66;
+
+  /* ---- On dark brown -------------------------------------- */
+  --on-brown:       #F4F1E2;
+  --on-brown-body:  #DACFC4;
+  --on-brown-label: #C4B9AC;
+  --on-brown-fine:  #A8998C;
+  --on-brown-rule:  #6A5347;
+
+  /* ---- Shape --------------------------------------------- */
+  --r-photo:  2px;
+  --r-badge:  6px;
+  --r-input:  10px;
+  --r-button: 12px;
+  --r-block:  20px;
+
+  /* ---- Rhythm -------------------------------------------- */
+  --gutter:      40px;
+  --gap-sibling: 24px;
+  --gap-section: 80px;
+}

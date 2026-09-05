@@ -1,0 +1,485 @@
+<!--
+  DANIELLE WALDER — HOMEPAGE
+  WordPress-safe HTML section. No <!doctype>, <html>, <head> or <body>.
+
+  WHERE TO PASTE
+  · Block editor: add a "Custom HTML" block, paste all of this, Preview to check.
+  · Elementor / Bricks / Breakdance: add an "HTML" widget, paste all of this.
+  · Hostinger Website Builder: add an "Embed code / HTML" element, paste all of this.
+  Set the page template to full-width / no-container, or the 40px gutters will double up.
+
+  WHAT TO EDIT
+  · Everything in [SQUARE BRACKETS] is a placeholder — replace with real copy.
+  · Every image is a grey box marked with an IMAGE comment — replace the whole <div class="dw-ph">…</div>
+    with an img tag: class="dw-img", src set to your media library URL, plus an alt description.
+  · Every link is href="#" — point them at your real pages.
+  · The search box and email field are real <form> elements but submit nowhere yet.
+    The search form needs your IDX provider's search URL in the action attribute.
+    The email form needs your newsletter provider's embed (Mailchimp, Flodesk, Kit).
+
+  NOTES
+  · All styles are namespaced .dw- and scoped inside #dw-home, so this cannot leak into
+    or inherit from your theme. If your theme still overrides something, the usual culprit
+    is a global `img { }` or `button { }` rule — add !important to the .dw- rule.
+  · Fonts load from Google Fonts via @import. If your host blocks it, install the
+    "Local Google Fonts" plugin or self-host Unbounded, Rozha One, Kalnia and Figtree.
+-->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Rozha+One&family=Kalnia:wght@300;400;500&family=Figtree:wght@300;400;500;600;700&display=swap');
+
+#dw-home { font-family: 'Figtree', system-ui, -apple-system, sans-serif; background: #F4F1E2; color: #3B2620; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+#dw-home *, #dw-home *::before, #dw-home *::after { box-sizing: border-box; }
+#dw-home p, #dw-home h1, #dw-home h2, #dw-home h3, #dw-home ul, #dw-home li { margin: 0; padding: 0; }
+#dw-home ul { list-style: none; }
+#dw-home img { display: block; max-width: 100%; height: 100%; width: 100%; object-fit: cover; }
+#dw-home a { color: inherit; text-decoration: none; transition: color .18s ease; }
+#dw-home a:hover { color: #7A1F2E; }
+#dw-home button { font: inherit; border: 0; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
+#dw-home input { font: inherit; border: 0; background: none; outline: none; color: #3B2620; width: 100%; min-width: 0; }
+#dw-home input::placeholder { color: #897D6D; }
+
+#dw-home .dw-wrap { padding: 0 40px; }
+#dw-home .dw-rule { border-bottom: 1px solid #DCD4C2; }
+#dw-home .dw-ph { background: #E3DBCB; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #A8998C; width: 100%; height: 100%; }
+
+/* type roles */
+#dw-home .dw-mark { font-family: 'Unbounded', sans-serif; font-weight: 600; letter-spacing: -.055em; }
+#dw-home .dw-mark-sm { font-family: 'Unbounded', sans-serif; font-weight: 600; letter-spacing: -.045em; }
+#dw-home .dw-util { font-family: 'Unbounded', sans-serif; font-weight: 500; letter-spacing: -.045em; }
+#dw-home .dw-display { font-family: 'Rozha One', serif; font-weight: 400; }
+#dw-home .dw-editorial { font-family: 'Kalnia', serif; font-weight: 400; }
+#dw-home .dw-eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #897D6D; }
+
+/* nav */
+#dw-home .dw-nav { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 26px 0 18px; }
+#dw-home .dw-nav-mark { font-size: 18px; white-space: nowrap; }
+#dw-home .dw-nav-links { display: flex; align-items: center; gap: 18px; font-size: 14.5px; font-weight: 500; white-space: nowrap; }
+#dw-home .dw-nav-ore { font-size: 16.5px; color: #7A1F2E; }
+#dw-home .dw-btn-dark { background: #513229; color: #F4F1E2; font-weight: 600; padding: 11px 20px; border-radius: 12px; }
+#dw-home .dw-btn-dark:hover { background: #7A1F2E; color: #F4F1E2; }
+
+/* hero */
+#dw-home .dw-hero { background: #D8EBF9; border-radius: 20px; padding: 54px 46px; display: grid; grid-template-columns: 1.04fr .96fr; gap: 50px; align-items: center; margin-top: 22px; }
+#dw-home .dw-hero-copy { display: flex; flex-direction: column; gap: 26px; min-width: 0; }
+#dw-home .dw-hero-h1 { font-size: 66px; line-height: .94; color: #24425A; }
+#dw-home .dw-hero-intro { font-size: 19px; line-height: 1.45; max-width: 400px; color: #3A5B75; }
+#dw-home .dw-hero-media { height: 520px; border-radius: 4px; overflow: hidden; min-width: 0; }
+#dw-home .dw-search { display: flex; align-items: center; gap: 10px; background: #FBF9F0; border-radius: 14px; padding: 8px 8px 8px 22px; max-width: 500px; }
+#dw-home .dw-search input { font-size: 16.5px; }
+#dw-home .dw-search button { background: #513229; color: #F4F1E2; font-size: 15px; font-weight: 600; padding: 14px 24px; border-radius: 10px; white-space: nowrap; }
+#dw-home .dw-search button:hover { background: #7A1F2E; }
+
+/* start-here row */
+#dw-home .dw-quick { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; font-size: 14.5px; font-weight: 500; color: #6B5F55; padding: 22px 0 20px; }
+
+/* section headers */
+#dw-home .dw-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+#dw-home .dw-more { font-size: 15px; font-weight: 600; color: #6B6C38; border-bottom: 2px solid #6B6C38; padding-bottom: 2px; white-space: nowrap; }
+#dw-home .dw-more:hover { color: #513229; border-color: #513229; }
+
+/* listings */
+#dw-home .dw-listings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 26px; }
+#dw-home .dw-listing { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+#dw-home .dw-listing-media { height: 420px; border-radius: 2px; overflow: hidden; min-width: 0; }
+#dw-home .dw-listing-meta { display: flex; flex-direction: column; gap: 7px; }
+#dw-home .dw-listing-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+#dw-home .dw-addr { font-size: 17px; }
+#dw-home .dw-price { font-family: 'Rozha One', serif; font-size: 24px; color: #7A1F2E; }
+#dw-home .dw-facts { font-size: 15px; color: #6B5F55; }
+#dw-home .dw-tag { align-self: flex-start; background: #FCE6B7; color: #6A4E12; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 6px 11px; border-radius: 6px; margin-top: 3px; }
+
+/* sold */
+#dw-home .dw-sold-head { margin-top: 76px; padding-top: 34px; border-top: 1px solid #DCD4C2; }
+#dw-home .dw-sold { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 22px; }
+#dw-home .dw-sold-item { display: flex; flex-direction: column; gap: 11px; min-width: 0; }
+#dw-home .dw-sold-media { height: 190px; border-radius: 2px; overflow: hidden; min-width: 0; }
+
+/* about */
+#dw-home .dw-about { background: #FCE6B7; border-radius: 20px; padding: 56px 48px; display: grid; grid-template-columns: .85fr 1.15fr; gap: 48px; align-items: center; margin-top: 80px; }
+#dw-home .dw-about-media { height: 420px; border-radius: 20px; overflow: hidden; min-width: 0; }
+#dw-home .dw-about-copy { display: flex; flex-direction: column; gap: 24px; min-width: 0; color: #6A4E12; }
+#dw-home .dw-about-h2 { font-size: 50px; line-height: .96; }
+#dw-home .dw-about-body { font-size: 18px; line-height: 1.55; max-width: 470px; }
+#dw-home .dw-stats { display: flex; gap: 40px; flex-wrap: wrap; border-top: 1px solid #EBD3A2; border-bottom: 1px solid #EBD3A2; padding: 20px 0; }
+#dw-home .dw-stat { display: flex; flex-direction: column; gap: 4px; }
+#dw-home .dw-stat-n { font-family: 'Rozha One', serif; font-size: 32px; line-height: 1.12; }
+#dw-home .dw-stat-l { font-size: 11.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #96773A; }
+#dw-home .dw-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+#dw-home .dw-btn-primary { background: #513229; color: #FCE6B7; font-size: 15px; font-weight: 600; padding: 14px 26px; border-radius: 12px; }
+#dw-home .dw-btn-primary:hover { background: #7A1F2E; color: #FCE6B7; }
+#dw-home .dw-btn-ghost { border: 1.5px solid #513229; color: #513229; background: none; font-size: 15px; font-weight: 600; padding: 12.5px 26px; border-radius: 12px; }
+#dw-home .dw-btn-ghost:hover { background: #6B6C38; color: #F4F1E2; border-color: #6B6C38; }
+
+/* overthinking real estate */
+#dw-home .dw-ore-head { margin-top: 88px; }
+#dw-home .dw-ore-eyebrow { color: #6B6C38; }
+#dw-home .dw-ore-title { font-size: 54px; line-height: 1.1; color: #7A1F2E; }
+#dw-home .dw-ore { display: grid; grid-template-columns: 1.4fr 1fr; gap: 44px; align-items: start; margin-top: 28px; }
+#dw-home .dw-ore-lead { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+#dw-home .dw-ore-media { height: 340px; border-radius: 20px; overflow: hidden; min-width: 0; }
+#dw-home .dw-ore-lead-h { font-size: 46px; line-height: 1.02; }
+#dw-home .dw-standfirst { font-size: 16.5px; line-height: 1.5; color: #6B5F55; max-width: 460px; }
+#dw-home .dw-ore-item { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #DCD4C2; padding: 22px 0; }
+#dw-home .dw-ore-item:last-child { border-bottom: 1px solid #DCD4C2; }
+#dw-home .dw-ore-item-h { font-size: 27px; line-height: 1.12; }
+#dw-home .dw-kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #897D6D; }
+
+/* quiz */
+#dw-home .dw-quiz { margin-top: 88px; background: #513229; color: #F4F1E2; padding: 80px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+#dw-home .dw-quiz-copy { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+#dw-home .dw-quiz-badge { align-self: flex-start; background: #FCE6B7; color: #513229; font-size: 11.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; padding: 7px 13px; border-radius: 6px; }
+#dw-home .dw-quiz-h2 { font-size: 54px; line-height: .94; }
+#dw-home .dw-quiz-intro { font-size: 17.5px; line-height: 1.5; color: #DACFC4; max-width: 380px; }
+#dw-home .dw-quiz-answers { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+#dw-home .dw-quiz-q { font-size: 11.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #C4B9AC; }
+#dw-home .dw-answer { text-align: left; background: #F4F1E2; color: #513229; font-size: 18px; font-weight: 500; padding: 19px 26px; border-radius: 12px; }
+#dw-home .dw-answer:hover { background: #FCE6B7; color: #513229; }
+#dw-home .dw-answer-1 { background: #D8EBF9; color: #24425A; }
+
+/* testimonial */
+#dw-home .dw-quote { padding: 88px 40px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+#dw-home .dw-quote-t { font-family: 'Kalnia', serif; font-weight: 300; font-size: 42px; line-height: 1.2; max-width: 860px; }
+#dw-home .dw-quote-c { font-size: 12.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #897D6D; }
+
+/* newsletter */
+#dw-home .dw-news { border-top: 1px solid #DCD4C2; padding-top: 44px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 46px; align-items: end; }
+#dw-home .dw-news-h2 { font-size: 44px; line-height: .98; }
+#dw-home .dw-news-h2 em { font-family: 'Kalnia', serif; font-weight: 400; font-style: normal; letter-spacing: -.01em; color: #7A1F2E; }
+#dw-home .dw-news-form { display: flex; align-items: center; gap: 10px; background: #FBF9F0; border: 1px solid #E3DBCB; border-radius: 14px; padding: 8px 8px 8px 22px; }
+#dw-home .dw-news-form input { font-size: 16px; }
+#dw-home .dw-news-form button { background: #7A1F2E; color: #F4F1E2; font-size: 15px; font-weight: 600; padding: 14px 24px; border-radius: 10px; white-space: nowrap; }
+#dw-home .dw-news-form button:hover { background: #5A1522; }
+
+/* footer */
+#dw-home .dw-foot { margin-top: 76px; background: #513229; color: #F4F1E2; padding: 52px 40px 40px; display: flex; flex-direction: column; gap: 34px; }
+#dw-home .dw-foot-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+#dw-home .dw-foot-mark { font-size: 34px; }
+#dw-home .dw-foot-ore { font-family: 'Kalnia', serif; font-size: 22px; color: #FCE6B7; }
+#dw-home .dw-foot-bot { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; border-top: 1px solid #6A5347; padding-top: 24px; flex-wrap: wrap; }
+#dw-home .dw-foot-nav { display: flex; gap: 22px; font-size: 14px; color: #C4B9AC; flex-wrap: wrap; }
+#dw-home .dw-foot-nav a:hover { color: #FCE6B7; }
+#dw-home .dw-foot-legal { display: flex; gap: 22px; font-size: 13px; color: #A8998C; flex-wrap: wrap; }
+
+/* ---- tablet ---- */
+@media (max-width: 1100px) {
+  #dw-home .dw-hero-h1 { font-size: 52px; }
+  #dw-home .dw-about-h2, #dw-home .dw-quiz-h2 { font-size: 42px; }
+  #dw-home .dw-ore-title { font-size: 44px; }
+  #dw-home .dw-news-h2 { font-size: 36px; }
+  #dw-home .dw-quote-t { font-size: 34px; }
+  #dw-home .dw-nav-links { gap: 14px; font-size: 13.5px; }
+  #dw-home .dw-listing-media { height: 300px; }
+  #dw-home .dw-hero-media { height: 420px; }
+}
+
+/* ---- mobile ---- */
+@media (max-width: 860px) {
+  #dw-home .dw-wrap { padding: 0 20px; }
+  #dw-home .dw-nav { flex-wrap: wrap; gap: 16px; }
+  #dw-home .dw-nav-links { flex-wrap: wrap; white-space: normal; gap: 12px 16px; }
+  #dw-home .dw-hero { grid-template-columns: 1fr; gap: 32px; padding: 32px 24px; border-radius: 16px; }
+  #dw-home .dw-hero-h1 { font-size: 40px; }
+  #dw-home .dw-hero-media { height: 380px; }
+  #dw-home .dw-search { max-width: none; flex-wrap: wrap; padding: 14px; border-radius: 16px; }
+  #dw-home .dw-search input { padding: 0 8px 6px; }
+  #dw-home .dw-search button { width: 100%; }
+  #dw-home .dw-listings, #dw-home .dw-sold { grid-template-columns: 1fr; gap: 32px; }
+  #dw-home .dw-listing-media { height: 340px; }
+  #dw-home .dw-sold-media { height: 220px; }
+  #dw-home .dw-about { grid-template-columns: 1fr; gap: 28px; padding: 32px 24px; border-radius: 16px; margin-top: 56px; }
+  #dw-home .dw-about-media { height: 340px; border-radius: 16px; }
+  #dw-home .dw-about-h2 { font-size: 36px; }
+  #dw-home .dw-stats { gap: 24px; }
+  #dw-home .dw-ore-head { margin-top: 64px; }
+  #dw-home .dw-ore-title { font-size: 34px; }
+  #dw-home .dw-ore { grid-template-columns: 1fr; gap: 28px; }
+  #dw-home .dw-ore-lead-h { font-size: 32px; }
+  #dw-home .dw-ore-item-h { font-size: 22px; }
+  #dw-home .dw-quiz { grid-template-columns: 1fr; gap: 32px; padding: 56px 20px; margin-top: 64px; }
+  #dw-home .dw-quiz-h2 { font-size: 34px; }
+  #dw-home .dw-quote { padding: 64px 20px; }
+  #dw-home .dw-quote-t { font-size: 26px; }
+  #dw-home .dw-news { grid-template-columns: 1fr; gap: 24px; }
+  #dw-home .dw-news-h2 { font-size: 30px; }
+  #dw-home .dw-news-form { flex-wrap: wrap; padding: 14px; }
+  #dw-home .dw-news-form button { width: 100%; }
+  #dw-home .dw-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+  #dw-home .dw-display { font-size: 38px !important; }
+  #dw-home .dw-foot { padding: 40px 20px 32px; margin-top: 56px; }
+  #dw-home .dw-foot-mark { font-size: 26px; }
+}
+</style>
+
+<div id="dw-home">
+
+  <!-- ============ NAVIGATION ============ -->
+  <nav class="dw-wrap">
+    <div class="dw-nav dw-rule">
+      <a class="dw-mark-sm dw-nav-mark" href="/">danielle walder</a>
+      <div class="dw-nav-links">
+        <a href="#">search</a>
+        <a href="#">listings</a>
+        <a href="#">sold</a>
+        <a class="dw-editorial dw-nav-ore" href="#">overthinking real estate</a>
+        <a href="#">quizzes</a>
+        <a href="#">about</a>
+        <a class="dw-btn-dark" href="#">say hello</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <header class="dw-wrap">
+    <div class="dw-hero">
+      <div class="dw-hero-copy">
+        <h1 class="dw-mark dw-hero-h1">[HERO HEADLINE]</h1>
+        <p class="dw-hero-intro">[INTRO COPY]</p>
+        <!-- SEARCH: put your IDX provider's search URL in action="" -->
+        <form class="dw-search" action="#" method="get">
+          <input type="search" name="q" placeholder="where are you looking?" aria-label="Search homes">
+          <button type="submit">search homes</button>
+        </form>
+      </div>
+      <div class="dw-hero-media">
+        <!-- IMAGE: Danielle, vertical portrait -->
+        <div class="dw-ph">Danielle</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ START HERE ============ -->
+  <div class="dw-wrap">
+    <div class="dw-quick dw-rule">
+      <span class="dw-eyebrow">start here</span>
+      <a href="#">map search</a>
+      <a href="#">new this week</a>
+      <a href="#">open houses</a>
+      <a href="#">what I've sold</a>
+      <a href="#">what's my home worth</a>
+    </div>
+  </div>
+
+  <!-- ============ LISTINGS ============ -->
+  <section class="dw-wrap" style="padding-top: 56px;">
+    <div class="dw-head">
+      <h2 class="dw-display" style="font-size: 54px; line-height: 1;">Now showing</h2>
+      <a class="dw-more" href="#">every listing &rarr;</a>
+    </div>
+    <div class="dw-listings">
+
+      <article class="dw-listing">
+        <a class="dw-listing-media" href="#">
+          <!-- IMAGE: listing photo -->
+          <div class="dw-ph">Listing</div>
+        </a>
+        <div class="dw-listing-meta">
+          <div class="dw-listing-top">
+            <a class="dw-util dw-addr" href="#">[LISTING ADDRESS]</a>
+            <span class="dw-price">[PRICE]</span>
+          </div>
+          <p class="dw-facts">[NEIGHBORHOOD] &middot; [BEDS] bd &middot; [BATHS] ba &middot; [SQ FT] sq ft</p>
+          <span class="dw-tag">open sun 2&ndash;4</span>
+        </div>
+      </article>
+
+      <article class="dw-listing">
+        <a class="dw-listing-media" href="#">
+          <!-- IMAGE: listing photo -->
+          <div class="dw-ph">Listing</div>
+        </a>
+        <div class="dw-listing-meta">
+          <div class="dw-listing-top">
+            <a class="dw-util dw-addr" href="#">[LISTING ADDRESS]</a>
+            <span class="dw-price">[PRICE]</span>
+          </div>
+          <p class="dw-facts">[NEIGHBORHOOD] &middot; [BEDS] bd &middot; [BATHS] ba &middot; [SQ FT] sq ft</p>
+        </div>
+      </article>
+
+      <article class="dw-listing">
+        <a class="dw-listing-media" href="#">
+          <!-- IMAGE: listing photo -->
+          <div class="dw-ph">Listing</div>
+        </a>
+        <div class="dw-listing-meta">
+          <div class="dw-listing-top">
+            <a class="dw-util dw-addr" href="#">[LISTING ADDRESS]</a>
+            <span class="dw-price">[PRICE]</span>
+          </div>
+          <p class="dw-facts">[NEIGHBORHOOD] &middot; [BEDS] bd &middot; [BATHS] ba &middot; [SQ FT] sq ft</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ SOLD ============ -->
+  <section class="dw-wrap">
+    <div class="dw-head dw-sold-head">
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <span class="dw-eyebrow">past sales</span>
+        <h2 class="dw-display" style="font-size: 40px; line-height: 1;">Sold</h2>
+      </div>
+      <a class="dw-more" href="#">everything I've sold &rarr;</a>
+    </div>
+    <div class="dw-sold">
+
+      <article class="dw-sold-item">
+        <a class="dw-sold-media" href="#">
+          <!-- IMAGE: sold photo -->
+          <div class="dw-ph">Sold</div>
+        </a>
+        <p style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</p>
+        <p class="dw-facts" style="font-size: 14px;">[NEIGHBORHOOD] &middot; sold [PRICE]</p>
+      </article>
+
+      <article class="dw-sold-item">
+        <a class="dw-sold-media" href="#">
+          <!-- IMAGE: sold photo -->
+          <div class="dw-ph">Sold</div>
+        </a>
+        <p style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</p>
+        <p class="dw-facts" style="font-size: 14px;">[NEIGHBORHOOD] &middot; sold [PRICE]</p>
+      </article>
+
+      <article class="dw-sold-item">
+        <a class="dw-sold-media" href="#">
+          <!-- IMAGE: sold photo -->
+          <div class="dw-ph">Sold</div>
+        </a>
+        <p style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</p>
+        <p class="dw-facts" style="font-size: 14px;">[NEIGHBORHOOD] &middot; sold [PRICE]</p>
+      </article>
+
+      <article class="dw-sold-item">
+        <a class="dw-sold-media" href="#">
+          <!-- IMAGE: sold photo -->
+          <div class="dw-ph">Sold</div>
+        </a>
+        <p style="font-size: 14.5px; font-weight: 600;">[LISTING ADDRESS]</p>
+        <p class="dw-facts" style="font-size: 14px;">[NEIGHBORHOOD] &middot; sold [PRICE]</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="dw-wrap">
+    <div class="dw-about">
+      <div class="dw-about-media">
+        <!-- IMAGE: Danielle, portrait -->
+        <div class="dw-ph">Danielle</div>
+      </div>
+      <div class="dw-about-copy">
+        <h2 class="dw-mark dw-about-h2">hi, I'm Danielle</h2>
+        <p class="dw-about-body">[ABOUT COPY &mdash; two or three sentences on how you work and what you're actually good at]</p>
+        <div class="dw-stats">
+          <div class="dw-stat"><span class="dw-stat-n">[SALES VOLUME]</span><span class="dw-stat-l">closed</span></div>
+          <div class="dw-stat"><span class="dw-stat-n">[TRANSACTIONS]</span><span class="dw-stat-l">homes</span></div>
+          <div class="dw-stat"><span class="dw-stat-n">[YEARS]</span><span class="dw-stat-l">years in LA</span></div>
+        </div>
+        <div class="dw-btn-row">
+          <a class="dw-btn-primary" href="#">[CTA]</a>
+          <a class="dw-btn-ghost" href="#">more about me</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ OVERTHINKING REAL ESTATE ============ -->
+  <section class="dw-wrap">
+    <div class="dw-head dw-ore-head">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span class="dw-eyebrow dw-ore-eyebrow">the reading part</span>
+        <h2 class="dw-editorial dw-ore-title">Overthinking Real Estate</h2>
+      </div>
+      <a class="dw-more" href="#">read everything &rarr;</a>
+    </div>
+    <div class="dw-ore">
+
+      <article class="dw-ore-lead">
+        <a class="dw-ore-media" href="#">
+          <!-- IMAGE: essay image -->
+          <div class="dw-ph">Essay</div>
+        </a>
+        <h3 class="dw-editorial dw-ore-lead-h"><a href="#">The Cost Per Tuesday</a></h3>
+        <p class="dw-standfirst">[STANDFIRST]</p>
+      </article>
+
+      <div>
+        <article class="dw-ore-item">
+          <h3 class="dw-editorial dw-ore-item-h"><a href="#">Everybody Says They Want a Deal.</a></h3>
+          <span class="dw-kicker">essay</span>
+        </article>
+        <article class="dw-ore-item">
+          <h3 class="dw-editorial dw-ore-item-h"><a href="#">Who Actually Has Access to Your Transaction?</a></h3>
+          <span class="dw-kicker">essay</span>
+        </article>
+        <article class="dw-ore-item">
+          <h3 class="dw-editorial dw-ore-item-h"><a href="#">Is the Kitchen Actually Outdated, or Are You Just Tired of Looking at It?</a></h3>
+          <span class="dw-kicker">essay</span>
+        </article>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="dw-quiz">
+    <div class="dw-quiz-copy">
+      <span class="dw-quiz-badge">quiz &middot; [N] questions</span>
+      <h2 class="dw-mark dw-quiz-h2">[QUIZ TITLE]</h2>
+      <p class="dw-quiz-intro">[QUIZ INTRO]</p>
+    </div>
+    <div class="dw-quiz-answers">
+      <span class="dw-quiz-q">[QUESTION 1]</span>
+      <button class="dw-answer dw-answer-1" type="button">[ANSWER A]</button>
+      <button class="dw-answer" type="button">[ANSWER B]</button>
+      <button class="dw-answer" type="button">[ANSWER C]</button>
+      <button class="dw-answer" type="button">[ANSWER D]</button>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIAL ============ -->
+  <section class="dw-quote">
+    <blockquote class="dw-quote-t">&ldquo;[CLIENT QUOTE]&rdquo;</blockquote>
+    <cite class="dw-quote-c" style="font-style: normal;">[CLIENT] &middot; [NEIGHBORHOOD]</cite>
+  </section>
+
+  <!-- ============ NEWSLETTER ============ -->
+  <section class="dw-wrap">
+    <div class="dw-news">
+      <h2 class="dw-mark dw-news-h2">one letter, twice a month. <em>occasionally a house.</em></h2>
+      <!-- NEWSLETTER: replace action="" with your provider's form endpoint -->
+      <form class="dw-news-form" action="#" method="post">
+        <input type="email" name="email" placeholder="your email" aria-label="Email address" required>
+        <button type="submit">subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="dw-foot">
+    <div class="dw-foot-top">
+      <span class="dw-mark dw-foot-mark">danielle walder</span>
+      <a class="dw-foot-ore" href="#">overthinking real estate</a>
+    </div>
+    <div class="dw-foot-bot">
+      <div class="dw-foot-nav">
+        <a href="#">search</a>
+        <a href="#">listings</a>
+        <a href="#">sold</a>
+        <a href="#">overthinking real estate</a>
+        <a href="#">quizzes</a>
+        <a href="#">about</a>
+        <a href="#">contact</a>
+      </div>
+      <div class="dw-foot-legal">
+        <span>[BROKERAGE]</span>
+        <span>DRE [DRE NUMBER]</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
