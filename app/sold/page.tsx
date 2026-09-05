@@ -9,13 +9,14 @@ export const metadata: Metadata = {
 }
 
 /**
- * LAUNCH BLOCKER — this page is reached from the nav and the footer as "sold",
- * and it has no sold properties on it.
+ * Deliberately unlinked. Kept as a route so any existing link to /sold still
+ * resolves, but removed from the nav and footer because there is no verified
+ * sold data — and the Your Listings widget on /homes already covers Sold and
+ * Rented.
  *
- * No sold properties, addresses, prices, photography, or transaction outcomes
- * may appear here until Danielle supplies verified data. Do not invent any,
- * and do not reach for a mock adapter — the previous one was deleted on
- * purpose. Until then this page is not launch-ready.
+ * Do not add it back to the nav, do not redirect it to /homes, and do not
+ * invent sold properties, prices, or transaction outcomes to fill it. It is
+ * also excluded from the sitemap.
  */
 export default function SoldPage() {
   return (

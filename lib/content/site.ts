@@ -18,14 +18,17 @@ export const navWordmark = 'danielle walder real estate'
  * vocabulary stays /read, /search, /tuesday-test, /homes, /sold, /about and
  * /contact; the nav calls them what she calls them.
  *
- * Every destination is a real page. `listings` and `sold` land on quiet pages
- * with no property data yet — honest, but thin until the RealScout listings
- * widget and verified sold data arrive.
+ * Every destination is a real page with real content.
+ *
+ * `sold` is deliberately NOT here. /sold still exists as a route so links to
+ * it do not break, but it has no verified sold data, and the Your Listings
+ * widget on /homes already includes Sold and Rented. Do not add it back to the
+ * nav, do not redirect it to /homes, and do not invent sold data to justify
+ * it.
  */
 export const navLinks = [
   { label: 'search', href: '/search' },
   { label: 'listings', href: '/homes' },
-  { label: 'sold', href: '/sold' },
 ] as const
 
 /** Sits mid-row, set in Kalnia and wine — it reads as a voice, not a nav item. */
@@ -63,7 +66,6 @@ export const footerGroups = [
     links: [
       { label: 'search', href: '/search' },
       { label: 'listings', href: '/homes' },
-      { label: 'sold', href: '/sold' },
       { label: 'about', href: '/about' },
       { label: 'say hello', href: '/contact' },
     ],

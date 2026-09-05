@@ -95,9 +95,11 @@ export function HomeValue({ className = '' }: { className?: string }) {
  * sort order, the full listing-status set, and the property types. Do not
  * trim or reorder them — this is what she configured in RealScout.
  *
- * The divider colour is likewise hers, verbatim. Note it is rgb(101, 141, 172)
- * / #658DAC, which is NOT in the locked palette; it ships because she asked
- * for it explicitly, and it is the single deliberate exception.
+ * The divider colour, rgb(101, 141, 172) / #658DAC, is preserved exactly as it
+ * came in that RealScout configuration. It sits outside the locked site
+ * palette. That is not a stated brand decision — it is simply the value the
+ * supplied snippet carried — so leave it alone unless we deliberately restyle
+ * the RealScout widget later.
  *
  * This widget fills the content width rather than sitting in a capped
  * container — listing cards need the room, and RealScout lays them out.

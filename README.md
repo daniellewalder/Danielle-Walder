@@ -10,12 +10,8 @@ Tailwind CSS.
 
 | # | Blocker | Where |
 |---|---|---|
-| 1 | **`/sold` is in the nav as "sold" and has no sold properties.** Needs verified sold data from Danielle. Nothing may be invented, and there is no widget for this yet. | `app/sold/page.tsx` |
-| 2 | **RealScout runtime behaviour is unverified.** The widgets are wired and the markup is correct, but no one has watched them run in a real browser. See "RealScout" below for the exact checklist. | `components/realscout/` |
-| 3 | **Contact delivery.** Without `CONTACT_FORM_ENDPOINT` the form renders with no submit control and says delivery is being connected. It never fake-submits. Email is the working channel. | environment only |
-| 4 | **Photography.** `[ADD DANIELLE PHOTO]` appears on the homepage hero, the homepage About block, and `/about`. | `lib/content/` |
-| 5 | **Favicon is a temporary technical icon** — a plain cream square with no glyph, added only so the app does not emit a favicon 404. Replace before launch. | `app/icon.svg` |
-| 6 | **No Open Graph / social share image.** Deliberately not declared rather than fabricated. | `app/layout.tsx` |
+| 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies, which makes this a real public-launch requirement. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. | not yet created |
+| 2 | **RealScout runtime behaviour is unverified.** All four widgets are wired and the markup is correct, but nobody has watched them run in a real browser. DOM structure and a clean build are not evidence of runtime behaviour. See "RealScout" below. | `components/realscout/` |
 
 ### Supplied and live
 
@@ -32,6 +28,23 @@ The two licence numbers are **not interchangeable**: `02253356` is Danielle's
 own agent licence, `00616212` is the brokerage's. The brokerage line and the
 disclosure are rendered **verbatim** — do not reword, re-case, reformat,
 abridge, or split them, and do not update the copyright year by inference.
+
+### Content still needed
+
+- **Photography** — `[ADD DANIELLE PHOTO]` on the homepage hero, the homepage
+  About block, and `/about`. A fourth placeholder, `[ADD ESSAY IMAGE]`, appears
+  only if a Substack post has no cover image; her posts do, so it should not be
+  seen in practice.
+- **Sold data**, if `/sold` is ever to return to the nav.
+
+### Polish before sharing publicly
+
+Not broken and not compliance — finish before the link goes out:
+
+- **Favicon** is a plain cream square with no glyph, present only so the app
+  does not emit a 404. Replace with an approved asset.
+- **No Open Graph / social share image.** Deliberately not declared rather than
+  fabricated.
 
 ### Supplied but deliberately not rendered
 
@@ -76,10 +89,10 @@ not show up locally, `rm -rf .next` and restart.
 | `/tuesday-test` | The Tuesday Test landing page, static non-interactive preview |
 | `/la-actually` | LA, Actually — editorial landing page |
 | `/about` | About Danielle |
-| `/contact` | Say Hello — contact form |
+| `/contact` | Say Hello. **Email only** — no form at launch |
 | `/homes` | In the nav as "listings". **RealScout Your Listings**, live |
-| `/sold` | In the nav as "sold". **Empty — blocker 1** |
-| `/api/contact` | Contact handler. Returns 503 when no endpoint is configured |
+| `/sold` | Kept for route stability. **Not in the nav or footer**, not redirected, excluded from the sitemap |
+| `/api/contact` | Dormant. The form is not rendered at launch; the route is kept for when a provider is chosen |
 
 Redirects (308): `/overthinking-real-estate/*` → `/read` · `/quizzes/*` →
 `/tuesday-test` · `/listings/*` → `/search`
@@ -113,9 +126,12 @@ URL, or an honest non-interactive state. Specifically:
 - **No fake quiz.** The Tuesday Test preview options are styled `<li>` text —
   not buttons, links, inputs, or focusable, with no hover state. Nothing is
   selected, scored, or saved.
-- **No fake form submission.** With no endpoint the contact form hides its
-  submit control and says so. `/api/contact` returns 503 rather than a false
-  success. There is no newsletter form — subscribing goes to Substack.
+- **No fake form submission.** There is no contact form at launch — email is
+  the contact method, because an unfinished form that says "delivery is being
+  connected" is worse than an address that works. ContactForm.tsx and
+  `/api/contact` are kept, dormant, for when Danielle picks a provider. **Do
+  not choose or install one without asking her.** There is no newsletter form
+  either — subscribing goes to Substack.
 - **No inferred claims about content.** The site does not guess whether a
   Substack post is subscriber-only. There is no reliable signal, and a wrong
   guess would put a false statement about Danielle's writing on her own site.
@@ -176,9 +192,12 @@ id, `sort-order="STATUS_AND_SIGNIFICANT_CHANGE"`, the full
 Unlike the other three it fills the content width rather than sitting in a
 capped container, because listing cards need the room.
 
-Its divider colour, `rgb(101, 141, 172)` / `#658DAC`, is **the one deliberate
-exception to the locked palette** — Danielle asked for it explicitly. Do not
-"correct" it to a palette token.
+Its divider colour, `rgb(101, 141, 172)` / `#658DAC`, is preserved exactly as
+it came in the supplied RealScout configuration. It sits **outside the locked
+site palette**. This is not a stated brand decision — it is the value the
+snippet carried — so do not "correct" it to a palette token, and do not treat
+it as licence to introduce other off-palette colours. It changes only if we
+deliberately restyle the RealScout widget.
 
 Note the status list includes Sold and Rented, so `/homes` already surfaces
 sold work. That may make a separate `/sold` page redundant — a question for

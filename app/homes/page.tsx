@@ -6,7 +6,7 @@ import { homesPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
   title: 'Listings — Danielle Walder',
-  description: "Danielle Walder's current Los Angeles listings.",
+  description: "Los Angeles listings from Danielle Walder.",
 }
 
 /**
@@ -16,13 +16,17 @@ export const metadata: Metadata = {
  * MLS data. There is no listing data in this repo and no mock adapter; do not
  * build a hand-rolled listing grid, recreate RealScout's cards, or duplicate
  * listing data here.
+ *
+ * The configured statuses are For Sale, For Rent, In Contract, Sold and
+ * Rented, so this page is not only current inventory. Copy here must not call
+ * it "current listings".
  */
 export default function HomesPage() {
   return (
     <>
       <PageHeader eyebrow={homesPage.eyebrow} heading={homesPage.heading} intro={homesPage.intro} />
 
-      <section aria-label="Current listings" className="wrap pt-12 mobile:pt-8">
+      <section aria-label="Listings" className="wrap pt-12 mobile:pt-8">
         <YourListings />
       </section>
 

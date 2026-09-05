@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { ContactForm } from '@/components/contact/ContactForm'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { contactEmail, contactFormEndpoint } from '@/lib/config'
+import { contactEmail } from '@/lib/config'
 import { contactPage } from '@/lib/content/contact'
 
 export const metadata: Metadata = {
@@ -9,6 +8,12 @@ export const metadata: Metadata = {
   description: 'Get in touch with Danielle Walder about buying, selling, or a Los Angeles neighborhood.',
 }
 
+/**
+ * Email is the contact method for launch. There is deliberately no form: an
+ * unfinished one that says "delivery is being connected" is worse than an
+ * address that works. Do not add a form, and do not pick a form provider —
+ * that is Danielle's call. ContactForm.tsx is kept for when she does.
+ */
 export default function ContactPage() {
   return (
     <>
@@ -16,26 +21,18 @@ export default function ContactPage() {
         eyebrow={contactPage.eyebrow}
         heading={contactPage.heading}
         intro={contactPage.intro}
-      >
-        {/* A real mailto only when a verified address exists. Never invented. */}
-        {contactEmail ? (
+      />
+
+      {contactEmail ? (
+        <section aria-label={contactPage.emailLabel} className="wrap pt-12 mobile:pt-8">
           <a
             href={`mailto:${contactEmail}`}
-            className="more-link inline-flex text-[16px]"
+            className="inline-flex border-b-2 border-sage-olive pb-1 font-sans text-[28px] font-medium text-sage-olive hover:border-sage-deep hover:text-sage-deep tablet:text-[24px] mobile:text-[20px]"
           >
             {contactEmail}
           </a>
-        ) : null}
-      </PageHeader>
-
-      <section aria-label="Contact form" className="wrap pt-12 mobile:pt-8">
-        <div className="max-w-[720px]">
-          <ContactForm
-            deliveryEnabled={Boolean(contactFormEndpoint)}
-            contactEmail={contactEmail}
-          />
-        </div>
-      </section>
+        </section>
+      ) : null}
     </>
   )
 }
