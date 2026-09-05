@@ -11,18 +11,31 @@ export const metadata: Metadata = {
     'Original essays about homes, money, Los Angeles, identity, class, status, technology, privacy, and risk.',
 }
 
-/** "Read on Substack →". Renders as plain text when there is nowhere real to go. */
+const readLinkStyle = 'font-sans text-[14px] font-medium text-sage-olive hover:text-sage-deep'
+
+/**
+ * Prefers the essay's page on this site. Falls back to the original on
+ * Substack, and to plain text when there is nowhere real to go.
+ */
 function ReadLink({ entry }: { entry: EssayEntry }) {
-  if (!entry.url) {
+  if (entry.slug) {
+    return (
+      <Link href={`/read/${entry.slug}`} className={readLinkStyle}>
+        {readPage.readOnSiteCta} <span aria-hidden="true">&rarr;</span>
+      </Link>
+    )
+  }
+
+  if (!entry.substackUrl) {
     return <span className="font-sans text-[14px] text-taupe">{readPage.readCta}</span>
   }
 
   return (
     <a
-      href={entry.url}
+      href={entry.substackUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-sans text-[14px] font-medium text-sage-olive hover:text-sage-deep"
+      className={readLinkStyle}
     >
       {readPage.readCta} <span aria-hidden="true">&rarr;</span>
       <span className="sr-only"> (opens on Substack)</span>

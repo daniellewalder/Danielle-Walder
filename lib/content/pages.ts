@@ -9,6 +9,7 @@
  * All copy is Danielle's, verbatim from her design.
  */
 export const readPage = {
+  publicationName: 'Overthinking Real Estate',
   headline: 'Where every take gets a counter.',
   eyebrow: 'essays by danielle walder',
   intro:
@@ -19,6 +20,15 @@ export const readPage = {
   essayKicker: 'essay',
   datePlaceholder: '[PUBLISH DATE]',
   readCta: 'Read on Substack',
+  readOnSiteCta: 'Read the essay',
+
+  /** Copy for an individual essay page. */
+  essay: {
+    originalCta: 'Read the original on Substack',
+    truncatedNote:
+      'This is a subscriber post, so only the opening appears here. The full essay is on Substack.',
+  },
+
   moreLabel: 'More to overthink',
 
   /**

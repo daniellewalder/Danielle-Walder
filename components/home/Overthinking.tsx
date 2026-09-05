@@ -10,11 +10,19 @@ import { getEssays, type EssayEntry } from '@/lib/essays'
  * text rather than a broken link.
  */
 function EssayTitle({ entry, className }: { entry: EssayEntry; className: string }) {
-  if (!entry.url) return <span className={className}>{entry.title}</span>
+  if (entry.slug) {
+    return (
+      <Link href={`/read/${entry.slug}`} className={`${className} hover:text-wine`}>
+        {entry.title}
+      </Link>
+    )
+  }
+
+  if (!entry.substackUrl) return <span className={className}>{entry.title}</span>
 
   return (
     <a
-      href={entry.url}
+      href={entry.substackUrl}
       target="_blank"
       rel="noopener noreferrer"
       className={`${className} hover:text-wine`}

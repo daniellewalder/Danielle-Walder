@@ -4,6 +4,8 @@ export interface FeedEntry {
   title: string
   url: string
   publishedAt: string | null
+  /** Raw post HTML from content:encoded. NEVER render without sanitising. */
+  contentHtml: string | null
 }
 
 const TIMEOUT_MS = 5000
@@ -61,7 +63,16 @@ export async function fetchSubstackEntries(feedUrl: string): Promise<FeedEntry[]
       const title = asText(item.title)
       const url = asText(item.link)
       if (!title || !url) return []
-      return [{ title, url, publishedAt: asText(item.pubDate) }]
+
+      return [
+        {
+          title,
+          url,
+          publishedAt: asText(item.pubDate),
+          // Substack puts the full post here for free posts, truncated for paid.
+          contentHtml: asText(item['content:encoded']),
+        },
+      ]
     })
 
     return entries.length > 0 ? entries : null
