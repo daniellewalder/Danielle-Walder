@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { AreaIndex } from '@/components/areas/AreaIndex'
 import { CtaLink } from '@/components/ui/CtaLink'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { getPublishedAreas } from '@/lib/areas'
 import { laActuallyPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
@@ -10,12 +12,17 @@ export const metadata: Metadata = {
 }
 
 /**
- * An editorial landing page for work that is coming.
+ * The LA, Actually hub, and the area-discovery index in Phase 1.
  *
- * No neighborhood guides, maps, commute times, school statements, rankings, or
- * local factual claims — none of that has been written or verified.
+ * The area section lists PUBLISHED guides only. Areas still being researched
+ * are absent rather than stubbed — no placeholder rows, no "coming soon".
+ *
+ * Still no maps, commute times, school statements, rankings, or local factual
+ * claims beyond what each guide verifies for itself.
  */
 export default function LaActuallyPage() {
+  const areas = getPublishedAreas()
+
   return (
     <>
       <PageHeader
@@ -23,6 +30,8 @@ export default function LaActuallyPage() {
         heading={laActuallyPage.heading}
         intro={laActuallyPage.intro}
       />
+
+      <AreaIndex areas={areas} />
 
       <section aria-label="Where to go next" className="wrap pt-12 mobile:pt-8">
         <div className="flex flex-col items-start gap-8 rounded-block bg-sage-field px-12 py-14 mobile:rounded-[16px] mobile:px-6 mobile:py-9">
