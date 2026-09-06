@@ -1,11 +1,19 @@
 type HeadingFont = 'display' | 'serif' | 'mark'
 
+/**
+ * Each variant owns its own line-height. The shared <h1> must not set one:
+ * `leading-none` there and `leading-[0.96]` here are the same utility, so the
+ * shared class silently won and the Unbounded statement role could never
+ * render at its approved 0.96.
+ */
 const headingStyles: Record<HeadingFont, string> = {
   // Rozha One — section headers. Sentence case, never tracked.
-  display: 'font-display text-section tablet:text-section-tablet mobile:text-section-mobile',
+  display:
+    'font-display text-section leading-none tablet:text-section-tablet mobile:text-section-mobile',
   // Kalnia — Overthinking Real Estate and editorial titles.
-  serif: 'font-serif text-section tablet:text-section-tablet mobile:text-section-mobile',
-  // Unbounded — Danielle's mark and big statements.
+  serif:
+    'font-serif text-section leading-none tablet:text-section-tablet mobile:text-section-mobile',
+  // Unbounded — Danielle's mark and big statements. 50px / 0.96 / -0.055em.
   mark: 'font-mark text-[50px] font-semibold leading-[0.96] tracking-display tablet:text-[42px] mobile:text-[32px]',
 }
 
@@ -36,7 +44,7 @@ export function PageHeader({
     <header className="wrap pt-14 mobile:pt-10">
       <div className="border-b border-hairline pb-11 mobile:pb-8">
         <p className="eyebrow">{eyebrow}</p>
-        <h1 className={`mt-4 leading-none text-espresso ${headingStyles[headingFont]} ${headingClassName}`}>
+        <h1 className={`mt-4 text-espresso ${headingStyles[headingFont]} ${headingClassName}`}>
           {heading}
         </h1>
         {intro ? (
