@@ -72,7 +72,14 @@ abridge, or split them, and do not update the copyright year by inference.
 ### Content Danielle still needs to supply
 
 - **Photography** — the three `[ADD DANIELLE PHOTO]` slots above. This is
-  launch blocker 3.
+  launch blocker 3. The two homepage placeholders now hold the final crop, so a
+  photograph shot to match drops in without the composition moving:
+  - **Homepage hero** — an upright ~2:3 slice that bleeds off the top, right
+    and bottom edges of the blue block. Needs headroom and air to her left in
+    frame; a tight headshot will not survive the crop.
+  - **Homepage About** — an upright ~6:7 frame that bleeds off the left and
+    bottom edges of the butter block. Waist-up, not a headshot.
+  - **`/about`** — unchanged by this pass.
 - **Sold data**, only if `/sold` is ever to return to the nav.
 
 ### Supplied but deliberately not rendered

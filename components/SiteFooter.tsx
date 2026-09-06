@@ -5,21 +5,24 @@ export function SiteFooter() {
   return (
     <footer className="mt-[76px] bg-brown px-gutter pb-11 pt-11 text-onbrown tablet:px-gutter-tablet mobile:mt-14 mobile:px-gutter-mobile mobile:pb-9 mobile:pt-9">
       {/*
-        Composed as an editorial masthead rather than a tall dark container:
-        the wordmark sits on the same line as the publication, the two nav
-        groups and the licence lines share one row so the width is used, and
-        the disclosure closes it out at a readable measure.
+        Composed as an editorial sign-off rather than a tall dark container:
+        the name is set at display scale across the top with the publication
+        on its baseline, then the working links and the licence block sit
+        beneath one rule.
+
+        Below it the two nav groups and the licence lines share one row so
+        the width is used and the footer stays a masthead, not a slab.
 
         The licence lines and the disclosure are rendered VERBATIM. Never
         reword, re-case, reformat, abridge, or shrink them for layout.
       */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-b border-onbrown-rule pb-7">
-        <span className="font-mark text-[30px] font-semibold tracking-display lowercase mobile:text-[24px]">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-4 border-b border-onbrown-rule pb-8 mobile:pb-6">
+        <span className="font-mark text-[56px] font-semibold lowercase leading-[0.94] tracking-display navtight:text-[46px] tablet:text-[38px] mobile:text-[26px]">
           {siteName}
         </span>
         <Link
           href={publicationWordmark.href}
-          className="font-serif text-[20px] text-butter-field hover:text-onbrown"
+          className="font-serif text-[26px] leading-none text-butter-field hover:text-onbrown tablet:text-[21px] mobile:text-[18px]"
         >
           {publicationWordmark.label}
         </Link>

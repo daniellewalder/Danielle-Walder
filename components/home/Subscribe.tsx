@@ -2,33 +2,40 @@ import { substackSubscribeUrl } from '@/lib/config'
 import { subscribe } from '@/lib/content/home'
 
 /**
- * The subscription point for Overthinking Real Estate — the same publication
- * as the editorial section above, not a second newsletter.
+ * The closing beat of Overthinking Real Estate — the same publication as the
+ * editorial section above, not a second newsletter.
+ *
+ * It deliberately rhymes with that section's masthead: the same espresso rule,
+ * the same publication name in Kalnia wine at display scale, one step smaller
+ * so the masthead stays the louder of the two. The section opens the
+ * publication; this one signs it off.
  *
  * Subscribing happens on Substack, so this is a real external link and not a
  * form. Do not add an email field here: one that cannot submit is exactly the
  * fake functionality this site refuses to ship.
- *
- * The heading keeps the handoff's mixed-typeface treatment, now carrying the
- * publication's own name in its own typeface.
  */
 export function Subscribe() {
   return (
-    <section aria-labelledby="subscribe" className="wrap pt-[88px] mobile:pt-16">
-      <div className="grid grid-cols-[1.15fr_0.85fr] items-end gap-14 border-t border-hairline pt-12 tablet:grid-cols-1 tablet:gap-7">
+    <section aria-labelledby="subscribe" className="wrap pt-[104px] mobile:pt-16">
+      <div className="border-t border-espresso pt-10 mobile:pt-8">
+        {/*
+          One sentence set as three lines so the publication's name carries the
+          scale. The words are Danielle's, unchanged — only their typography
+          changes across the lockup.
+        */}
         <h2
           id="subscribe"
-          className="max-w-[19ch] font-mark text-[44px] font-semibold leading-[1.04] tracking-display text-espresso tablet:text-[38px] mobile:text-[28px]"
+          className="font-mark text-[30px] font-semibold leading-[1.05] tracking-display text-espresso tablet:text-[24px] mobile:text-[19px]"
         >
-          {subscribe.headingBefore}{' '}
-          <span className="font-serif font-normal tracking-[-0.01em] text-wine">
+          <span className="block">{subscribe.headingBefore}</span>
+          <span className="mt-3 block font-serif text-[68px] font-normal leading-[0.94] tracking-[-0.01em] text-wine tablet:mt-2 tablet:text-[46px] mobile:text-[30px]">
             {subscribe.headingPublication}
-          </span>{' '}
-          {subscribe.headingAfter}
+          </span>
+          <span className="mt-3 block tablet:mt-2">{subscribe.headingAfter}</span>
         </h2>
 
-        <div className="flex flex-col items-start gap-6">
-          <p className="max-w-measure font-sans text-[16.5px] leading-[1.6] text-warmgray">
+        <div className="mt-14 flex items-end justify-between gap-14 border-t border-hairline pt-8 tablet:mt-10 tablet:flex-col tablet:items-start tablet:gap-7">
+          <p className="max-w-[54ch] font-sans text-[16.5px] leading-[1.6] text-warmgray">
             {subscribe.body}
           </p>
 
@@ -37,7 +44,7 @@ export function Subscribe() {
               href={substackSubscribeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-button bg-wine px-[26px] py-[14px] font-sans text-[15px] font-semibold text-cream hover:bg-wine-pressed"
+              className="inline-flex shrink-0 items-center rounded-button bg-wine px-[26px] py-[14px] font-sans text-[15px] font-semibold text-cream hover:bg-wine-pressed"
             >
               {subscribe.cta}
               <span aria-hidden="true" className="ml-2">
