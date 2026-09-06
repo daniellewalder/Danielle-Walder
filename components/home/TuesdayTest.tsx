@@ -19,9 +19,14 @@ export function TuesdayTest() {
         <span className="self-start rounded-badge bg-butter-field px-[13px] py-[7px] text-[11.5px] font-bold uppercase tracking-label text-brown">
           {tuesdayTest.badge}
         </span>
+        {/*
+          The approved quiz Statement role: Unbounded 600 at 54px / 0.94 /
+          -0.055em (handoff §8). This was Rozha One — font-display — which is
+          the section-header role, not the statement one.
+        */}
         <h2
           id="tuesday-test"
-          className="max-w-[13ch] font-display text-[58px] leading-[1.02] tablet:text-[46px] mobile:text-[34px]"
+          className="max-w-[13ch] font-mark text-section font-semibold leading-[0.94] tracking-display tablet:text-section-tablet mobile:text-section-mobile"
         >
           {tuesdayTest.heading}
         </h2>

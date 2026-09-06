@@ -77,8 +77,8 @@ abridge, or split them, and do not update the copyright year by inference.
   - **Homepage hero** — an upright ~2:3 slice that bleeds off the top, right
     and bottom edges of the blue block. Needs headroom and air to her left in
     frame; a tight headshot will not survive the crop.
-  - **Homepage About** — an upright ~6:7 frame that bleeds off the left and
-    bottom edges of the butter block. Waist-up, not a headshot.
+  - **Homepage About** — an upright ~6:7 frame that bleeds off the left, top
+    and bottom edges of the butter block. Waist-up, not a headshot.
   - **`/about`** — unchanged by this pass.
 - **Sold data**, only if `/sold` is ever to return to the nav.
 
