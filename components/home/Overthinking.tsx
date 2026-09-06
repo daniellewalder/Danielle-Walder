@@ -86,18 +86,21 @@ export async function Overthinking() {
         </article>
 
         {/* Supporting stories */}
-        <ul className="min-w-0">
-          {supporting.map((entry, index) => (
-            <li key={entry.title} className={`min-w-0 ${index > 0 ? 'mt-6 border-t border-hairline pt-6' : ''}`}>
-              <EssayLink entry={entry} className="group flex min-w-0 gap-5">
+        <ul className="min-w-0 border-t border-hairline">
+          {supporting.map((entry) => (
+            <li key={entry.title} className="min-w-0 border-b border-hairline">
+              <EssayLink entry={entry} className="group flex min-w-0 gap-5 py-6">
                 {/*
                   ImageSlot is always w-full, so the size lives on a wrapper
                   rather than fighting it. 12px corners: soft, per the editorial
                   photography rule, but not the 20px block radius, which at this
                   scale reads as a bubble rather than a photograph.
+
+                  A story with no cover in the feed stays text-only. Nothing is
+                  substituted to even out the column.
                 */}
                 {entry.imageUrl ? (
-                  <div className="h-[92px] w-[92px] shrink-0">
+                  <div className="h-[104px] w-[86px] shrink-0">
                     <ImageSlot
                       image={{ label: '[ADD ESSAY IMAGE]', alt: entry.title, src: entry.imageUrl }}
                       sizes="120px"
@@ -105,11 +108,25 @@ export async function Overthinking() {
                     />
                   </div>
                 ) : null}
-                <div className="min-w-0">
-                  <h3 className="font-serif text-[21px] leading-[1.16] text-espresso group-hover:text-wine">
+
+                <div className="flex min-w-0 flex-col">
+                  <h3 className="font-serif text-[22px] leading-[1.14] text-espresso group-hover:text-wine">
                     {entry.title}
                   </h3>
-                  <span className="mt-3 inline-block font-sans text-[13.5px] font-medium text-sage-olive">
+                  {/* Dates come from the feed or not at all. */}
+                  {entry.publishedAt ? (
+                    <time
+                      dateTime={new Date(entry.publishedAt).toISOString()}
+                      className="mt-2 font-sans text-[13px] text-taupe"
+                    >
+                      {new Date(entry.publishedAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </time>
+                  ) : null}
+                  <span className="mt-auto pt-3 font-sans text-[13.5px] font-medium text-sage-olive">
                     {overthinking.readCta} <span aria-hidden="true">&rarr;</span>
                   </span>
                 </div>

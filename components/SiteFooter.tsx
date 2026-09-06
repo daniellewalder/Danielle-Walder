@@ -3,66 +3,71 @@ import { footerGroups, legal, publicationWordmark, siteName } from '@/lib/conten
 
 export function SiteFooter() {
   return (
-    <footer className="mt-[76px] bg-brown px-gutter pb-10 pt-[52px] text-onbrown tablet:px-gutter-tablet mobile:mt-14 mobile:px-gutter-mobile mobile:pb-8 mobile:pt-10">
-      <div className="flex flex-col gap-[34px]">
-        <div className="flex flex-wrap items-end justify-between gap-10">
-          <span className="font-mark text-[34px] font-semibold tracking-display lowercase mobile:text-[26px]">
-            {siteName}
-          </span>
-          <Link
-            href={publicationWordmark.href}
-            className="font-serif text-[22px] text-butter-field hover:text-onbrown"
-          >
-            {publicationWordmark.label}
-          </Link>
-        </div>
+    <footer className="mt-[76px] bg-brown px-gutter pb-11 pt-11 text-onbrown tablet:px-gutter-tablet mobile:mt-14 mobile:px-gutter-mobile mobile:pb-9 mobile:pt-9">
+      {/*
+        Composed as an editorial masthead rather than a tall dark container:
+        the wordmark sits on the same line as the publication, the two nav
+        groups and the licence lines share one row so the width is used, and
+        the disclosure closes it out at a readable measure.
 
-        <div className="flex flex-wrap items-start justify-between gap-x-16 gap-y-9 border-t border-onbrown-rule pt-6">
-          <nav aria-label="Footer" className="flex flex-wrap gap-x-16 gap-y-9">
-            {footerGroups.map((group) => (
-              <div key={group.heading} className="flex flex-col gap-3">
-                <h2 className="text-[11.5px] font-bold uppercase tracking-label text-onbrown-fine">
-                  {group.heading}
-                </h2>
-                <ul className="flex flex-col gap-[10px]">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="font-sans text-[14px] text-onbrown-label hover:text-butter-field"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
+        The licence lines and the disclosure are rendered VERBATIM. Never
+        reword, re-case, reformat, abridge, or shrink them for layout.
+      */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-b border-onbrown-rule pb-7">
+        <span className="font-mark text-[30px] font-semibold tracking-display lowercase mobile:text-[24px]">
+          {siteName}
+        </span>
+        <Link
+          href={publicationWordmark.href}
+          className="font-serif text-[20px] text-butter-field hover:text-onbrown"
+        >
+          {publicationWordmark.label}
+        </Link>
+      </div>
 
-          {/*
-            Legally required on every page. Rendered verbatim as supplied by
-            the brokerage — never reword, re-case, or reformat. Never add any
-            further disclosure language that has not been supplied and
-            verified; see the launch blockers in README.md.
-          */}
-          <div className="flex flex-col gap-[6px] font-sans text-[13px] leading-[1.5] text-onbrown-body">
+      {/*
+        Three columns so the width is actually used: the two nav groups, then
+        the legal block. Putting the licence lines and the disclosure together
+        on the right fills what was dead space under the nav and keeps the
+        footer to a masthead rather than a tall dark slab.
+
+        The licence lines and the disclosure are rendered VERBATIM. Never
+        reword, re-case, reformat, abridge, or shrink them for layout.
+      */}
+      <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,1.7fr)] gap-x-12 gap-y-9 pt-8 tablet:grid-cols-2 mobile:grid-cols-1 mobile:gap-y-7">
+        <nav aria-label="Footer" className="contents">
+          {footerGroups.map((group) => (
+            <div key={group.heading} className="flex min-w-0 flex-col gap-[14px]">
+              <h2 className="text-[11.5px] font-bold uppercase tracking-label text-onbrown-fine">
+                {group.heading}
+              </h2>
+              <ul className="flex flex-col gap-[9px]">
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="font-sans text-[14px] text-onbrown-label hover:text-butter-field"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        {/*
+          No heading above the licence lines on purpose: they label themselves,
+          and any word there would be compliance copy nobody approved.
+        */}
+        <div className="flex min-w-0 flex-col gap-4 font-sans text-[13px] leading-[1.5] text-onbrown-body tablet:col-span-2 mobile:col-span-1">
+          <div className="flex flex-col gap-[6px]">
             <span>{legal.agentLine}</span>
             <span>{legal.brokerageLine}</span>
           </div>
+          <p className="border-t border-onbrown-rule pt-4 leading-[1.65]">{legal.disclosure}</p>
         </div>
-
-        {/*
-          The approved brokerage disclosure. Both this and the broker line
-          above use --on-brown-body (#DACFC4) rather than the fine-print tone
-          (#A8998C): legally required text has to be legible, and #A8998C on
-          brown is 4.13:1, under AA for text this size. #DACFC4 is 7.46:1 and
-          is the token the handoff reserves for text on brown. Both are locked
-          palette values — no new colour was introduced.
-        */}
-        <p className="max-w-measure border-t border-onbrown-rule pt-6 font-sans text-[13px] leading-[1.6] text-onbrown-body">
-          {legal.disclosure}
-        </p>
       </div>
     </footer>
   )

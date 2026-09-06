@@ -15,27 +15,33 @@ export function Hero() {
   return (
     <header className="wrap pt-[22px]">
       <div className="grid grid-cols-[1.12fr_0.88fr] items-stretch gap-[56px] overflow-hidden rounded-block bg-blue-field pl-[52px] tablet:grid-cols-1 tablet:gap-9 tablet:px-9 tablet:pb-0 tablet:pt-12 mobile:gap-8 mobile:rounded-[16px] mobile:px-6 mobile:pt-8">
-        <div className="flex min-w-0 flex-col justify-center gap-7 py-16 tablet:py-0 mobile:py-0">
+        <div className="flex min-w-0 flex-col justify-center py-16 pr-[52px] tablet:py-0 tablet:pr-0 mobile:py-0">
           <p className="text-[11.5px] font-bold uppercase tracking-attribution text-blue-deep">
             {hero.eyebrow}
           </p>
 
-          <h1 className="font-mark text-hero font-semibold tracking-display text-blue-ink tablet:text-hero-tablet mobile:text-hero-mobile">
+          <h1 className="mt-6 font-mark text-hero font-semibold tracking-display text-blue-ink tablet:text-hero-tablet mobile:text-hero-mobile">
             {hero.headline}
           </h1>
 
-          <p className="max-w-[40ch] font-sans text-[19px] leading-[1.5] text-blue-deep">
+          <p className="mt-6 max-w-[40ch] font-sans text-[19px] leading-[1.5] text-blue-deep">
             {hero.intro}
           </p>
 
           {/*
             The search field the approved hero always had. It was removed while
             it could not search; RealScout makes it real, so it is back.
-          */}
-          <SimpleSearch className="mt-1 pr-2" />
 
-          <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
-            <CtaLink href={hero.secondaryCta.href} variant="editorial">
+            A blue-steel rule separates the statement from the practical action
+            so the search reads as its own zone rather than a small control
+            floating under the copy. The rule is a palette token and the widget
+            is untouched — no wrapper here implies behaviour RealScout does not
+            have.
+          */}
+          <div className="mt-11 border-t border-blue-steel pt-9 tablet:mt-8 tablet:pt-7">
+            <SimpleSearch />
+
+            <CtaLink href={hero.secondaryCta.href} variant="editorial" className="mt-8">
               {hero.secondaryCta.label} &rarr;
             </CtaLink>
           </div>

@@ -30,12 +30,20 @@ export function About() {
 
           <p className="max-w-about font-sans text-[18px] leading-[1.55]">{about.copy}</p>
 
-          <div className="flex flex-wrap gap-[10px]">
+          {/*
+            One confident action, one quieter one. Two filled buttons side by
+            side read as a conversion panel; this reads as an invitation.
+          */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-8 gap-y-4">
             <CtaLink href={about.primaryCta.href} variant="primary" tone="butter">
               {about.primaryCta.label}
             </CtaLink>
-            <CtaLink href={about.secondaryCta.href} variant="secondary">
-              {about.secondaryCta.label}
+            <CtaLink
+              href={about.secondaryCta.href}
+              variant="editorial"
+              className="border-butter-rule text-butter-text hover:border-butter-text hover:text-butter-text"
+            >
+              {about.secondaryCta.label} &rarr;
             </CtaLink>
           </div>
         </div>

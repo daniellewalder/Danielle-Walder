@@ -65,7 +65,7 @@ export function TuesdayTest() {
           {tuesdayTest.preview.options.map((option) => (
             <li
               key={option}
-              className="rounded-input bg-cream px-5 py-[15px] font-sans text-[15.5px] leading-[1.45] text-espresso"
+              className="rounded-button bg-cream px-5 py-[15px] font-sans text-[15.5px] leading-[1.45] text-espresso"
             >
               {option}
             </li>
