@@ -23,6 +23,7 @@ export default function TuesdayTestPage() {
         eyebrow={tuesdayTestPage.eyebrow}
         heading={tuesdayTestPage.heading}
         intro={tuesdayTestPage.intro}
+        headingFont="mark"
       />
 
       <section aria-labelledby="preview-question" className="wrap pt-12 mobile:pt-8">
