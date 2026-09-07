@@ -38,3 +38,45 @@ export const contactPage = {
   failure: 'That did not send. Email is the reliable way to reach me in the meantime.',
   invalid: 'Please complete the required fields so I can reply.',
 }
+
+/**
+ * The showing / property inquiry state — /contact?intent=showing.
+ *
+ * The same page in a different mode, not a second contact page and not a lead
+ * funnel. The listing link is the point of the whole thing, so it is the first
+ * and most prominent field; everything else is what Danielle needs to reply.
+ *
+ * The copy is conditional on purpose: "if a showing is available". Nothing here
+ * promises access to every listing, because that is not something the site can
+ * promise. Nothing here is scraped or fetched either — a pasted link is stored
+ * as text and read by a person.
+ */
+export const showingInquiry = {
+  eyebrow: 'send me a house',
+  heading: 'Send me the house.',
+  intro:
+    "If there's a property you want to see, send it over. If a showing is available, I'll set it up — and we can use the appointment to look at the surrounding streets and the rest of the neighborhood, so you're evaluating more than the listing.",
+
+  fields: {
+    listingUrl: {
+      label: 'Listing link',
+      hint: 'Zillow, Redfin, the brokerage site — wherever you found it. Paste the address instead if that is easier.',
+      required: false,
+    },
+    name: { label: 'Name', required: true },
+    email: { label: 'Email', required: true },
+    phone: { label: 'Phone', required: false, hint: 'Optional' },
+    area: { label: 'Area', required: false, hint: 'Optional' },
+    message: {
+      label: 'Message',
+      hint: "Anything you want me to know about the house, or what you're looking for.",
+      required: false,
+    },
+  },
+
+  submitLabel: 'Send it over',
+  submitting: 'Sending',
+  /** Reuses the approved contact notice verbatim. Do not reword. */
+  success: "Got it — I'll come back to you directly about this one.",
+  invalid: 'Please add your name and email so I can reply.',
+}
