@@ -25,14 +25,17 @@ Rules that go with these files:
 The raw 4K sources are deliberately **not** committed — they are ~40 MB each
 and nothing on the site would ever serve them.
 
-## Not yet supplied
+| `la-residential-palms.jpg` | `pexels-myatezhny39-30151761.jpg` | 2048×1365, 1.00 MB. Registered, not currently placed on any page. |
+| `la-hills-freeway-vertical.jpg` | `pexels-thekameragrapher-15591600.jpg` | 1364×2048, 0.95 MB. Used on /la-actually as the counterpoint. |
 
-Two stills were described but were not in the upload, so they are not in the
-registry and nothing references them:
+## Currently placed
 
-- `pexels-myatezhny39-30151761.jpg` — horizontal residential scene, white homes
-  and palms.
-- `pexels-thekameragrapher-15591600.jpg` — vertical green hills / freeway.
+Two assets, on `/la-actually` only:
 
-When they arrive, add them here and to `lib/content/editorialMedia.ts`. The
-`EditorialImage` component already supports them; no new code is needed.
+- the coastal aerial video as the establishing band,
+- the hills/freeway still as the counterpoint beside the line about moving
+  through the city.
+
+The palm-street loop and the residential-palms still are registered and
+deliberately unused. Two ~10 MB loops on one page is a lot to ask of a phone,
+and one moving element is more restrained than two.

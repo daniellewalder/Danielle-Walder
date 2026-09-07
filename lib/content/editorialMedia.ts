@@ -81,12 +81,30 @@ export const editorialMedia = {
     durationSeconds: 14,
     approxBytes: 11_662_688,
   },
+  /**
+   * Residential street, low white houses and palms, warm light. Reads as a
+   * neighborhood rather than a listing — no house is the subject.
+   */
+  residentialPalms: {
+    kind: 'image',
+    src: '/media/editorial/la-residential-palms.jpg',
+    alt: 'A residential street of low white houses behind palms in warm afternoon light.',
+    orientation: 'landscape',
+    width: 2048,
+    height: 1365,
+  },
+
+  /**
+   * Green hillsides above a freeway. The geography-and-distance asset: what
+   * "it is only twenty minutes away" actually looks like.
+   */
+  hillsFreeway: {
+    kind: 'image',
+    src: '/media/editorial/la-hills-freeway-vertical.jpg',
+    alt: 'Green hills with houses scattered across the slopes, above a freeway crossing the valley floor.',
+    orientation: 'portrait',
+    width: 1364,
+    height: 2048,
+  },
 } satisfies Record<string, EditorialMediaAsset>
 
-/*
- * Two stills were described but not supplied, so they are deliberately absent
- * rather than stubbed with a broken path:
- *   - a horizontal residential scene (white homes, palms)
- *   - a vertical green hills / freeway scene
- * EditorialImage already handles both; adding them is a registry entry.
- */

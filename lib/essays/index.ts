@@ -1,5 +1,6 @@
 import { substackFeedUrl, substackUrl } from '@/lib/config'
 import { curatedEssays } from '@/lib/content/essays'
+import { stripLeadingCoverImage } from './images'
 import { curatedFallback, findBySlug, mergeFeed } from './merge'
 import { sanitizeEssayHtml } from './sanitize'
 import { fetchSubstackEntries } from './substack'
@@ -24,7 +25,15 @@ export async function getEssays() {
   const feed = substackFeedUrl ? await fetchSubstackEntries(substackFeedUrl) : null
 
   if (feed && feed.length > 0) {
-    return mergeFeed(feed, curatedEssays, sanitizeEssayHtml)
+    return mergeFeed(feed, curatedEssays, (html, coverUrl) =>
+      /*
+       * The essay page renders the cover above the article, and Substack's HTML
+       * normally opens with that same picture — which would show it twice. Only
+       * a LEADING image resolving to the same asset is removed; inline images
+       * further down are content and are left alone.
+       */
+      sanitizeEssayHtml(stripLeadingCoverImage(html, coverUrl) ?? ''),
+    )
   }
 
   /*

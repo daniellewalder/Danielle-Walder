@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { AreaIndex } from '@/components/areas/AreaIndex'
+import { EditorialImage } from '@/components/media/EditorialImage'
 import { EditorialVideo } from '@/components/media/EditorialVideo'
 import { CtaLink } from '@/components/ui/CtaLink'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -52,13 +53,19 @@ export default function LaActuallyPage() {
 
       {/*
         The counterpoint, and the argument of the page: the coast at the top and
-        a residential street down here are not the same city. Vertical media in
-        a narrow column — never stretched into a horizontal hero.
+        inland hills cut by a freeway down here are not the same city, and the
+        freeway is the thing you actually have to drive. Vertical media in a
+        narrow column — never stretched into a horizontal hero.
+
+        A still rather than the second video on purpose. Two ~10 MB loops on one
+        page is a lot to ask of a phone, one moving element is more restrained
+        than two, and this frame carries the argument better than palms do. The
+        palm loop and the residential still stay in the registry, unused here.
       */}
-      <section aria-label="Los Angeles is not one visual experience" className="wrap pt-14 mobile:pt-10">
+      <section aria-label="Hills, houses and a freeway" className="wrap pt-14 mobile:pt-10">
         <div className="grid grid-cols-[0.42fr_1fr] items-end gap-12 border-t border-hairline pt-12 tablet:grid-cols-1 tablet:gap-8 mobile:pt-9">
-          <EditorialVideo
-            asset={editorialMedia.palmStreet}
+          <EditorialImage
+            asset={editorialMedia.hillsFreeway}
             sizes="(max-width: 1024px) 60vw, 30vw"
             className="h-[520px] tablet:h-[380px] mobile:h-[320px]"
           />

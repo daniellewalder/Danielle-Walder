@@ -9,7 +9,8 @@ import type { FeedEntry } from './substack.ts'
  * broke once; it should not be able to break silently again.
  */
 
-const sanitize = (html: string) => html.replace(/<script[\s\S]*?<\/script>/g, '')
+const sanitize = (html: string, _coverUrl: string | null = null) =>
+  html.replace(/<script[\s\S]*?<\/script>/g, '')
 
 const entry = (slug: string, title: string, over: Partial<FeedEntry> = {}): FeedEntry => ({
   title,
@@ -131,4 +132,41 @@ test('an empty curated list does not break a live feed', () => {
   const result = mergeFeed(FEED_AFTER, [], sanitize)
   assert.equal(result.lead?.title, 'Essay C')
   assert.equal(result.more.length, 2)
+})
+
+test('prepareBody receives both the raw HTML and that essay\'s own cover', () => {
+  const seen: Array<[string, string | null]> = []
+  mergeFeed(
+    [entry('a', 'A', { contentHtml: '<p>A</p>', imageUrl: 'https://x/coverA.jpg' })],
+    [],
+    (html, cover) => {
+      seen.push([html, cover])
+      return html
+    },
+  )
+  assert.deepEqual(seen, [['<p>A</p>', 'https://x/coverA.jpg']])
+})
+
+test('each essay keeps its own image through the merge', () => {
+  const result = mergeFeed(
+    [
+      entry('a', 'Essay A', { imageUrl: 'https://x/imageA.jpg' }),
+      entry('b', 'Essay B', { imageUrl: 'https://x/imageB.jpg' }),
+      entry('d', 'Essay D', { imageUrl: null }),
+    ],
+    curated,
+    sanitize,
+  )
+  assert.equal(result.lead?.imageUrl, 'https://x/imageA.jpg')
+  assert.equal(result.more[0]?.imageUrl, 'https://x/imageB.jpg')
+  assert.equal(result.more[1]?.imageUrl, null, 'D stays honestly image-less')
+})
+
+test('publishing Essay E with image E makes it the lead with its own image', () => {
+  const before = [entry('a', 'Essay A', { imageUrl: 'https://x/imageA.jpg' })]
+  const after = [entry('e', 'Essay E', { imageUrl: 'https://x/imageE.jpg' }), ...before]
+  const result = mergeFeed(after, curated, sanitize)
+  assert.equal(result.lead?.title, 'Essay E')
+  assert.equal(result.lead?.imageUrl, 'https://x/imageE.jpg')
+  assert.equal(result.more[0]?.imageUrl, 'https://x/imageA.jpg', 'older art stays attached')
 })

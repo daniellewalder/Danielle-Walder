@@ -25,6 +25,70 @@ export const revalidate = 300
 const readLinkStyle = 'font-sans text-[14px] font-medium text-sage-olive hover:text-sage-deep'
 
 /**
+ * Wraps anything — an image, a title — in the essay's destination.
+ *
+ * Prefers the on-site page, falls back to the original on Substack, and
+ * renders plain text when there is nowhere real to go, so a cover image is
+ * never a dead link.
+ */
+function EssayLink({
+  entry,
+  className,
+  children,
+}: {
+  entry: EssayEntry
+  className: string
+  children: React.ReactNode
+}) {
+  if (entry.slug) {
+    return (
+      <Link href={`/read/${entry.slug}`} className={className}>
+        {children}
+      </Link>
+    )
+  }
+
+  if (!entry.substackUrl) return <span className={className}>{children}</span>
+
+  return (
+    <a href={entry.substackUrl} target="_blank" rel="noopener noreferrer" className={className}>
+      {children}
+      <span className="sr-only"> (opens on Substack)</span>
+    </a>
+  )
+}
+
+/**
+ * The essay's own artwork from Substack, or nothing.
+ *
+ * A missing cover renders an intentional text-only story rather than a
+ * labelled empty rectangle: nobody is going to "add" this image to the site —
+ * it belongs to the post — so a placeholder asking for one would be a lie
+ * about what is missing. Stock is never substituted here.
+ */
+function EssayCover({
+  entry,
+  sizes,
+  className,
+}: {
+  entry: EssayEntry
+  sizes: string
+  className: string
+}) {
+  if (!entry.imageUrl) return null
+
+  return (
+    <EssayLink entry={entry} className="group block">
+      <ImageSlot
+        image={{ label: '[ADD ESSAY IMAGE]', alt: entry.title, src: entry.imageUrl }}
+        sizes={sizes}
+        className={className}
+      />
+    </EssayLink>
+  )
+}
+
+/**
  * Prefers the essay's page on this site. Falls back to the original on
  * Substack, and to plain text when there is nowhere real to go.
  */
@@ -90,76 +154,132 @@ export default async function ReadPage() {
         </p>
       </header>
 
-      {/* The two-column front page */}
-      <div className="wrap mt-10 grid grid-cols-[1.15fr_1fr] items-start gap-14 border-t border-hairline pt-9 tablet:grid-cols-1 tablet:gap-10">
-        {/* Lead essay */}
-        {lead ? (
-          <section aria-labelledby="lead-essay" className="min-w-0">
-            <p className="eyebrow tracking-label">{readPage.latestLabel}</p>
+      {/* The lead story, given the width it deserves. */}
+      {lead ? (
+        <section
+          aria-labelledby="lead-essay"
+          className="wrap mt-10 border-t border-hairline pt-9"
+        >
+          <p className="eyebrow tracking-label">{readPage.latestLabel}</p>
 
-            <div className="mt-5 flex flex-col gap-5">
-              <ImageSlot
-                image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: lead.imageUrl }}
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="h-[300px] rounded-block mobile:h-[220px]"
-              />
+          <div className="mt-6 grid grid-cols-[1.35fr_1fr] items-center gap-12 tablet:grid-cols-1 tablet:gap-8">
+            <EssayCover
+              entry={lead}
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="h-[440px] rounded-block tablet:h-[340px] mobile:h-[240px]"
+            />
 
-              <div className="flex flex-col gap-3">
+            <div className="flex min-w-0 flex-col gap-4">
+              <EssayLink entry={lead} className="group block">
                 <h2
                   id="lead-essay"
-                  className="font-serif text-[38px] leading-[1.1] text-espresso mobile:text-[28px]"
+                  className="font-serif text-[42px] leading-[1.08] text-espresso group-hover:text-wine tablet:text-[34px] mobile:text-[27px]"
                 >
                   {lead.title}
                 </h2>
-                {lead.dek ? (
-                  <p className="font-sans text-[16.5px] leading-[1.55] text-warmgray">{lead.dek}</p>
-                ) : null}
-                <p className="font-sans text-[14px] font-semibold text-espresso">
-                  {readPage.byline}
-                </p>
-                <EssayMeta entry={lead} />
-                <div className="mt-1">
-                  <ReadLink entry={lead} />
-                </div>
+              </EssayLink>
+              {lead.dek ? (
+                <p className="font-sans text-[16.5px] leading-[1.55] text-warmgray">{lead.dek}</p>
+              ) : null}
+              <p className="font-sans text-[14px] font-semibold text-espresso">{readPage.byline}</p>
+              <EssayMeta entry={lead} />
+              <div className="mt-1">
+                <ReadLink entry={lead} />
               </div>
             </div>
+          </div>
 
-            {/* The Counter — a recurring feature, Danielle's placeholder until written. */}
-            <div className="mt-9 border-t border-hairline pt-7">
-              <p className="eyebrow tracking-label">{readPage.counter.label}</p>
-              <p className="mt-4 max-w-measure font-serif text-[21px] leading-[1.35] text-espresso mobile:text-[18px]">
-                {readPage.counter.body}
-              </p>
-            </div>
-          </section>
-        ) : null}
-
-        {/* More to overthink */}
-        <section aria-labelledby="more-essays" className="min-w-0">
-          <h2
-            id="more-essays"
-            className="border-b border-hairline pb-4 font-display text-[30px] leading-none text-espresso mobile:text-[24px]"
-          >
-            {readPage.moreLabel}
-          </h2>
-
-          <ul>
-            {more.map((entry) => (
-              <li key={entry.title} className="border-b border-hairline py-6">
-                <article className="flex flex-col gap-3">
-                  <h3 className="font-serif text-[24px] leading-[1.16] text-espresso mobile:text-[20px]">
-                    {entry.title}
-                  </h3>
-                  {entry.dek ? (
-                    <p className="font-sans text-[15px] leading-[1.55] text-warmgray">{entry.dek}</p>
-                  ) : null}
-                  <ReadLink entry={entry} />
-                </article>
-              </li>
-            ))}
-          </ul>
+          {/* The Counter — a recurring feature, Danielle's placeholder until written. */}
+          <div className="mt-11 border-t border-hairline pt-7">
+            <p className="eyebrow tracking-label">{readPage.counter.label}</p>
+            <p className="mt-4 max-w-measure font-serif text-[21px] leading-[1.35] text-espresso mobile:text-[18px]">
+              {readPage.counter.body}
+            </p>
+          </div>
         </section>
-      </div>
+      ) : null}
+
+      {/*
+        The archive. Every essay carries its own Substack artwork, and the image
+        side alternates row to row so the page reads as a magazine spread rather
+        than a column of identical cards. An essay with no artwork runs full
+        width as text — a deliberate state, not a gap.
+      */}
+      <section aria-labelledby="more-essays" className="wrap mt-14 mobile:mt-10">
+        <h2
+          id="more-essays"
+          className="border-b border-espresso pb-4 font-display text-[34px] leading-none text-espresso mobile:text-[26px]"
+        >
+          {readPage.moreLabel}
+        </h2>
+
+        <ul>
+          {more.map((entry, index) => (
+            <li key={entry.title} className="border-b border-hairline py-9 mobile:py-7">
+              {entry.imageUrl ? (
+                <article
+                  className={`grid items-center gap-11 tablet:grid-cols-1 tablet:gap-6 ${
+                    /*
+                      The image side alternates, but its column keeps the same
+                      width on every row — flipping the template as well as the
+                      order is what stops the picture growing on odd rows.
+                    */
+                    index % 2 === 1
+                      ? 'grid-cols-[1fr_0.62fr]'
+                      : 'grid-cols-[0.62fr_1fr]'
+                  }`}
+                >
+                  <div className={index % 2 === 1 ? 'order-2 tablet:order-none' : ''}>
+                    <EssayCover
+                      entry={entry}
+                      sizes="(max-width: 1024px) 100vw, 34vw"
+                      className="h-[240px] rounded-block mobile:h-[220px]"
+                    />
+                  </div>
+
+                  <div
+                    className={`flex min-w-0 flex-col gap-3 ${
+                      index % 2 === 1 ? 'order-1 tablet:order-none' : ''
+                    }`}
+                  >
+                    <EssayLink entry={entry} className="group block">
+                      <h3 className="font-serif text-[28px] leading-[1.14] text-espresso group-hover:text-wine mobile:text-[23px]">
+                        {entry.title}
+                      </h3>
+                    </EssayLink>
+                    {entry.dek ? (
+                      <p className="font-sans text-[15.5px] leading-[1.55] text-warmgray">
+                        {entry.dek}
+                      </p>
+                    ) : null}
+                    <EssayMeta entry={entry} />
+                    <div className="mt-1">
+                      <ReadLink entry={entry} />
+                    </div>
+                  </div>
+                </article>
+              ) : (
+                <article className="flex max-w-measure flex-col gap-3">
+                  <EssayLink entry={entry} className="group block">
+                    <h3 className="font-serif text-[28px] leading-[1.14] text-espresso group-hover:text-wine mobile:text-[23px]">
+                      {entry.title}
+                    </h3>
+                  </EssayLink>
+                  {entry.dek ? (
+                    <p className="font-sans text-[15.5px] leading-[1.55] text-warmgray">
+                      {entry.dek}
+                    </p>
+                  ) : null}
+                  <EssayMeta entry={entry} />
+                  <div className="mt-1">
+                    <ReadLink entry={entry} />
+                  </div>
+                </article>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* Blue owns this band. */}
       <section

@@ -1,4 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
+import { pickEssayImage } from './images'
 
 export interface FeedEntry {
   title: string
@@ -33,26 +34,6 @@ const parser = new XMLParser({
   cdataPropName: false,
   processEntities: true,
 })
-
-/**
- * Substack attaches the post's cover image as an enclosure. Only image types
- * are taken, and only over http(s) — never a data: or javascript: URL.
- */
-function imageFromEnclosure(enclosure: unknown): string | null {
-  const list = Array.isArray(enclosure) ? enclosure : enclosure ? [enclosure] : []
-
-  for (const item of list) {
-    if (!item || typeof item !== 'object') continue
-    const record = item as Record<string, unknown>
-    const type = record['@_type']
-    const url = record['@_url']
-    if (typeof type !== 'string' || !type.startsWith('image/')) continue
-    if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) continue
-    return url
-  }
-
-  return null
-}
 
 function asText(value: unknown): string | null {
   if (typeof value === 'string') return value.trim() || null
@@ -98,14 +79,21 @@ export async function fetchSubstackEntries(feedUrl: string): Promise<FeedEntry[]
       const url = asText(item.link)
       if (!title || !url) return []
 
+      // Substack puts the full post here for free posts, truncated for paid.
+      const contentHtml = asText(item['content:encoded'])
+
       return [
         {
           title,
           url,
           publishedAt: asText(item.pubDate),
-          // Substack puts the full post here for free posts, truncated for paid.
-          contentHtml: asText(item['content:encoded']),
-          imageUrl: imageFromEnclosure(item.enclosure),
+          contentHtml,
+          /*
+           * Enclosure first, then this item's other declared artwork, then the
+           * first meaningful image in its own body. Every source is inside THIS
+           * item, so artwork cannot bleed between essays. See ./images.ts.
+           */
+          imageUrl: pickEssayImage(item, contentHtml),
         },
       ]
     })

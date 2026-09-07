@@ -69,12 +69,17 @@ export function slugFromUrl(url: string): string | null {
 export function mergeFeed(
   feed: FeedEntry[],
   curated: CuratedEssay[],
-  sanitize: (html: string) => string,
+  /**
+   * Turns raw feed HTML into what the page renders: de-duplicates the cover
+   * image against the body, then sanitises. Injected rather than imported so
+   * this module keeps no runtime dependency and stays directly testable.
+   */
+  prepareBody: (html: string, coverUrl: string | null) => string,
 ): EssayResult {
   const dekByTitle = new Map(curated.map((essay) => [normalise(essay.title), essay.dek]))
 
   const entries: EssayEntry[] = feed.map((item) => {
-    const contentHtml = item.contentHtml ? sanitize(item.contentHtml) : null
+    const contentHtml = item.contentHtml ? prepareBody(item.contentHtml, item.imageUrl) : null
 
     return {
       title: item.title,
