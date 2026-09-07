@@ -105,6 +105,12 @@ export const searchPage = {
     { label: 'LA, Actually', href: '/la-actually' },
     { label: 'Need a second opinion?', href: '/contact' },
   ],
+  /**
+   * The handoff for someone who has just found a house in the search above.
+   * A link, not an integration: RealScout exposes no verified way to pass a
+   * listing into this site, so nothing here implies the house comes with it.
+   */
+  showingHandoff: { heading: 'Found one you want to see?' },
 }
 
 /**
@@ -159,6 +165,9 @@ export const laActuallyPage = {
     { label: "Tell me what you're trying to solve for", href: '/contact' },
     { label: 'Read Overthinking Real Estate', href: '/read' },
   ],
+  /** Set beside the vertical editorial media. Danielle's argument for the page. */
+  mediaCounterpoint:
+    'Los Angeles is not one visual experience. You have to actually move through it.',
 }
 
 export const homesPage = {

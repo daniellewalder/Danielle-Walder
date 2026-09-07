@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { AdvancedSearch } from '@/components/realscout/RealScout'
+import { PropertyShowingCta } from '@/components/ui/PropertyShowingCta'
 import { searchPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
@@ -27,6 +28,23 @@ export default function SearchPage() {
       <section aria-label={searchPage.searchLabel} className="wrap pt-12 mobile:pt-8">
         <div className="rounded-block bg-blue-field px-10 py-12 mobile:px-5 mobile:py-8">
           <AdvancedSearch />
+        </div>
+      </section>
+
+      {/*
+        Directly under the search, where someone has just found a house. The
+        RealScout widget is untouched: this is a link to the showing inquiry,
+        not an integration, and the listing does not travel with it.
+      */}
+      <section aria-labelledby="showing-handoff" className="wrap pt-12 mobile:pt-8">
+        <div className="border-t border-hairline pt-10 mobile:pt-8">
+          <h2
+            id="showing-handoff"
+            className="font-display text-sub leading-none text-espresso tablet:text-sub-tablet mobile:text-sub-mobile"
+          >
+            {searchPage.showingHandoff.heading}
+          </h2>
+          <PropertyShowingCta className="mt-6" />
         </div>
       </section>
 

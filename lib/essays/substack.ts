@@ -11,7 +11,19 @@ export interface FeedEntry {
 }
 
 const TIMEOUT_MS = 5000
-const REVALIDATE_SECONDS = 1800
+
+/**
+ * How long a fetched feed stays cached: five minutes.
+ *
+ * This was 1800 (30 minutes), which is what made a newly published essay take
+ * far too long to appear. Note that Next serves ISR pages stale-while-
+ * revalidate, so the window is the earliest a refresh can START, not when a
+ * visitor sees it — the first request after the window still gets the old page
+ * and only triggers regeneration. Five minutes keeps the real-world delay
+ * inside the 5-10 minute target without hammering Substack: one fetch per five
+ * minutes per page, however many visitors arrive.
+ */
+const REVALIDATE_SECONDS = 300
 
 const parser = new XMLParser({
   ignoreAttributes: false,

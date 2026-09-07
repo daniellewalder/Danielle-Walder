@@ -43,6 +43,15 @@ export const navLinksAfter = [
 /** The publication wordmark in the footer, always lowercase. */
 export const publicationWordmark = { label: 'overthinking real estate', href: '/read' }
 
+/**
+ * The showing handoff, in the nav so it does not depend on anyone knowing the
+ * query-param URL exists. It sits next to "say hello" rather than replacing it:
+ * one is "talk to me", the other is "here is a specific house".
+ *
+ * Danielle's words. Not "request a showing", not "contact an agent".
+ */
+export const navShowing = { label: 'send me a house', href: '/contact?intent=showing' }
+
 export const navCta = { label: 'say hello', href: '/contact' }
 
 export const startHereLinks = [

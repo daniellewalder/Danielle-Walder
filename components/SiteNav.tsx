@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { navCta, navLinks, navLinksAfter, navWordmark, readLink } from '@/lib/content/site'
+import { navCta, navLinks, navLinksAfter, navShowing, navWordmark, readLink } from '@/lib/content/site'
 
 /**
  * Nav is not sticky in the approved design. It collapses to the mark plus a
@@ -57,6 +57,17 @@ export function SiteNav() {
               {link.label}
             </Link>
           ))}
+          {/*
+            Differentiated from the editorial links by weight and colour, but
+            still a text action — not a second filled button competing with
+            "say hello".
+          */}
+          <Link
+            href={navShowing.href}
+            className="whitespace-nowrap font-sans text-[16px] font-semibold text-wine hover:text-wine-pressed navtight:text-[14.5px]"
+          >
+            {navShowing.label}
+          </Link>
           <Link
             href={navCta.href}
             className="whitespace-nowrap rounded-button bg-brown px-6 py-[13px] font-sans text-[15px] font-semibold text-onbrown hover:bg-wine navtight:px-5 navtight:py-[11px] navtight:text-[14px]"
@@ -130,9 +141,17 @@ export function SiteNav() {
           </div>
 
           <Link
+            href={navShowing.href}
+            onClick={() => setMobileNavOpen(false)}
+            className="mt-4 flex min-h-[56px] items-center border-t border-hairline pt-5 font-mark text-[24px] font-semibold tracking-utility text-wine hover:text-wine-pressed"
+          >
+            {navShowing.label}
+          </Link>
+
+          <Link
             href={navCta.href}
             onClick={() => setMobileNavOpen(false)}
-            className="mt-6 flex min-h-[56px] items-center justify-center rounded-button bg-brown px-5 font-sans text-[16px] font-semibold text-onbrown hover:bg-wine"
+            className="mt-5 flex min-h-[56px] items-center justify-center rounded-button bg-brown px-5 font-sans text-[16px] font-semibold text-onbrown hover:bg-wine"
           >
             {navCta.label}
           </Link>

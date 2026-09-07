@@ -11,6 +11,17 @@ export const metadata: Metadata = {
     'Original essays about homes, money, Los Angeles, identity, class, status, technology, privacy, and risk.',
 }
 
+/**
+ * Explicit ISR window for the Substack feed.
+ *
+ * Next would otherwise infer this from the shortest fetch revalidate in the
+ * tree, which is fragile: adding one unrelated fetch with a different window
+ * silently changes how fresh this page is. Stating it here is what makes the
+ * "new essay within about five minutes" promise a property of the page rather
+ * than a side effect of lib/essays.
+ */
+export const revalidate = 300
+
 const readLinkStyle = 'font-sans text-[14px] font-medium text-sage-olive hover:text-sage-deep'
 
 /**

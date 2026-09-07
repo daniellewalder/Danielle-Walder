@@ -6,6 +6,17 @@ import { Subscribe } from '@/components/home/Subscribe'
 import { TuesdayTest } from '@/components/home/TuesdayTest'
 
 /**
+ * Explicit ISR window for the Substack feed.
+ *
+ * Next would otherwise infer this from the shortest fetch revalidate in the
+ * tree, which is fragile: adding one unrelated fetch with a different window
+ * silently changes how fresh this page is. Stating it here is what makes the
+ * "new essay within about five minutes" promise a property of the page rather
+ * than a side effect of lib/essays.
+ */
+export const revalidate = 300
+
+/**
  * Homepage flow, approved:
  *   hero → start here → Overthinking Real Estate → the Tuesday Test →
  *   about Danielle → subscribe to Overthinking Real Estate → footer

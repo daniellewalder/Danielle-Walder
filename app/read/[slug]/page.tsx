@@ -5,6 +5,25 @@ import { ImageSlot } from '@/components/ui/ImageSlot'
 import { readPage } from '@/lib/content/pages'
 import { getEssay, getEssaySlugs } from '@/lib/essays'
 
+/**
+ * Explicit ISR window for the Substack feed.
+ *
+ * Next would otherwise infer this from the shortest fetch revalidate in the
+ * tree, which is fragile: adding one unrelated fetch with a different window
+ * silently changes how fresh this page is. Stating it here is what makes the
+ * "new essay within about five minutes" promise a property of the page rather
+ * than a side effect of lib/essays.
+ */
+export const revalidate = 300
+
+/**
+ * A slug published after the last deploy is NOT in generateStaticParams, so it
+ * must be renderable on demand. True is the Next default; it is stated because
+ * flipping it to false would 404 every new essay until the next deployment,
+ * which is exactly the failure this file is guarding against.
+ */
+export const dynamicParams = true
+
 interface Props {
   params: Promise<{ slug: string }>
 }
