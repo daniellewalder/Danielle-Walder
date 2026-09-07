@@ -90,17 +90,32 @@ const config: Config = {
         'gutter-mobile': '20px',
       },
       fontSize: {
-        // Type scale from tokens.css — desktop values; the responsive steps
-        // live alongside each use with the tablet/mobile variants.
-        hero: ['66px', { lineHeight: '0.94' }],
-        'hero-tablet': ['52px', { lineHeight: '0.94' }],
-        'hero-mobile': ['40px', { lineHeight: '0.94' }],
-        section: ['54px', { lineHeight: '1' }],
-        'section-tablet': ['44px', { lineHeight: '1' }],
-        'section-mobile': ['34px', { lineHeight: '1' }],
-        sub: ['40px', { lineHeight: '1' }],
-        'sub-tablet': ['34px', { lineHeight: '1' }],
-        'sub-mobile': ['28px', { lineHeight: '1' }],
+        /*
+         * The type scale, deliberately quieter than it was.
+         *
+         * Size is not the primary way this site builds hierarchy — whitespace,
+         * rules, column width, image scale and font choice do most of that
+         * work. When every module reaches for statement scale nothing reads as
+         * the statement, and the page starts to look like a template trying to
+         * buy importance by the pixel.
+         *
+         * Mass is not the same as size across these faces: Unbounded at 36px
+         * carries more weight than Rozha One at 40px, so the roles below are
+         * calibrated per face at the call site rather than shared blindly.
+         *
+         * hero    — the one earned statement per page. Homepage only.
+         * section — page titles (PageHeader).            was 54 / 44 / 34
+         * sub     — section headings within a page.      was 40 / 34 / 28
+         */
+        hero: ['52px', { lineHeight: '0.96' }],
+        'hero-tablet': ['44px', { lineHeight: '0.96' }],
+        'hero-mobile': ['36px', { lineHeight: '0.98' }],
+        section: ['40px', { lineHeight: '1.04' }],
+        'section-tablet': ['34px', { lineHeight: '1.04' }],
+        'section-mobile': ['28px', { lineHeight: '1.06' }],
+        sub: ['30px', { lineHeight: '1.08' }],
+        'sub-tablet': ['26px', { lineHeight: '1.08' }],
+        'sub-mobile': ['24px', { lineHeight: '1.1' }],
       },
       transitionDuration: {
         hover: '150ms',

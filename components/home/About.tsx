@@ -39,7 +39,7 @@ export function About() {
           <div className="flex min-w-0 flex-col items-start justify-center gap-6 px-14 py-14 tablet:gap-5 tablet:p-9 mobile:gap-5 mobile:p-6">
             <h2
               id="about"
-              className="font-mark text-[50px] font-semibold leading-[0.96] tracking-display text-butter-text tablet:text-[42px] mobile:text-[32px]"
+              className="font-mark text-[34px] font-semibold leading-[1.04] tracking-display text-butter-text tablet:text-[30px] mobile:text-[26px]"
             >
               {about.headline}
             </h2>

@@ -60,7 +60,7 @@ export default async function EssayPage({ params }: Props) {
           <span aria-hidden="true">&larr;</span>&nbsp;{readPage.publicationName}
         </Link>
 
-        <h1 className="mt-7 font-serif text-[44px] leading-[1.08] text-espresso tablet:text-[38px] mobile:text-[30px]">
+        <h1 className="mt-7 font-serif text-[34px] leading-[1.14] text-espresso tablet:text-[30px] mobile:text-[26px]">
           {essay.title}
         </h1>
 

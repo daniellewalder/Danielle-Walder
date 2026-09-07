@@ -35,7 +35,7 @@ export function AreaIndex({ areas }: { areas: Area[] }) {
                 className="group flex items-center justify-between gap-6 py-6"
               >
                 <span className="min-w-0">
-                  <span className="block font-mark text-[26px] font-semibold leading-[1.1] tracking-utility text-espresso group-hover:text-wine mobile:text-[21px]">
+                  <span className="block font-mark text-[21px] font-semibold leading-[1.2] tracking-utility text-espresso group-hover:text-wine mobile:text-[19px]">
                     {area.name}
                   </span>
                 </span>

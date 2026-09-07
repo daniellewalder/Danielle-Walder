@@ -1,3 +1,4 @@
+import type { AreaGuide } from './itinerary'
 import type { Area, FactBlock, Place, Provenance } from './types'
 
 /**
@@ -186,4 +187,20 @@ export function publicationBlockers(area: Area): string[] {
   if (!renderableFact(area.facts.housing)) blockers.push('no renderable housing block')
   if (!renderableFact(area.facts.access)) blockers.push('no renderable access block')
   return blockers
+}
+
+/**
+ * Whether an itinerary is complete enough to publish.
+ *
+ * A route needs a headline, an intro, a point, and at least two stops — one
+ * stop is not a day, and a page that promises a route and shows a single
+ * entry is worse than a page that shows none. Anything short of this renders
+ * nothing at all, so a guide in progress cannot leak onto the site.
+ */
+export function isGuideRenderable(guide: AreaGuide | null): guide is AreaGuide {
+  if (!guide) return false
+  if (!guide.headline.trim()) return false
+  if (!guide.intro.body.trim()) return false
+  if (!guide.pointOfTheDay.body.trim()) return false
+  return guide.stops.length >= 2
 }

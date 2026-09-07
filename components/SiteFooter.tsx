@@ -17,12 +17,12 @@ export function SiteFooter() {
         reword, re-case, reformat, abridge, or shrink them for layout.
       */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-4 border-b border-onbrown-rule pb-8 mobile:pb-6">
-        <span className="font-mark text-[56px] font-semibold lowercase leading-[0.94] tracking-display navtight:text-[46px] tablet:text-[38px] mobile:text-[26px]">
+        <span className="font-mark text-[40px] font-semibold lowercase leading-[1] tracking-display navtight:text-[34px] tablet:text-[30px] mobile:text-[24px]">
           {siteName}
         </span>
         <Link
           href={publicationWordmark.href}
-          className="font-serif text-[26px] leading-none text-butter-field hover:text-onbrown tablet:text-[21px] mobile:text-[18px]"
+          className="font-serif text-[20px] leading-none text-butter-field hover:text-onbrown tablet:text-[18px] mobile:text-[16px]"
         >
           {publicationWordmark.label}
         </Link>

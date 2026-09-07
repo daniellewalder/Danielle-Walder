@@ -25,10 +25,10 @@ export function Subscribe() {
         */}
         <h2
           id="subscribe"
-          className="font-mark text-[30px] font-semibold leading-[1.05] tracking-display text-espresso tablet:text-[24px] mobile:text-[19px]"
+          className="font-mark text-[22px] font-semibold leading-[1.15] tracking-display text-espresso tablet:text-[19px] mobile:text-[17px]"
         >
           <span className="block">{subscribe.headingBefore}</span>
-          <span className="mt-3 block font-serif text-[68px] font-normal leading-[0.94] tracking-[-0.01em] text-wine tablet:mt-2 tablet:text-[46px] mobile:text-[30px]">
+          <span className="mt-3 block font-serif text-[42px] font-normal leading-[1.04] tracking-[-0.01em] text-wine tablet:mt-2 tablet:text-[34px] mobile:text-[27px]">
             {subscribe.headingPublication}
           </span>
           <span className="mt-3 block tablet:mt-2">{subscribe.headingAfter}</span>

@@ -71,7 +71,7 @@ export async function Overthinking() {
         <div className="mt-5 flex items-end justify-between gap-12 tablet:flex-col tablet:items-start tablet:gap-6">
           <h2
             id="overthinking"
-            className="max-w-[11ch] font-serif text-[92px] leading-[0.9] text-wine tablet:max-w-none tablet:text-[62px] mobile:text-[40px]"
+            className="max-w-[16ch] font-serif text-[46px] leading-[1.02] text-wine tablet:max-w-none tablet:text-[38px] mobile:text-[30px]"
           >
             {overthinking.title}
           </h2>
@@ -96,7 +96,7 @@ export async function Overthinking() {
               />
             ) : null}
             <p className="eyebrow mt-7 tracking-label">{overthinking.leadLabel}</p>
-            <h3 className="mt-4 max-w-[18ch] font-serif text-[46px] leading-[1.02] text-espresso group-hover:text-wine tablet:text-[38px] mobile:text-[28px]">
+            <h3 className="mt-4 max-w-[22ch] font-serif text-[32px] leading-[1.12] text-espresso group-hover:text-wine tablet:text-[28px] mobile:text-[24px]">
               {lead.title}
             </h3>
             {lead.dek ? (
@@ -120,7 +120,7 @@ export async function Overthinking() {
                     className="h-[240px] rounded-block mobile:h-[170px]"
                   />
                 ) : null}
-                <h3 className="mt-6 font-serif text-[28px] leading-[1.1] text-espresso group-hover:text-wine mobile:text-[24px]">
+                <h3 className="mt-6 font-serif text-[23px] leading-[1.16] text-espresso group-hover:text-wine mobile:text-[21px]">
                   {second.title}
                 </h3>
                 {second.dek ? (
@@ -142,7 +142,7 @@ export async function Overthinking() {
               <li key={entry.title} className="min-w-0 border-b border-hairline">
                 <EssayLink entry={entry} className="group flex min-w-0 items-start gap-5 py-7">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-serif text-[21px] leading-[1.14] text-espresso group-hover:text-wine">
+                    <h3 className="font-serif text-[19px] leading-[1.2] text-espresso group-hover:text-wine">
                       {entry.title}
                     </h3>
                     <PublishedAt

@@ -12,12 +12,27 @@ import { showingInquiry } from '@/lib/content/contact'
  * `area` is optional and only carries through to the form's Area field; it
  * does not filter anything and does not claim to.
  */
-export function PropertyShowingCta({ area, className = '' }: { area?: string; className?: string }) {
+export function PropertyShowingCta({
+  area,
+  className = '',
+  /**
+   * Drops the framing paragraph and renders the action alone. For a second
+   * placement on the same page, where repeating the same sentence would read
+   * as a lead funnel rather than an offer.
+   */
+  compact = false,
+}: {
+  area?: string
+  className?: string
+  compact?: boolean
+}) {
   return (
     <div className={`flex flex-col items-start gap-5 ${className}`}>
-      <p className="max-w-measure font-sans text-[18px] leading-[1.55] text-warmgray mobile:text-[17px]">
-        {showingInquiry.intro}
-      </p>
+      {compact ? null : (
+        <p className="max-w-measure font-sans text-[17px] leading-[1.6] text-warmgray mobile:text-[16px]">
+          {showingInquiry.intro}
+        </p>
+      )}
       <CtaLink href={showingHref(area)} variant="primary">
         {showingInquiry.heading}
       </CtaLink>

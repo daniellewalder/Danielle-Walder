@@ -188,4 +188,16 @@ export const calabasas: Area = {
 
   metaDescription:
     'An area guide to the incorporated city of Calabasas in Los Angeles County: housing forms, getting around, and verified local places.',
+
+  /*
+   * The test-drive itinerary is NOT WRITTEN YET. The real route — which
+   * residential pockets, which drives, which contrasts — is being researched
+   * separately and is not something to invent here.
+   *
+   * Null renders nothing: the page keeps the verified factual sections it has
+   * always had, and gains the route the day the route is approved. Do not
+   * populate this with plausible-sounding stops to see the layout; there is a
+   * fixture for that.
+   */
+  guide: null,
 }

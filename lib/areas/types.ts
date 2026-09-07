@@ -20,6 +20,8 @@
  */
 
 /** Where a claim came from. Never a search-results page, never a guess. */
+import type { AreaGuide } from './itinerary'
+
 export type SourceKind =
   /** A city, county, state or federal body publishing about itself. */
   | 'government'
@@ -213,4 +215,14 @@ export interface Area {
    * rather than inventing marketing copy.
    */
   metaDescription: string | null
+
+  /**
+   * The test-drive itinerary — the editorial spine of a finished guide.
+   *
+   * Optional and null by default. An area without one renders its factual
+   * sections exactly as before; an area whose itinerary is still being
+   * researched renders none of it rather than a half-built route. Nothing is
+   * ever stubbed here to make the layout look finished.
+   */
+  guide: AreaGuide | null
 }

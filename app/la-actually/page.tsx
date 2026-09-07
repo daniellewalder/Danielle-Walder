@@ -69,7 +69,7 @@ export default function LaActuallyPage() {
             sizes="(max-width: 1024px) 60vw, 30vw"
             className="h-[520px] tablet:h-[380px] mobile:h-[320px]"
           />
-          <p className="max-w-[30ch] pb-2 font-serif text-[34px] leading-[1.15] text-espresso tablet:max-w-none tablet:pb-0 tablet:text-[28px] mobile:text-[24px]">
+          <p className="max-w-[32ch] pb-2 font-serif text-[27px] leading-[1.25] text-espresso tablet:max-w-none tablet:pb-0 tablet:text-[24px] mobile:text-[21px]">
             {laActuallyPage.mediaCounterpoint}
           </p>
         </div>

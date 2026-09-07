@@ -14,7 +14,12 @@ const headingStyles: Record<HeadingFont, string> = {
   serif:
     'font-serif text-section leading-none tablet:text-section-tablet mobile:text-section-mobile',
   // Unbounded — Danielle's mark and big statements. 50px / 0.96 / -0.055em.
-  mark: 'font-mark text-[50px] font-semibold leading-[0.96] tracking-display tablet:text-[42px] mobile:text-[32px]',
+  /*
+   * Unbounded carries far more visual mass than the other faces at the same
+   * size, so the mark variant sits well below the Rozha/Kalnia page titles in
+   * pixels while reading as their equal on the page.
+   */
+  mark: 'font-mark text-[36px] font-semibold leading-[1] tracking-display tablet:text-[32px] mobile:text-[27px]',
 }
 
 interface PageHeaderProps {

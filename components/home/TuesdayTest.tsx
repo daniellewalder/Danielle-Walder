@@ -26,7 +26,7 @@ export function TuesdayTest() {
         */}
         <h2
           id="tuesday-test"
-          className="max-w-[13ch] font-mark text-section font-semibold leading-[0.94] tracking-display tablet:text-section-tablet mobile:text-section-mobile"
+          className="max-w-[15ch] font-mark text-[34px] font-semibold leading-[1.06] tracking-display tablet:text-[30px] mobile:text-[26px]"
         >
           {tuesdayTest.heading}
         </h2>
@@ -62,7 +62,7 @@ export function TuesdayTest() {
           </span>
         </div>
 
-        <p className="mt-6 font-display text-[26px] leading-[1.2] text-espresso mobile:text-[21px]">
+        <p className="mt-6 font-display text-[23px] leading-[1.25] text-espresso mobile:text-[20px]">
           {tuesdayTest.preview.question}
         </p>
 

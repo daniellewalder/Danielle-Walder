@@ -145,7 +145,7 @@ export default async function ReadPage() {
     <>
       {/* Masthead */}
       <header className="wrap pt-14 mobile:pt-10">
-        <h1 className="max-w-[16ch] font-serif text-[54px] leading-[1.08] text-wine tablet:text-[44px] mobile:text-[34px]">
+        <h1 className="max-w-[20ch] font-serif text-[40px] leading-[1.12] text-wine tablet:text-[34px] mobile:text-[28px]">
           {readPage.headline}
         </h1>
         <p className="eyebrow mt-5">{readPage.eyebrow}</p>
@@ -173,7 +173,7 @@ export default async function ReadPage() {
               <EssayLink entry={lead} className="group block">
                 <h2
                   id="lead-essay"
-                  className="font-serif text-[42px] leading-[1.08] text-espresso group-hover:text-wine tablet:text-[34px] mobile:text-[27px]"
+                  className="font-serif text-[33px] leading-[1.12] text-espresso group-hover:text-wine tablet:text-[29px] mobile:text-[25px]"
                 >
                   {lead.title}
                 </h2>
@@ -192,7 +192,7 @@ export default async function ReadPage() {
           {/* The Counter — a recurring feature, Danielle's placeholder until written. */}
           <div className="mt-11 border-t border-hairline pt-7">
             <p className="eyebrow tracking-label">{readPage.counter.label}</p>
-            <p className="mt-4 max-w-measure font-serif text-[21px] leading-[1.35] text-espresso mobile:text-[18px]">
+            <p className="mt-4 max-w-measure font-serif text-[19px] leading-[1.4] text-espresso mobile:text-[17px]">
               {readPage.counter.body}
             </p>
           </div>
@@ -208,7 +208,7 @@ export default async function ReadPage() {
       <section aria-labelledby="more-essays" className="wrap mt-14 mobile:mt-10">
         <h2
           id="more-essays"
-          className="border-b border-espresso pb-4 font-display text-[34px] leading-none text-espresso mobile:text-[26px]"
+          className="border-b border-espresso pb-4 font-display text-[27px] leading-none text-espresso mobile:text-[23px]"
         >
           {readPage.moreLabel}
         </h2>
@@ -243,7 +243,7 @@ export default async function ReadPage() {
                     }`}
                   >
                     <EssayLink entry={entry} className="group block">
-                      <h3 className="font-serif text-[28px] leading-[1.14] text-espresso group-hover:text-wine mobile:text-[23px]">
+                      <h3 className="font-serif text-[24px] leading-[1.18] text-espresso group-hover:text-wine mobile:text-[21px]">
                         {entry.title}
                       </h3>
                     </EssayLink>
@@ -261,7 +261,7 @@ export default async function ReadPage() {
               ) : (
                 <article className="flex max-w-measure flex-col gap-3">
                   <EssayLink entry={entry} className="group block">
-                    <h3 className="font-serif text-[28px] leading-[1.14] text-espresso group-hover:text-wine mobile:text-[23px]">
+                    <h3 className="font-serif text-[24px] leading-[1.18] text-espresso group-hover:text-wine mobile:text-[21px]">
                       {entry.title}
                     </h3>
                   </EssayLink>
@@ -289,7 +289,7 @@ export default async function ReadPage() {
         <div className="min-w-0">
           <h2
             id="real-life"
-            className="font-display text-[32px] leading-[1.1] text-blue-ink mobile:text-[26px]"
+            className="font-display text-[26px] leading-[1.15] text-blue-ink mobile:text-[22px]"
           >
             {readPage.helpBand.heading}
           </h2>
@@ -324,7 +324,7 @@ export default async function ReadPage() {
         <div className="min-w-0">
           <h2
             id="subscribe"
-            className="max-w-[18ch] font-display text-[38px] leading-[1.12] mobile:text-[28px]"
+            className="max-w-[22ch] font-display text-[28px] leading-[1.18] mobile:text-[24px]"
           >
             {readPage.subscribeBand.heading}
           </h2>

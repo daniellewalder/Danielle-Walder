@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { fixtureArea } from './areas/__fixture.ts'
 import { calabasas } from './areas/calabasas.ts'
 import { places } from './places.ts'
 import type { Area, FactBlock, Place, Provenance } from './types.ts'
 import {
   areaInvariantViolations,
+  isGuideRenderable,
   isPublishable,
   isRenderable,
   publicationBlockers,
@@ -53,6 +55,7 @@ const area = (overrides: Partial<Area> = {}): Area => ({
   published: true,
   currentConditionsFlag: null,
   metaDescription: null,
+  guide: null,
   ...overrides,
 })
 
@@ -177,4 +180,79 @@ test('no rendered Calabasas place carries a guessed URL', () => {
     const cited = rendered.provenance.sources.some((s) => s.url === rendered.officialUrl)
     assert.ok(cited, `${rendered.id}: officialUrl must be one of its cited sources`)
   }
+})
+
+// ------------------------------------------------- the itinerary gate
+
+const stop = (id: string, over: Partial<import('./itinerary.ts').ItineraryStop> = {}) =>
+  ({
+    id,
+    time: null,
+    title: id,
+    kind: 'anchor' as const,
+    location: null,
+    whySentHere: null,
+    whatThisTeaches: null,
+    whatToNotice: [],
+    whatNotToConclude: null,
+    howLong: null,
+    drive: null,
+    access: 'public' as const,
+    accessNote: null,
+    media: null,
+    provenance: good,
+    ...over,
+  })
+
+const guide = (over: Partial<import('./itinerary.ts').AreaGuide> = {}) => ({
+  headline: 'How I would spend a day here',
+  intro: { body: 'An intro.', written: null },
+  pointOfTheDay: { body: 'The point.', written: null },
+  heroMedia: null,
+  stops: [stop('one'), stop('two')],
+  normalLifeTest: null,
+  beforeYouLeave: null,
+  showingCtaAfterStopId: null,
+  ...over,
+})
+
+test('a complete itinerary renders', () => {
+  assert.equal(isGuideRenderable(guide()), true)
+})
+
+test('no itinerary renders nothing — the factual guide stands alone', () => {
+  assert.equal(isGuideRenderable(null), false)
+})
+
+test('a half-written itinerary never leaks onto the site', () => {
+  assert.equal(isGuideRenderable(guide({ stops: [] })), false, 'no stops')
+  assert.equal(isGuideRenderable(guide({ stops: [stop('one')] })), false, 'one stop is not a day')
+  assert.equal(isGuideRenderable(guide({ headline: '  ' })), false, 'no headline')
+  assert.equal(isGuideRenderable(guide({ intro: { body: '', written: null } })), false, 'no intro')
+  assert.equal(
+    isGuideRenderable(guide({ pointOfTheDay: { body: '', written: null } })),
+    false,
+    'no point of the day',
+  )
+})
+
+test('Calabasas has no itinerary yet and its factual guide is unaffected', () => {
+  assert.equal(calabasas.guide, null, 'the real route is not written')
+  assert.equal(isGuideRenderable(calabasas.guide), false)
+  assert.equal(isPublishable(calabasas), true, 'the factual guide still publishes')
+})
+
+test('the layout fixture can never be published', () => {
+  assert.equal(fixtureArea.published, false)
+  assert.equal(isPublishable(fixtureArea), false)
+  assert.deepEqual(
+    publishedAreas([calabasas, fixtureArea]).map((a) => a.slug),
+    ['calabasas'],
+    'the fixture is absent from every published surface',
+  )
+})
+
+test('an optional itinerary module missing is not a failure', () => {
+  const bare = guide({ normalLifeTest: null, beforeYouLeave: null, heroMedia: null })
+  assert.equal(isGuideRenderable(bare), true)
 })
