@@ -55,14 +55,37 @@ export const showingInquiry = {
   eyebrow: 'send me a house',
   heading: 'Send me the house.',
   intro:
-    "If there's a property you want to see, send it over. If a showing is available, I'll set it up — and we can use the appointment to look at the surrounding streets and the rest of the neighborhood, so you're evaluating more than the listing.",
+    'If there\u2019s a property you want to see, send it over and I\u2019ll set up a showing. We can use the appointment to look at the surrounding streets and the rest of the neighborhood, so you\u2019re evaluating more than just the listing.',
+
+  /**
+   * The quick-send path: paste the house once, then choose how to send it.
+   *
+   * Both actions are plain links — a mailto: and an sms: — so neither depends
+   * on CONTACT_FORM_ENDPOINT and neither sends anything on its own. They open
+   * the reader's own composer with the message already written, and the reader
+   * presses send.
+   *
+   * `{listing}` is replaced with whatever was pasted. Nothing fetches it,
+   * resolves it, or checks that it is a real listing.
+   */
+  quickSend: {
+    listingLabel: 'Listing link or address',
+    listingHint: 'Paste the listing or the address.',
+    textLabel: 'Text Danielle',
+    emailLabel: 'Email Danielle',
+    /** Shown while the field is empty, in place of an unusable message. */
+    emptyHint: 'Add a listing link or an address and these will fill themselves in.',
+    /** Honest about sms: — a desktop browser may have no handler for it. */
+    textNote: 'Texting opens your messaging app, so it works best on a phone.',
+    emailSubject: 'House I want to see',
+    emailBody: 'Hi Danielle,\n\nI\u2019d like to see this house:\n\n{listing}\n\nThanks!',
+    smsBody: 'Hi Danielle \u2014 I\u2019d like to see this house: {listing}',
+  },
+
+  /** The web form below the quick actions. Optional, never a prerequisite. */
+  noteHeading: 'Or send me a note here.',
 
   fields: {
-    listingUrl: {
-      label: 'Listing link',
-      hint: 'Zillow, Redfin, the brokerage site — wherever you found it. Paste the address instead if that is easier.',
-      required: false,
-    },
     name: { label: 'Name', required: true },
     email: { label: 'Email', required: true },
     phone: { label: 'Phone', required: false, hint: 'Optional' },

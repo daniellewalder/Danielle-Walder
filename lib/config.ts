@@ -60,6 +60,19 @@ export const contactEmail = clean(process.env.CONTACT_EMAIL) ?? 'homes@daniellew
 export const contactFormEndpoint = clean(process.env.CONTACT_FORM_ENDPOINT)
 
 /**
+ * Public contact phone. ENVIRONMENT-ONLY — there is deliberately no committed
+ * default, and one must not be added without Danielle saying so.
+ *
+ * A number she supplied is recorded in README under "Supplied but deliberately
+ * not rendered". Publishing a phone number as a tappable link is her decision,
+ * not an implementation detail, so this stays unset until she sets it.
+ *
+ * When it IS set, "Text Danielle" appears on the showing inquiry automatically.
+ * Until then that action is not rendered at all — never as a dead button.
+ */
+export const contactPhone = clean(process.env.CONTACT_PHONE)
+
+/**
  * RealScout IDX. The agent id is a public embed identifier — it appears in the
  * page source by design and is not a credential.
  */

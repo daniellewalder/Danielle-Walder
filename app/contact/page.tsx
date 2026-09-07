@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import { ShowingForm } from '@/components/contact/ShowingForm'
+import { ShowingInquiry } from '@/components/contact/ShowingInquiry'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { contactEmail, contactFormEndpoint } from '@/lib/config'
+import { contactEmail, contactFormEndpoint, contactPhone } from '@/lib/config'
 import { parseArea, parseIntent } from '@/lib/contact/intent'
 import { contactPage, showingInquiry } from '@/lib/content/contact'
 
@@ -53,9 +53,10 @@ export default async function ContactPage({ searchParams }: Props) {
 
         <section aria-label={showingInquiry.heading} className="wrap pt-12 mobile:pt-8">
           <div className="max-w-[720px]">
-            <ShowingForm
+            <ShowingInquiry
               deliveryEnabled={Boolean(contactFormEndpoint)}
               contactEmail={contactEmail}
+              contactPhone={contactPhone}
               area={area}
             />
           </div>
