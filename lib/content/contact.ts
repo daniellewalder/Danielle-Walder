@@ -74,7 +74,8 @@ export const showingInquiry = {
     textLabel: 'Text Danielle',
     emailLabel: 'Email Danielle',
     /** Shown while the field is empty, in place of an unusable message. */
-    emptyHint: 'Add a listing link or an address and these will fill themselves in.',
+    /* Said "these" even when only the email action exists. Now works either way. */
+    emptyHint: 'Add the listing or the address first.',
     /** Honest about sms: — a desktop browser may have no handler for it. */
     textNote: 'Texting opens your messaging app, so it works best on a phone.',
     emailSubject: 'House I want to see',

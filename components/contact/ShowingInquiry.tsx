@@ -54,8 +54,18 @@ function QuickSendAction({
       : 'border-[1.5px] border-brown py-[12.5px] text-brown hover:border-sage-olive hover:bg-sage-olive hover:text-cream'
 
   if (!href) {
+    /*
+      Disabled reads as inactive through SHAPE, not only through colour: the
+      fill drops away to a dashed outline, so it is still legible to someone
+      who cannot distinguish the two greys. The `disabled` attribute carries it
+      for assistive tech, and the helper line below says why in words.
+    */
     return (
-      <button type="button" disabled className={`${actionShell} ${skin} opacity-45`}>
+      <button
+        type="button"
+        disabled
+        className={`${actionShell} cursor-not-allowed border border-dashed border-sand py-[13px] text-taupe`}
+      >
         {label}
       </button>
     )
@@ -150,57 +160,72 @@ export function ShowingInquiry({
 
   return (
     <div className="flex flex-col gap-12 mobile:gap-10">
-      {/* ---------------------------------------------------- quick send --- */}
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2 rounded-field border border-sand bg-paper px-6 py-6 mobile:px-4 mobile:py-5">
-          <label
-            htmlFor="showing-listing"
-            className="font-sans text-[16px] font-semibold text-espresso"
-          >
-            {showingInquiry.quickSend.listingLabel}
-          </label>
-          <p id="showing-listing-hint" className={hintShell}>
-            {showingInquiry.quickSend.listingHint}
-          </p>
-          <input
-            id="showing-listing"
-            name="listing"
-            type="text"
-            inputMode="url"
-            autoComplete="off"
-            value={listing}
-            onChange={(event) => setListing(event.target.value)}
-            aria-describedby="showing-listing-hint"
-            className="mt-2 w-full rounded-input border border-sand bg-cream px-4 py-[15px] font-sans text-[17px] text-espresso placeholder:text-taupe mobile:text-[16px]"
-          />
+      {/*
+        ------------------------------------------------------ quick send ---
+        One field and its actions in one panel, because they are one thing:
+        paste the house, send the house. Previously the panel held only the
+        input and the button floated beneath it, which read as two unrelated
+        controls rather than a single utility.
+      */}
+      <div className="max-w-[620px] rounded-field border border-sand bg-paper px-7 py-7 mobile:px-5 mobile:py-6">
+        <label
+          htmlFor="showing-listing"
+          className="font-sans text-[16px] font-semibold text-espresso"
+        >
+          {showingInquiry.quickSend.listingLabel}
+        </label>
+        <p id="showing-listing-hint" className={`mt-1 ${hintShell}`}>
+          {showingInquiry.quickSend.listingHint}
+        </p>
+
+        {/*
+          Plain text input, no inputMode: the field takes a pasted URL or a
+          typed street address, and a url keyboard would put ".com" under the
+          thumb of someone typing "1234 Mulholland". Autocorrect and
+          capitalisation are off because both mangle a pasted link.
+        */}
+        <input
+          id="showing-listing"
+          name="listing"
+          type="text"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          value={listing}
+          onChange={(event) => setListing(event.target.value)}
+          aria-describedby="showing-listing-hint"
+          className="mt-4 w-full rounded-input border border-sand bg-cream px-4 py-[15px] font-sans text-[17px] text-espresso placeholder:text-taupe mobile:text-[16px]"
+        />
+
+        <div className="mt-5 flex flex-wrap items-center gap-3 mobile:flex-col mobile:items-stretch">
+          {contactPhone ? (
+            <QuickSendAction
+              href={smsHref}
+              label={showingInquiry.quickSend.textLabel}
+              tone="primary"
+            />
+          ) : null}
+          {contactEmail ? (
+            <QuickSendAction
+              href={emailHref}
+              label={showingInquiry.quickSend.emailLabel}
+              tone={contactPhone ? 'secondary' : 'primary'}
+            />
+          ) : null}
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-3 mobile:flex-col mobile:items-stretch">
-            {contactPhone ? (
-              <QuickSendAction
-                href={smsHref}
-                label={showingInquiry.quickSend.textLabel}
-                tone="primary"
-              />
-            ) : null}
-            {contactEmail ? (
-              <QuickSendAction
-                href={emailHref}
-                label={showingInquiry.quickSend.emailLabel}
-                tone={contactPhone ? 'secondary' : 'primary'}
-              />
-            ) : null}
-          </div>
-
-          {!ready ? <p className={hintShell}>{showingInquiry.quickSend.emptyHint}</p> : null}
-          {contactPhone ? <p className={hintShell}>{showingInquiry.quickSend.textNote}</p> : null}
-        </div>
+        {!ready ? (
+          <p className={`mt-4 ${hintShell}`}>{showingInquiry.quickSend.emptyHint}</p>
+        ) : null}
+        {contactPhone ? (
+          <p className={`mt-3 ${hintShell}`}>{showingInquiry.quickSend.textNote}</p>
+        ) : null}
       </div>
 
       {/* --------------------------------------------------- the note form --- */}
-      <div className="border-t border-hairline pt-10 mobile:pt-8">
-        <h2 className="font-display text-sub leading-none text-espresso tablet:text-sub-tablet mobile:text-sub-mobile">
+      <div className="border-t border-hairline pt-9 mobile:pt-7">
+        <h2 className="font-display text-[22px] leading-[1.2] text-espresso mobile:text-[20px]">
           {showingInquiry.noteHeading}
         </h2>
 
@@ -212,7 +237,7 @@ export function ShowingInquiry({
             {showingInquiry.success}
           </p>
         ) : (
-          <form onSubmit={onSubmit} noValidate className="mt-7 flex flex-col gap-6">
+          <form onSubmit={onSubmit} noValidate className="mt-6 flex max-w-[620px] flex-col gap-5">
             <div className="grid grid-cols-2 gap-5 mobile:grid-cols-1">
               <div className="flex flex-col gap-2">
                 <label htmlFor="showing-name" className={labelShell}>
