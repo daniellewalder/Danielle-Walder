@@ -11,48 +11,82 @@ export const siteName = 'danielle walder'
 /** The nav wordmark carries the full mark. */
 export const navWordmark = 'danielle walder real estate'
 
+export type NavVoice = 'publication' | 'plain' | 'action'
+
+export type NavLink = {
+  label: string
+  href: string
+  voice: NavVoice
+}
+
+export type MenuGroup = {
+  heading: string
+  links: readonly NavLink[]
+}
+
 /**
- * Primary navigation — Danielle's labels, lowercase, in her order.
+ * The visible header navigation — four things, in Danielle's order and her
+ * words. Everything else lives in the menu.
  *
  * Labels and routes are deliberately different things. The public route
- * vocabulary stays /read, /search, /tuesday-test, /homes, /sold, /about and
- * /contact; the nav calls them what she calls them.
+ * vocabulary stays /read, /la-actually, /tuesday-test, /search, /home-valuation,
+ * /homes, /sold, /about and /contact; the nav calls them what she calls them.
  *
- * Every destination is a real page with real content.
+ * `voice` is how a link is set, not what it is: the publication takes Kalnia
+ * and wine because it is a masthead, the showing handoff takes wine and a
+ * heavier weight because it is the one real-estate action in the header. It is
+ * still text — it is not a filled button, and it must not become one.
  *
- * `sold` is deliberately NOT here. /sold still exists as a route so links to
- * it do not break, but it has no verified sold data, and the Your Listings
- * widget on /homes already includes Sold and Rented. Do not add it back to the
- * nav, do not redirect it to /homes, and do not invent sold data to justify
- * it.
+ * Deliberately NOT here:
+ *
+ * - `search`. Danielle's objection is that the bare word reads as a site-wide
+ *   search box. Wherever the home-search tool is named in navigation it is
+ *   "search homes"; the route stays /search.
+ * - `/homes`. The route and the page are intact, but its public-facing label
+ *   is undecided — "listings" is out and nothing has replaced it. It stays out
+ *   of the header and out of the menu until Danielle approves a name. Do not
+ *   invent one.
+ * - `/sold`. Still a route so links to it do not break, but there is no
+ *   verified sold data and the Your Listings widget on /homes already includes
+ *   Sold and Rented.
  */
-export const navLinks = [
-  { label: 'search', href: '/search' },
-  { label: 'listings', href: '/homes' },
-] as const
+export const primaryNav: readonly NavLink[] = [
+  { label: 'overthinking real estate', href: '/read', voice: 'publication' },
+  { label: 'la, actually', href: '/la-actually', voice: 'plain' },
+  { label: 'quizzes', href: '/tuesday-test', voice: 'plain' },
+  { label: 'send me a house', href: '/contact?intent=showing', voice: 'action' },
+]
 
-/** Sits mid-row, set in Kalnia and wine — it reads as a voice, not a nav item. */
-export const readLink = { label: 'overthinking real estate', href: '/read' }
-
-/** The rest of the row, after the publication. */
-export const navLinksAfter = [
-  { label: 'quizzes', href: '/tuesday-test' },
-  { label: 'about', href: '/about' },
-] as const
+/**
+ * The rest of the menu behind the hamburger, grouped and labelled.
+ *
+ * `primaryNav` leads the panel above these, in its own column — someone who
+ * opens the menu should not have to close it again to reach the thing they
+ * came for.
+ *
+ * Privacy, terms and accessibility pages do not exist. When they do they
+ * belong in a restrained secondary area at the foot of the panel, not as a
+ * third group here. Nothing goes in this file until its destination exists.
+ */
+export const menuGroups: readonly MenuGroup[] = [
+  {
+    heading: 'Real estate',
+    links: [
+      { label: 'search homes', href: '/search', voice: 'plain' },
+      { label: 'home valuation', href: '/home-valuation', voice: 'plain' },
+    ],
+  },
+  {
+    heading: 'Danielle',
+    links: [
+      { label: 'about', href: '/about', voice: 'plain' },
+      { label: 'contact', href: '/contact', voice: 'plain' },
+    ],
+  },
+]
 
 /** The publication wordmark in the footer, always lowercase. */
 export const publicationWordmark = { label: 'overthinking real estate', href: '/read' }
-
-/**
- * The showing handoff, in the nav so it does not depend on anyone knowing the
- * query-param URL exists. It sits next to "say hello" rather than replacing it:
- * one is "talk to me", the other is "here is a specific house".
- *
- * Danielle's words. Not "request a showing", not "contact an agent".
- */
-export const navShowing = { label: 'send me a house', href: '/contact?intent=showing' }
-
-export const navCta = { label: 'say hello', href: '/contact' }
 
 export const startHereLinks = [
   { label: 'search homes', href: '/search' },
@@ -61,6 +95,15 @@ export const startHereLinks = [
   { label: "what's my home worth?", href: '/home-valuation' },
 ] as const
 
+/**
+ * The footer follows the header's vocabulary: "search homes", not "search";
+ * "contact", not "say hello". `/homes` is out of the footer too until its
+ * public-facing label is approved — the route is untouched, only the word for
+ * it is unsettled, and "listings" is not it.
+ *
+ * Otherwise left alone. "send me a house" is deliberately not added here: the
+ * footer was not part of this pass beyond the three label corrections.
+ */
 export const footerGroups = [
   {
     heading: 'Explore',
@@ -73,10 +116,9 @@ export const footerGroups = [
   {
     heading: 'Work with me',
     links: [
-      { label: 'search', href: '/search' },
-      { label: 'listings', href: '/homes' },
+      { label: 'search homes', href: '/search' },
       { label: 'about', href: '/about' },
-      { label: 'say hello', href: '/contact' },
+      { label: 'contact', href: '/contact' },
     ],
   },
 ] as const

@@ -136,13 +136,13 @@ const config: Config = {
         // desktop values in the spec are what a class states plainly.
         tablet: { max: '1024px' },
         mobile: { max: '640px' },
-        // The nav row stops fitting on one line below ~1120px — the wordmark
-        // carries "real estate" and the links sit at 16px. It collapses to the
-        // mark plus the hamburger there rather than wrapping into a ragged
-        // second row. Raise this if the nav ever gets shorter again.
-        navstack: { max: '1120px' },
-        // Between the collapse point and a wide desktop the full seven-item
-        // row needs tighter spacing and slightly smaller type to survive.
+        // Where the header gives up the four-link row for the wordmark plus the
+        // menu. Set at the approved desktop floor rather than at the width
+        // where the links actually collide: the row is meant to look spacious,
+        // and a row that merely fits is already too full.
+        navstack: { max: '1199px' },
+        // Between the collapse point and a wide desktop the wordmark comes
+        // down a step so the row keeps real air in it.
         navtight: { max: '1400px' },
       },
     },

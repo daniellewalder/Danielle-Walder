@@ -10,7 +10,10 @@ export const metadata: Metadata = {
 }
 
 /**
- * Reached from the nav and the footer as "listings".
+ * Not linked from the header or the footer right now: "listings" was retired
+ * as the public label for this page and nothing has replaced it yet. The route
+ * and the page are intact and every existing link to /homes still works — do
+ * not invent a name to put it back in the nav.
  *
  * Listings come from RealScout's Your Listings web component — Danielle's real
  * MLS data. There is no listing data in this repo and no mock adapter; do not
