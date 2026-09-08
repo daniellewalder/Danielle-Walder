@@ -99,8 +99,15 @@ export function HomeValue({ className = '' }: { className?: string }) {
  * Danielle's own MLS listings, straight from RealScout.
  *
  * Every attribute below is preserved exactly as supplied: the agent id, the
- * sort order, the full listing-status set, and the property types. Do not
- * trim or reorder them — this is what she configured in RealScout.
+ * sort order, the full listing-status set, the property types, and the two
+ * inclusion flags. Do not trim or reorder them — this is what she configured
+ * in RealScout.
+ *
+ * include-co-listings and include-seller-listings were added when sold
+ * properties were missing from the page: without them the widget shows only
+ * the listings where she is the sole listing agent, which leaves out the ones
+ * she co-listed or represented the seller on. They come from her own updated
+ * snippet, not from guesswork.
  *
  * The divider colour, rgb(101, 141, 172) / #658DAC, is preserved exactly as it
  * came in that RealScout configuration. It sits outside the locked site
@@ -122,11 +129,20 @@ export function YourListings({ className = '' }: { className?: string }) {
         }
       `}</style>
       <div className={`${slot} min-h-[320px] ${className}`}>
+        {/*
+          include-co-listings and include-seller-listings are bare boolean
+          attributes in Danielle's snippet. JSX needs a value, so they are
+          passed as empty strings — which React renders as the attribute
+          present with no value, exactly as the pasted HTML has it. Same
+          pattern as remove-title on Home Value above.
+        */}
         <realscout-your-listings
           agent-encoded-id={realScoutAgentId}
           sort-order="STATUS_AND_SIGNIFICANT_CHANGE"
           listing-status="For Sale,For Rent,In Contract,Sold,Rented"
           property-types="SFR,MF,TC,LAL,MOBILE,OTHER"
+          include-co-listings=""
+          include-seller-listings=""
         />
       </div>
     </>

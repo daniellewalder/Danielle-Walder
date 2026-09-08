@@ -21,6 +21,9 @@ declare module 'react' {
         'sort-order'?: string
         'listing-status'?: string
         'property-types'?: string
+        /** Bare boolean attributes in the source snippet; passed as "". */
+        'include-co-listings'?: string
+        'include-seller-listings'?: string
       }
     }
   }
