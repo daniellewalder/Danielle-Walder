@@ -60,6 +60,13 @@ export const fixtureArea: Area = {
   currentConditionsFlag: null,
   metaDescription: null,
 
+  /*
+   * No verified RealScout Search Link yet. Until Danielle supplies one the
+   * page shows a generic "Search homes" CTA rather than an area-named button
+   * that would land on an unfiltered search.
+   */
+  homeSearch: null,
+
   guide: {
     headline: "How I'd spend a day getting to know Fixtureville",
     intro: note(

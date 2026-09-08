@@ -190,6 +190,13 @@ export const calabasas: Area = {
     'An area guide to the incorporated city of Calabasas in Los Angeles County: housing forms, getting around, and verified local places.',
 
   /*
+   * No verified RealScout Search Link yet. Until Danielle supplies one the
+   * page shows a generic "Search homes" CTA rather than an area-named button
+   * that would land on an unfiltered search.
+   */
+  homeSearch: null,
+
+  /*
    * The test-drive itinerary is NOT WRITTEN YET. The real route — which
    * residential pockets, which drives, which contrasts — is being researched
    * separately and is not something to invent here.

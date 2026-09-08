@@ -13,9 +13,22 @@ export const areaGuide = {
   placesHeading: 'Verified local places',
   /** Rendered as "Local details last verified September 5, 2026". */
   verifiedLabel: 'Local details last verified',
-  /** Becomes "Search homes in Calabasas". Goes to /search, unfiltered. */
-  searchCtaPrefix: 'Search homes in',
+  /**
+   * Two CTAs, and which one shows depends on whether a verified area search
+   * actually exists.
+   *
+   * `areaSearch` names the area and is only ever rendered when the area has a
+   * real RealScout Search Link behind it. `genericSearch` is the honest
+   * fallback: it does not name the area, because the ordinary search page is
+   * not filtered to one.
+   */
+  areaSearchPrefix: 'See',
+  areaSearchSuffix: 'homes',
+  genericSearchLabel: 'Search homes',
   searchHref: '/search',
+
+  /** Small label above the compact reference block. */
+  referenceLabel: 'For reference',
 }
 
 /** Plain category labels for the places list. No marketing register. */

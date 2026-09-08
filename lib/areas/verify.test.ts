@@ -55,6 +55,7 @@ const area = (overrides: Partial<Area> = {}): Area => ({
   published: true,
   currentConditionsFlag: null,
   metaDescription: null,
+  homeSearch: null,
   guide: null,
   ...overrides,
 })
@@ -255,4 +256,30 @@ test('the layout fixture can never be published', () => {
 test('an optional itinerary module missing is not a failure', () => {
   const bare = guide({ normalLifeTest: null, beforeYouLeave: null, heroMedia: null })
   assert.equal(isGuideRenderable(bare), true)
+})
+
+// ------------------------------------------- the area search destination
+
+test('an area with no verified search link does not name itself in the CTA', () => {
+  // The guard is the data: null homeSearch means AreaSearchCta renders the
+  // generic label. Calabasas is the live case.
+  assert.equal(calabasas.homeSearch, null)
+})
+
+test('a verified search link carries a real URL and a confirmation date', () => {
+  const withSearch = area({
+    homeSearch: { url: 'https://example.realscout.com/saved/abc', verifiedAt: '2026-09-07' },
+  })
+  assert.ok(withSearch.homeSearch?.url.startsWith('https://'))
+  assert.ok(withSearch.homeSearch?.verifiedAt)
+})
+
+test('places are still verified and gated even though nothing renders them', () => {
+  // The directory left the page; the research did not leave the repo.
+  const rendered = renderablePlaces(places, 'calabasas')
+  assert.ok(rendered.length > 0, 'records still pass the gate for the report')
+  for (const place of rendered) {
+    assert.ok(place.provenance.lastVerified, 'still verified')
+    assert.ok(place.provenance.sources.length > 0, 'still sourced')
+  }
 })

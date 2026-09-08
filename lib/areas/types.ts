@@ -217,6 +217,26 @@ export interface Area {
   metaDescription: string | null
 
   /**
+   * A real RealScout Search Link for this area, generated from Danielle's
+   * RealScout account.
+   *
+   * NEVER CONSTRUCT THIS. It is not a URL pattern to guess, a query string to
+   * assemble, or an undocumented attribute on the search widget — it is a
+   * shareable saved search she creates and supplies, and it carries her
+   * account attribution with it.
+   *
+   * Null means no verified area search exists, and the page must then not
+   * claim one: the CTA falls back to a generic "Search homes" pointing at the
+   * ordinary search page. An area-named button that lands on an unfiltered
+   * search is a promise the site cannot keep.
+   */
+  homeSearch: {
+    url: string
+    /** ISO date the link was last confirmed to open the right results. */
+    verifiedAt: string
+  } | null
+
+  /**
    * The test-drive itinerary — the editorial spine of a finished guide.
    *
    * Optional and null by default. An area without one renders its factual

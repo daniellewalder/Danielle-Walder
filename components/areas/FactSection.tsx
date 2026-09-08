@@ -12,11 +12,14 @@ export function FactSection({
   heading,
   block,
   divider = true,
+  measure = 'max-w-measure',
 }: {
   heading?: string
   block: FactBlock | null
   /** The first block sits under PageHeader's own rule and needs no second one. */
   divider?: boolean
+  /** Text measure. Narrower than the default reads as a standfirst, not a slab. */
+  measure?: string
 }) {
   const verified = renderableFact(block)
   if (!verified) return null
@@ -34,7 +37,7 @@ export function FactSection({
           {verified.body.map((paragraph) => (
             <p
               key={paragraph}
-              className="max-w-measure font-sans text-[18px] leading-[1.6] text-warmgray [&+p]:mt-5 mobile:text-[17px]"
+              className={`${measure} font-sans text-[17.5px] leading-[1.6] text-warmgray [&+p]:mt-4 mobile:text-[16.5px]`}
             >
               {paragraph}
             </p>
