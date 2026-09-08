@@ -222,7 +222,7 @@ login/signup behaviour the widgets introduce. A redirect would also decide
 whether RealScout's paid branding tier is worth buying.
 
 **Your Listings** on `/homes` carries Danielle's exact configuration — agent
-id, `sort-order="STATUS_AND_SIGNIFICANT_CHANGE"`, the full
+id, `sort-order="PRICE_HIGH"`, the full
 `listing-status="For Sale,For Rent,In Contract,Sold,Rented"`, and
 `property-types="SFR,MF,TC,LAL,MOBILE,OTHER"`. Do not trim or reorder them.
 Unlike the other three it fills the content width rather than sitting in a

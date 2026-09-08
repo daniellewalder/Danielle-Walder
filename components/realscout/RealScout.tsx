@@ -101,7 +101,10 @@ export function HomeValue({ className = '' }: { className?: string }) {
  * Every attribute below is preserved exactly as supplied: the agent id, the
  * sort order, the full listing-status set, the property types, and the two
  * inclusion flags. Do not trim or reorder them — this is what she configured
- * in RealScout.
+ * in RealScout, and the values are hers, not ours. `sort-order` in particular
+ * is a RealScout enum: PRICE_HIGH came from her own snippet. Never invent one
+ * — a sort value the widget does not recognise is likely to be ignored
+ * silently, which looks like nothing happened rather than like an error.
  *
  * include-co-listings and include-seller-listings were added when sold
  * properties were missing from the page: without them the widget shows only
@@ -138,7 +141,7 @@ export function YourListings({ className = '' }: { className?: string }) {
         */}
         <realscout-your-listings
           agent-encoded-id={realScoutAgentId}
-          sort-order="STATUS_AND_SIGNIFICANT_CHANGE"
+          sort-order="PRICE_HIGH"
           listing-status="For Sale,For Rent,In Contract,Sold,Rented"
           property-types="SFR,MF,TC,LAL,MOBILE,OTHER"
           include-co-listings=""
