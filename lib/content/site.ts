@@ -25,50 +25,56 @@ export type MenuGroup = {
 }
 
 /**
- * The visible header navigation — four things, in Danielle's order and her
- * words. Everything else lives in the menu.
+ * The visible desktop header — the strongest products and actions, not every
+ * route. Everything else lives in the drawer.
  *
  * Labels and routes are deliberately different things. The public route
- * vocabulary stays /read, /la-actually, /tuesday-test, /search, /home-valuation,
- * /homes, /sold, /about and /contact; the nav calls them what she calls them.
+ * vocabulary stays /read, /la-actually, /tuesday-test, /search,
+ * /home-valuation, /homes, /sold, /about and /contact; the nav calls them what
+ * Danielle calls them, lowercase, as the rest of the site chrome does.
  *
  * `voice` is how a link is set, not what it is: the publication takes Kalnia
- * and wine because it is a masthead, the showing handoff takes wine and a
- * heavier weight because it is the one real-estate action in the header. It is
- * still text — it is not a filled button, and it must not become one.
+ * and wine because it is a masthead, the showing handoff takes wine, a heavier
+ * weight and an arrow because it is the site's main action. It is still text —
+ * it is not a filled button in the header, and it must not become one.
  *
- * Deliberately NOT here:
+ * Deliberately NOT here: home valuation, about and contact, which the drawer
+ * carries; and `/homes`, whose public-facing label is undecided. "listings" is
+ * out and nothing has replaced it, so the route stays out of the navigation
+ * entirely until Danielle approves a name. Do not invent one. `/sold` is out
+ * for the same reason plus the absence of verified sold data.
  *
- * - `search`. Danielle's objection is that the bare word reads as a site-wide
- *   search box. Wherever the home-search tool is named in navigation it is
- *   "search homes"; the route stays /search.
- * - `/homes`. The route and the page are intact, but its public-facing label
- *   is undecided — "listings" is out and nothing has replaced it. It stays out
- *   of the header and out of the menu until Danielle approves a name. Do not
- *   invent one.
- * - `/sold`. Still a route so links to it do not break, but there is no
- *   verified sold data and the Your Listings widget on /homes already includes
- *   Sold and Rented.
+ * "search" alone is never a label here: it reads as a site-wide search box.
+ * The tool is "search homes"; the route stays /search.
  */
-export const primaryNav: readonly NavLink[] = [
+export const headerNav: readonly NavLink[] = [
   { label: 'overthinking real estate', href: '/read', voice: 'publication' },
   { label: 'la, actually', href: '/la-actually', voice: 'plain' },
   { label: 'quizzes', href: '/tuesday-test', voice: 'plain' },
+  { label: 'search homes', href: '/search', voice: 'plain' },
   { label: 'send me a house', href: '/contact?intent=showing', voice: 'action' },
 ]
 
 /**
- * The rest of the menu behind the hamburger, grouped and labelled.
- *
- * `primaryNav` leads the panel above these, in its own column — someone who
- * opens the menu should not have to close it again to reach the thing they
- * came for.
+ * The one link the compact header keeps beside the menu button, where there is
+ * room for it. Below 640px it drops and the drawer carries it.
+ */
+export const headerSearch: NavLink = {
+  label: 'search homes',
+  href: '/search',
+  voice: 'plain',
+}
+
+/**
+ * The drawer: utilities and the deeper navigation layer. Not content
+ * discovery — no essay previews, no area previews, no subscribe point, no
+ * promotional copy. Those belong on the pages that own them.
  *
  * Privacy, terms and accessibility pages do not exist. When they do they
- * belong in a restrained secondary area at the foot of the panel, not as a
- * third group here. Nothing goes in this file until its destination exists.
+ * belong in a restrained area below the action, not as a fourth group.
+ * Nothing goes in this file until its destination exists.
  */
-export const menuGroups: readonly MenuGroup[] = [
+export const drawerGroups: readonly MenuGroup[] = [
   {
     heading: 'Real estate',
     links: [
@@ -77,13 +83,28 @@ export const menuGroups: readonly MenuGroup[] = [
     ],
   },
   {
+    heading: 'Explore',
+    links: [
+      { label: 'la, actually', href: '/la-actually', voice: 'plain' },
+      { label: 'overthinking real estate', href: '/read', voice: 'publication' },
+      { label: 'quizzes', href: '/tuesday-test', voice: 'plain' },
+    ],
+  },
+  {
     heading: 'Danielle',
     links: [
-      { label: 'about', href: '/about', voice: 'plain' },
+      { label: 'about danielle', href: '/about', voice: 'plain' },
       { label: 'contact', href: '/contact', voice: 'plain' },
     ],
   },
 ]
+
+/** The drawer closes on the one action, after a rule. Nothing competes with it. */
+export const drawerAction: NavLink = {
+  label: 'send me a house',
+  href: '/contact?intent=showing',
+  voice: 'action',
+}
 
 /** The publication wordmark in the footer, always lowercase. */
 export const publicationWordmark = { label: 'overthinking real estate', href: '/read' }

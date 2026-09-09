@@ -130,20 +130,31 @@ const config: Config = {
         search: '500px',
         measure: '68ch',
       },
+      /*
+       * All four are max-width variants, so the desktop values in the spec are
+       * what a class states plainly.
+       *
+       * ORDER MATTERS AND IS NOT ALPHABETICAL. Tailwind emits these media
+       * queries in the order they are declared here, so a later one wins the
+       * cascade wherever two of them apply to the same property. They are
+       * therefore listed widest-first, which is the only order where the
+       * narrower breakpoint is the one that takes effect — the way anyone
+       * writing `navtight:text-[34px] mobile:text-[24px]` expects. Listing
+       * `navtight` last previously made the footer wordmark 34px on a phone
+       * instead of 24px. Keep this descending.
+       */
       screens: {
-        // The three approved breakpoints: desktop ≥1200px as specified,
-        // tablet ≤1024px, mobile ≤640px. Both are max-width variants so the
-        // desktop values in the spec are what a class states plainly.
+        // Between the collapse point and a wide desktop the wordmark comes
+        // down a step so the header row keeps real air in it.
+        navtight: { max: '1400px' },
+        // Where the header gives up its full row for the wordmark plus the
+        // menu button. Set at the approved desktop floor of 1200px rather than
+        // at the width where the links would actually collide: a row that
+        // merely fits is already too full.
+        navstack: { max: '1199px' },
+        // The two approved layout breakpoints.
         tablet: { max: '1024px' },
         mobile: { max: '640px' },
-        // Where the header gives up the four-link row for the wordmark plus the
-        // menu. Set at the approved desktop floor rather than at the width
-        // where the links actually collide: the row is meant to look spacious,
-        // and a row that merely fits is already too full.
-        navstack: { max: '1199px' },
-        // Between the collapse point and a wide desktop the wordmark comes
-        // down a step so the row keeps real air in it.
-        navtight: { max: '1400px' },
       },
     },
   },
