@@ -34,14 +34,24 @@ export function EditorialVideo({
   priority,
   className = '',
   rounded = 'rounded-block',
+  mediaClassName = '',
 }: {
   asset: EditorialVideoAsset
   sizes: string
   priority?: boolean
   className?: string
   rounded?: string
+  /**
+   * Classes applied to both the poster and the video — the way to give one
+   * call site a responsive crop (`object-[50%_38%] mobile:object-[62%_50%]`),
+   * which the asset's single `objectPosition` cannot express. When it is
+   * supplied it replaces that inline style rather than losing to it.
+   */
+  mediaClassName?: string
 }) {
   const frameRef = useRef<HTMLDivElement>(null)
+  const cropStyle =
+    !mediaClassName && asset.objectPosition ? { objectPosition: asset.objectPosition } : undefined
   const [showVideo, setShowVideo] = useState(false)
 
   useEffect(() => {
@@ -92,8 +102,8 @@ export function EditorialVideo({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover"
-          style={asset.objectPosition ? { objectPosition: asset.objectPosition } : undefined}
+          className={`object-cover ${mediaClassName}`}
+          style={cropStyle}
         />
 
         {showVideo ? (
@@ -113,8 +123,8 @@ export function EditorialVideo({
             preload="auto"
             aria-hidden="true"
             tabIndex={-1}
-            className="absolute inset-0 h-full w-full object-cover"
-            style={asset.objectPosition ? { objectPosition: asset.objectPosition } : undefined}
+            className={`absolute inset-0 h-full w-full object-cover ${mediaClassName}`}
+            style={cropStyle}
           />
         ) : null}
       </div>

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { AreaIndex } from '@/components/areas/AreaIndex'
+import { LaActuallyHero } from '@/components/areas/LaActuallyHero'
 import { EditorialImage } from '@/components/media/EditorialImage'
-import { EditorialVideo } from '@/components/media/EditorialVideo'
 import { CtaLink } from '@/components/ui/CtaLink'
-import { PageHeader } from '@/components/ui/PageHeader'
 import { getPublishedAreas } from '@/lib/areas'
 import { editorialMedia } from '@/lib/content/editorialMedia'
 import { laActuallyPage } from '@/lib/content/pages'
@@ -28,26 +27,13 @@ export default function LaActuallyPage() {
 
   return (
     <>
-      <PageHeader
-        eyebrow={laActuallyPage.eyebrow}
-        heading={laActuallyPage.heading}
-        intro={laActuallyPage.intro}
-      />
-
       {/*
-        The establishing shot: a wide coastal band, full-bleed, immediately
-        under the masthead. Stock editorial media — not a listing, not a sale,
-        and not captioned with a place name, because the location has not been
-        verified.
+        The opening is the footage with the copy set into it — not a cream
+        masthead with a picture underneath. Stock editorial media: not a
+        listing, not a sale, and not captioned with a place name, because the
+        location has not been verified.
       */}
-      <section aria-label="Los Angeles coastline" className="pt-12 mobile:pt-9">
-        <EditorialVideo
-          asset={editorialMedia.coastalAerial}
-          sizes="100vw"
-          rounded="rounded-none"
-          className="h-[420px] tablet:h-[320px] mobile:h-[240px]"
-        />
-      </section>
+      <LaActuallyHero />
 
       <AreaIndex areas={areas} />
 
