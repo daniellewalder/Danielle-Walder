@@ -220,10 +220,19 @@ export function SiteNav() {
                 key={group.heading}
                 className="flex flex-col gap-3 border-b border-hairline py-7 mobile:py-6"
               >
-                <h2 className="text-[11.5px] font-bold uppercase tracking-label text-taupe">
+                {/*
+                  Not a heading. These label groups of links inside a nav; they
+                  are not sections of the page, and as <h2> they sat above the
+                  page's own <h1> in every document's outline. The grouping is
+                  kept by naming each list with its label instead.
+                */}
+                <p
+                  id={groupLabelId(group.heading)}
+                  className="text-[11.5px] font-bold uppercase tracking-label text-taupe"
+                >
                   {group.heading}
-                </h2>
-                <ul className="flex flex-col">
+                </p>
+                <ul aria-labelledby={groupLabelId(group.heading)} className="flex flex-col">
                   {group.links.map((link) => (
                     <li key={link.href}>
                       <Link
@@ -259,6 +268,11 @@ export function SiteNav() {
       </div>
     </header>
   )
+}
+
+/** Ties a drawer group's list to its visible label without a heading. */
+function groupLabelId(heading: string) {
+  return `menu-group-${heading.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
 }
 
 const wordmarkStyle =

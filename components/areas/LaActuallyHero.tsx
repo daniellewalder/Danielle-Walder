@@ -19,12 +19,15 @@ import { laActuallyPage } from '@/lib/content/pages'
  * it ever moves, re-measure the composite rather than eyeballing it.
  *
  * CROP. The container is wider than the 16:9 source at every desktop height,
- * so the frame is cut top and bottom and the horizontal position only starts
- * mattering on a phone. `38%` vertically holds the mountains and the far
- * coastline — the geography the page is about — above the copy instead of
- * letting them slide out of frame. On a phone the crop turns hard horizontal,
- * and `62%` keeps the beach on one edge and the houses, highway and bluff in
- * the middle, rather than centring on open sand.
+ * so the frame is cut top and bottom there and only the vertical position
+ * matters. `38%` holds the mountains and the far coastline — the geography the
+ * page is about — above the copy instead of letting them slide out of frame.
+ * On a phone the crop turns hard horizontal, and `78%` puts the houses, the
+ * highway and the bluff behind the text rather than centring on open sand,
+ * which is what the measured contrast asked for: centred needs 64-65% of
+ * overlay to clear AA, this crop needs 57-59%. It costs the ocean on a phone.
+ * (Tablet widths crop horizontally too, but the beach runs diagonally across
+ * the whole frame there, so shifting it sideways buys nothing.)
  *
  * The poster carries the meaning and the alt text; the video is aria-hidden,
  * muted, looping and inline, and a reader on reduced motion or a slow
