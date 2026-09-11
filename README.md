@@ -84,8 +84,13 @@ abridge, or split them, and do not update the copyright year by inference.
 
 ### Supplied but deliberately not rendered
 
-- **Phone** — `(847) 899-9604`, and **service areas**, *Beverly Hills | Hancock
-  Park*. Neither has an approved home in the design.
+- **Service areas** — *Beverly Hills | Hancock Park*. No approved home in the
+  design yet.
+
+Danielle's phone, `(847) 899-9604`, is approved and published: it is committed
+in `lib/config.ts` as `+18478999604` and rendered in exactly one place, the
+"Text Danielle" quick send on `/contact?intent=showing`. Putting it anywhere
+else is a separate decision and hers to make.
 
 ### Not to be invented, ever
 

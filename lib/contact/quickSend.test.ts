@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { contactPhone } from '../config.ts'
+import { showingInquiry } from '../content/contact.ts'
 import { buildMailto, buildSms, fillTemplate, normalizePhone } from './quickSend.ts'
 
 /**
@@ -64,4 +66,36 @@ test('markup in a pasted value is encoded, never emitted raw', () => {
   const href = buildMailto('a@b.co', 's', fillTemplate('{listing}', '<script>alert(1)</script>'))
   assert.ok(!href.includes('<script>'))
   assert.equal(new URLSearchParams(href.split('?')[1]).get('body'), '<script>alert(1)</script>')
+})
+
+/**
+ * The real wiring, not a stand-in: Danielle's approved public texting number
+ * and the approved SMS body, against the three shapes people actually paste.
+ *
+ * This pins the committed default too. If it is ever cleared or edited by
+ * accident, "Text Danielle" silently stops rendering — this fails first.
+ */
+test('the configured phone produces a usable sms: URI for every listing shape', () => {
+  assert.equal(contactPhone, '+18478999604')
+
+  const shapes = [
+    '1242 N Kings Rd, West Hollywood, CA 90069',
+    'https://www.zillow.com/homedetails/1242-N-Kings-Rd-APT-3-West-Hollywood-CA-90069/20517063_zpid/?utm_source=share&view=public#photos',
+    'https://www.redfin.com/CA/Calabasas/24118-Hidden-Ridge-Rd-91302/home/7112233?utm_campaign=share&t=1#schools',
+  ]
+
+  for (const listing of shapes) {
+    const href = buildSms(contactPhone!, fillTemplate(showingInquiry.quickSend.smsBody, listing))
+    assert.ok(href.startsWith('sms:+18478999604?&body='), `wrong prefix for: ${listing}`)
+
+    const body = href.slice('sms:+18478999604?&body='.length)
+    // Anything that would truncate the body at the URI level must be encoded.
+    for (const char of ['&', '?', '#', ' ']) {
+      assert.ok(!body.includes(char), `${char} must be encoded for: ${listing}`)
+    }
+    assert.equal(
+      decodeURIComponent(body),
+      `Hi Danielle \u2014 I\u2019d like to see this house: ${listing}`,
+    )
+  }
 })

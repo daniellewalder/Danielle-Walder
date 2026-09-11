@@ -60,17 +60,23 @@ export const contactEmail = clean(process.env.CONTACT_EMAIL) ?? 'homes@daniellew
 export const contactFormEndpoint = clean(process.env.CONTACT_FORM_ENDPOINT)
 
 /**
- * Public contact phone. ENVIRONMENT-ONLY — there is deliberately no committed
- * default, and one must not be added without Danielle saying so.
+ * Public contact phone — (847) 899-9604, stored in E.164 so `sms:` and `tel:`
+ * take it verbatim.
  *
- * A number she supplied is recorded in README under "Supplied but deliberately
- * not rendered". Publishing a phone number as a tappable link is her decision,
- * not an implementation detail, so this stays unset until she sets it.
+ * Danielle approved this explicitly as her public, client-facing texting
+ * number. It is published business contact information, committed like the
+ * address above so the action works on any deploy with no dashboard setup, and
+ * CONTACT_PHONE still overrides it.
  *
- * When it IS set, "Text Danielle" appears on the showing inquiry automatically.
- * Until then that action is not rendered at all — never as a dead button.
+ * It has ONE rendering site: the "Text Danielle" quick send on
+ * /contact?intent=showing. Approval to publish it there is not licence to
+ * scatter it through the footer, the header, or every page's contact copy —
+ * adding it anywhere else is a new decision and hers to make.
+ *
+ * The component still branches on this being present, so clearing it removes
+ * the action cleanly rather than leaving a dead button.
  */
-export const contactPhone = clean(process.env.CONTACT_PHONE)
+export const contactPhone = clean(process.env.CONTACT_PHONE) ?? '+18478999604'
 
 /**
  * RealScout IDX. The agent id is a public embed identifier — it appears in the
