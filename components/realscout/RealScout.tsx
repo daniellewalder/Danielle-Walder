@@ -1,3 +1,4 @@
+import { SuppressEmptyOptions } from '@/components/realscout/SuppressEmptyOptions'
 import { realScoutAgentId, realScoutScriptSrc } from '@/lib/config'
 
 /**
@@ -43,6 +44,13 @@ export function SimpleSearch({ className = '' }: { className?: string }) {
       <div className={`${slot} min-h-[62px] ${className}`}>
         <realscout-simple-search agent-encoded-id={realScoutAgentId} />
       </div>
+      {/*
+        The widget opens its autocomplete on focus and, with nothing typed
+        yet, fills it with "No options". That reads as a broken search on the
+        first thing anyone sees. See lib/realscout/emptyOptions.ts for why this
+        matches on the rendered text rather than on a selector.
+      */}
+      <SuppressEmptyOptions selector="realscout-simple-search" />
     </>
   )
 }
