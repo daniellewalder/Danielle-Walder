@@ -31,6 +31,7 @@ export function About() {
           <div className="min-h-[560px] tablet:h-[420px] tablet:min-h-0 mobile:h-[340px]">
             <ImageSlot
               image={about.portrait}
+              tone="bg-butter-deep"
               sizes="(max-width: 1024px) 100vw, 30vw"
               className="h-full"
             />

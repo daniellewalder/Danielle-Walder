@@ -53,6 +53,7 @@ export function Hero() {
         <ImageSlot
           image={hero.portrait}
           priority
+          tone="bg-blue-steel"
           sizes="(max-width: 1024px) 100vw, 34vw"
           className="h-full min-h-[620px] tablet:h-[440px] tablet:min-h-0 mobile:h-[380px]"
         />

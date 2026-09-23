@@ -23,6 +23,7 @@ export default function AboutPage() {
         <ImageSlot
           image={aboutPage.portrait}
           priority
+          tone="bg-butter-deep"
           sizes="(max-width: 1024px) 100vw, 35vw"
           className="h-[460px] rounded-block tablet:h-[420px] mobile:h-[340px] mobile:rounded-[16px]"
         />

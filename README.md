@@ -12,7 +12,7 @@ Tailwind CSS.
 |---|---|
 | 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies, which makes this a genuine public-launch requirement. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. |
 | 2 | **RealScout has not been observed working in a real browser.** Search and listings are public core functionality, so all four widgets must be watched running before launch. DOM structure and a clean build are not evidence of runtime behaviour. Checklist below. |
-| 3 | **Visible `[ADD DANIELLE PHOTO]` placeholders.** The site must not launch publicly with literal placeholders on the homepage hero, the homepage About block, or `/about`. The conditional `[ADD ESSAY IMAGE]` fallback does **not** block launch as long as real Substack cover images are loading. |
+| 3 | **No photograph of Danielle anywhere on the site.** The homepage hero, the homepage About block and `/about` each reserve a portrait and none of them has one. The slot name is now development-only, so a public page shows a quiet tonal block rather than `[ADD DANIELLE PHOTO]` — **that is cosmetic and clears nothing.** A site whose whole premise is that Danielle is the reason to stay cannot launch without her face on it. The conditional essay-image fallback does **not** block launch as long as real Substack cover images are loading. |
 
 ## Real-browser testing
 
@@ -71,8 +71,12 @@ abridge, or split them, and do not update the copyright year by inference.
 
 ### Content Danielle still needs to supply
 
-- **Photography** — the three `[ADD DANIELLE PHOTO]` slots above. This is
-  launch blocker 3. The two homepage placeholders now hold the final crop, so a
+- **Photography** — the three portrait slots above. This is launch blocker 3.
+  Stock, borrowed or generated images of someone else are NOT an option here,
+  however unfinished the empty slots look: presenting another person as
+  Danielle on a licensed agent's site is a misrepresentation, and a
+  recognisable face carries a right-of-publicity problem on top of that. Real
+  photographs of her, or an empty slot. The two homepage placeholders now hold the final crop, so a
   photograph shot to match drops in without the composition moving:
   - **Homepage hero** — an upright ~2:3 slice that bleeds off the top, right
     and bottom edges of the blue block. Needs headroom and air to her left in

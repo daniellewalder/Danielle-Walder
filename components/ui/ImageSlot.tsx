@@ -16,13 +16,28 @@ interface ImageSlotProps {
    * the design, and it is skipped under `prefers-reduced-motion`.
    */
   hoverScale?: boolean
+  /**
+   * Background class for the empty state, so the block belongs to its
+   * section's colour family. One family per section: a sand rectangle inside
+   * a blue or butter block is a second family and reads as a missing asset
+   * rather than a composition. Defaults to sand, which is right on cream.
+   */
+  tone?: string
 }
 
 /**
- * Until real photos exist, this renders a labelled empty rectangle: the slot
- * name in Ink Soft (#6B5F55) on sand (#E3DBCB). Never fill it with stock or
- * generated photography — a visible empty slot is honest, a stock kitchen is a
- * lie about the listing.
+ * Until real photos exist, this renders a quiet tonal block in the section's
+ * own colour family. Never fill it with stock or generated photography — an
+ * empty slot is honest, a borrowed face or a stock kitchen is a claim about a
+ * person or a property that is not true. That rule has no exceptions, and
+ * "the site looks unfinished" is not one.
+ *
+ * THE SLOT NAME IS DEVELOPMENT-ONLY. `[ADD DANIELLE PHOTO]` is a production
+ * note to us, and printing it on a public page says "unfinished" far louder
+ * than an empty block does. In production the block carries no text and is
+ * decorative — it makes no claim, it just does not have a photograph in it
+ * yet. The missing photography is still a launch blocker; see README. Do not
+ * read a silent block as the blocker being cleared.
  *
  * Local assets go through next/image and get optimised. Remote ones do not:
  * essay covers come from whatever host Substack happens to use, and next/image
@@ -30,7 +45,18 @@ interface ImageSlotProps {
  * crashed page is a far worse trade than an unoptimised image, and these are
  * already CDN-served at a sane size.
  */
-export function ImageSlot({ image, className = '', sizes, priority, hoverScale }: ImageSlotProps) {
+export function ImageSlot({
+  image,
+  className = '',
+  sizes,
+  priority,
+  hoverScale,
+  tone = 'bg-sand',
+}: ImageSlotProps) {
+  // Statically replaced at build time, so the label never reaches a production
+  // bundle — but stays loud for whoever is building the page.
+  const showLabel = process.env.NODE_ENV !== 'production'
+
   const scale = hoverScale
     ? 'motion-safe:transition-transform motion-safe:duration-photo motion-safe:ease-out motion-safe:group-hover:scale-[1.02]'
     : ''
@@ -60,16 +86,16 @@ export function ImageSlot({ image, className = '', sizes, priority, hoverScale }
         )
       ) : (
         <div
-          role="img"
-          aria-label={`${image.label} photograph — not supplied yet`}
-          className={`flex h-full w-full items-center justify-center bg-sand ${scale}`}
+          // Nothing to announce: there is no photograph here, and a screen
+          // reader saying so on every empty slot is noise, not information.
+          aria-hidden="true"
+          className={`flex h-full w-full items-center justify-center ${tone} ${scale}`}
         >
-          <span
-            aria-hidden="true"
-            className="text-[12px] font-bold uppercase tracking-kicker text-warmgray"
-          >
-            {image.label}
-          </span>
+          {showLabel ? (
+            <span className="text-[12px] font-bold uppercase tracking-kicker text-warmgray">
+              {image.label}
+            </span>
+          ) : null}
         </div>
       )}
     </div>
