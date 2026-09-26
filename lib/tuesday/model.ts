@@ -150,8 +150,8 @@ export const ATTRIBUTES: readonly Attribute[] = [
   { id: 'privacy', label: 'Privacy', changeability: 'protectAtPurchase' },
   {
     id: 'outdoor',
-    label: 'Outdoor space you would actually use',
-    phrase: 'outdoor space you would actually use',
+    label: "Outdoor space you'd actually use",
+    phrase: "outdoor space you'd actually use",
     changeability: 'protectAtPurchase',
   },
   { id: 'lot', label: 'The lot itself', changeability: 'protectAtPurchase' },
@@ -185,7 +185,7 @@ export const ATTRIBUTES: readonly Attribute[] = [
     phrase: 'living space that works for how you cook and host',
     changeability: 'realProject',
   },
-  { id: 'kitchen', label: 'A kitchen you do not have to redo', phrase: 'the kitchen', changeability: 'realProject' },
+  { id: 'kitchen', label: "A kitchen you don't have to redo", phrase: 'the kitchen', changeability: 'realProject' },
   { id: 'condition', label: 'Move-in condition', changeability: 'realProject' },
   { id: 'ceilings', label: 'Ceiling height', changeability: 'realProject' },
 
@@ -244,3 +244,11 @@ export const PERSONAL_LAYERS: readonly string[] = [
   'Window treatments',
   'Art, furniture and styling',
 ]
+
+/**
+ * Added to the layers only when the answers support COSMETIC outdoor
+ * personalisation — never by default. "Landscaping" sits on a hair trigger
+ * between styling a patio and regrading a hillside, and a buyer who flagged
+ * upkeep as a daily frustration must never be handed it as a fun project.
+ */
+export const OUTDOOR_LAYER = 'Planting and outdoor styling'

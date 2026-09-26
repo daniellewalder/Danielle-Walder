@@ -210,3 +210,18 @@ test('protecting a real-project attribute means it has to work on arrival', asyn
     assert.ok(!/condition|kitchen/i.test(layer), `${layer} does not belong in make it yours`)
   }
 })
+
+test('a buyer open to real work is not handed a day-one requirements list', async () => {
+  const { dayOneItems } = await import('./interpret.ts')
+  const openToProject: Answers = {
+    tuesday: 'room', dealbreaker: 'outgrow', daily: ['separation', 'stairs'],
+    inherit: 'lot', whitehouse: 'personality', kitchen: 'fixable', location: 'strong',
+  }
+  const result = score(openToProject)
+  assert.ok(result.scales.renovationTolerance >= 0.62)
+  // They protected square footage and separation — both real projects to
+  // change. For this buyer that means "space matters", not "it must already
+  // be big". Listing them as day-one would contradict their own result.
+  assert.equal(dayOneItems(result).length, 0)
+  assert.ok(result.attributes.some((entry) => entry.attribute.id === 'size' && entry.state === 'protect'))
+})
