@@ -93,7 +93,7 @@ function mapLine(result: Result): string | null {
 /** Said only when we genuinely did not establish something. */
 export function unknownsLine(result: Result): string | null {
   if (result.unknowns.length === 0) return null
-  return 'There are things this did not ask about — parking, storage, stairs, upkeep, what a building lets you do. I would rather raise those against real houses than guess at them here.'
+  return "There are things this didn't ask about — parking, storage, stairs, upkeep. I'd rather figure those out against real houses than pretend they don't matter."
 }
 
 /**
