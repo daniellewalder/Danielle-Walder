@@ -199,3 +199,31 @@ export function dayOneItems(result: Result): readonly ReadAttribute[] {
     (entry) => entry.state === 'protect' && entry.attribute.changeability === 'realProject',
   )
 }
+
+/** The map finding as a phrase you can read at a glance. */
+export function mapSummary(result: Result): string | null {
+  switch (result.findings.map) {
+    case 'fixed':
+      return 'One area. It does not move.'
+    case 'strongPreference':
+      return 'Strong preference, not a hard boundary.'
+    case 'fewAreas':
+      return 'A handful of areas, not one ZIP code.'
+    case 'propertyLed':
+      return 'The property leads. The map follows.'
+    case null:
+      return null
+  }
+}
+
+/**
+ * Project appetite as two scannable rows. The two are answered separately on
+ * purpose — the whole point of the model is that they are different questions.
+ */
+export function projectSummary(result: Result): { label: string; value: string }[] {
+  const read = (value: number) => (value >= HIGH ? 'Yes' : value <= LOW ? 'Not really' : 'Depends')
+  return [
+    { label: 'Cosmetic changes', value: read(result.scales.personalizationAppetite) },
+    { label: 'Major renovation', value: read(result.scales.renovationTolerance) },
+  ]
+}
