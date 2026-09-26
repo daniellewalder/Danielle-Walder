@@ -2,23 +2,24 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { decodeAnswers, encodeAnswers } from './encode.ts'
 import { QUESTIONS } from './questions.ts'
-import { score } from './score.ts'
+import { score, type Answers } from './score.ts'
 
-const FULL = {
+const FULL: Answers = {
   tuesday: 'quiet',
   dealbreaker: 'dark',
-  inherit: 'depends',
+  daily: ['dark', 'public'],
+  inherit: 'renovation',
   whitehouse: 'mine',
   kitchen: 'never',
-  location: 'life',
+  location: 'property',
 }
 
-test('a full set round-trips exactly', () => {
+test('a full set, multi-select included, round-trips exactly', () => {
   assert.deepEqual(decodeAnswers(encodeAnswers(FULL)), FULL)
 })
 
 test('a partial set round-trips exactly', () => {
-  const partial = { tuesday: 'quiet', location: 'neighborhood' }
+  const partial: Answers = { tuesday: 'quiet', location: 'fixed' }
   assert.deepEqual(decodeAnswers(encodeAnswers(partial)), partial)
 })
 
@@ -29,27 +30,28 @@ test('the encoding survives a URL untouched', () => {
   assert.deepEqual(decodeAnswers(url.searchParams.get('a')), FULL)
 })
 
+test('a multi-select cannot be stuffed past its limit through the URL', () => {
+  const decoded = decodeAnswers('daily.dark-outdoor-public-separation-stairs')
+  assert.deepEqual(decoded.daily, ['dark', 'outdoor'])
+  assert.equal(score(decoded).answered, 2)
+})
+
 test('a stale or hostile link degrades to a partial result rather than an error', () => {
   for (const hostile of [
-    '',
-    null,
-    undefined,
-    'garbage',
-    'tuesday.not-an-option',
-    'not-a-question.quiet',
-    'tuesday.quiet_____',
-    '.._..',
+    '', null, undefined, 'garbage', 'tuesday.not-an-option', 'not-a-question.quiet',
+    'tuesday.quiet_____', '.._..', 'daily.-', 'daily.nope-alsonope',
     'tuesday.quiet_dealbreaker.dark_removed-question.gone',
   ]) {
     const answers = decodeAnswers(hostile)
     assert.doesNotThrow(() => score(answers))
-    for (const [questionId, optionId] of Object.entries(answers)) {
+    for (const [questionId, value] of Object.entries(answers)) {
       const question = QUESTIONS.find((candidate) => candidate.id === questionId)
       assert.ok(question, `decoded an unknown question: ${questionId}`)
-      assert.ok(question.options.some((option) => option.id === optionId))
+      for (const pick of Array.isArray(value) ? value : [value]) {
+        assert.ok(question.options.some((option) => option.id === pick))
+      }
     }
   }
-  // The one above that has real answers keeps them and drops only the stale pair.
   assert.deepEqual(decodeAnswers('tuesday.quiet_dealbreaker.dark_removed-question.gone'), {
     tuesday: 'quiet',
     dealbreaker: 'dark',
@@ -57,7 +59,8 @@ test('a stale or hostile link degrades to a partial result rather than an error'
 })
 
 test('encoding is stable, so the same answers always produce the same link', () => {
-  const reordered = { location: 'life', tuesday: 'quiet', dealbreaker: 'dark' }
-  const inOrder = { tuesday: 'quiet', dealbreaker: 'dark', location: 'life' }
-  assert.equal(encodeAnswers(reordered), encodeAnswers(inOrder))
+  assert.equal(
+    encodeAnswers({ location: 'fixed', tuesday: 'quiet' }),
+    encodeAnswers({ tuesday: 'quiet', location: 'fixed' }),
+  )
 })

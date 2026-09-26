@@ -1,163 +1,212 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { DIMENSION_IDS } from './model.ts'
+import { ATTRIBUTES, SCALE_IDS } from './model.ts'
 import { QUESTIONS } from './questions.ts'
-import { byBucket, score, type Answers } from './score.ts'
+import { byState, nextQuestion, score, type Answers } from './score.ts'
 
 /**
- * These tests are the product spec. Each persona is one of the people Danielle
+ * These tests are the product spec. Each persona is a person Danielle
  * described, and the assertions are the outcomes she said they must get —
- * particularly the ones a naive model gets backwards.
+ * especially the ones a scoring model gets backwards.
  */
 
-/** The person who will paper and relight a house but never touch a kitchen. */
 const DECORATOR: Answers = {
-  tuesday: 'quiet',
-  dealbreaker: 'dark',
-  inherit: 'depends',
-  whitehouse: 'mine',
-  kitchen: 'never',
-  location: 'life',
+  tuesday: 'quiet', dealbreaker: 'dark', daily: ['dark', 'public'],
+  inherit: 'renovation', whitehouse: 'mine', kitchen: 'never', location: 'property',
 }
 
-/** The person who wants it finished. A legitimate, expensive requirement. */
-const TURNKEY: Answers = {
-  tuesday: 'errands',
-  dealbreaker: 'layout',
-  inherit: 'renovation',
-  whitehouse: 'finished',
-  kitchen: 'done',
-  location: 'life',
+const TURNKEY_OVER_LOT: Answers = {
+  tuesday: 'errands', dealbreaker: 'layout', daily: ['public', 'separation'],
+  inherit: 'renovation', whitehouse: 'finished', kitchen: 'done', location: 'property',
 }
 
-/** The person who buys the lot and lives with the house for now. */
-const LOT_BUYER: Answers = {
-  tuesday: 'room',
-  dealbreaker: 'outside',
-  inherit: 'lot',
-  whitehouse: 'bones',
-  kitchen: 'fixable',
-  location: 'life',
+const OUTDOOR_NO_BURDEN: Answers = {
+  tuesday: 'quiet', dealbreaker: 'outside', daily: ['outdoor', 'upkeep'],
+  inherit: 'lot', whitehouse: 'bones', kitchen: 'depends', location: 'few',
 }
 
-/** The person whose life genuinely pins the map. */
+const CHARACTER_AND_LAYERS: Answers = {
+  tuesday: 'room', dealbreaker: 'dark', daily: ['dark', 'public'],
+  inherit: 'lot', whitehouse: 'personality', kitchen: 'depends', location: 'property',
+}
+
 const TIGHT_MAP: Answers = {
-  tuesday: 'close',
-  dealbreaker: 'far',
-  inherit: 'renovation',
-  whitehouse: 'finished',
-  kitchen: 'done',
-  location: 'neighborhood',
+  tuesday: 'close', dealbreaker: 'far', daily: ['public', 'parking'],
+  inherit: 'renovation', whitehouse: 'finished', kitchen: 'done', location: 'fixed',
 }
 
-const bucketOf = (answers: Answers, attributeId: string) =>
-  score(answers).attributes.find((entry) => entry.attribute.id === attributeId)?.bucket
+const stateOfAttr = (answers: Answers, id: string) =>
+  score(answers).attributes.find((entry) => entry.attribute.id === id)?.state
 
-test('every dimension normalises inside 0..1 for every persona', () => {
-  for (const answers of [DECORATOR, TURNKEY, LOT_BUYER, TIGHT_MAP]) {
-    const { dimensions } = score(answers)
-    for (const id of DIMENSION_IDS) {
-      assert.ok(dimensions[id] >= 0 && dimensions[id] <= 1, `${id} out of range`)
-    }
-  }
-})
+// ---------------------------------------------------------------- invariants
 
-test('the decorator keeps a high personalization appetite and a low renovation tolerance', () => {
-  const { dimensions, findings } = score(DECORATOR)
-  assert.ok(dimensions.personalizationAppetite > 0.6, 'should want to add character')
-  assert.ok(dimensions.renovationTolerance < 0.4, 'should not want structural work')
-  // The combination Danielle named explicitly. It must not collapse into one
-  // "likes renovation" score in either direction.
-  assert.equal(findings.project, 'decorateNotRenovate')
-})
-
-test('"I will never redo it" puts the kitchen in PROTECT, not in room', () => {
-  // The whole point. A buyer who knows they will not do the work has a real
-  // search criterion, not a flexibility.
-  assert.equal(bucketOf(DECORATOR, 'kitchen'), 'protect')
-  assert.equal(bucketOf(TURNKEY, 'kitchen'), 'protect')
-})
-
-test('the decorator still gets finishes as an opportunity, not a demand', () => {
-  assert.equal(bucketOf(DECORATOR, 'character'), 'makeItYours')
-})
-
-test('the turnkey buyer is never told to take on a project', () => {
-  const { findings } = score(TURNKEY)
-  assert.equal(findings.project, 'noProject')
-  assert.equal(bucketOf(TURNKEY, 'condition'), 'protect')
-  const grouped = byBucket(score(TURNKEY))
-  assert.equal(grouped.makeItYours.length, 0, 'nothing should be framed as a project')
-})
-
-test('the lot buyer protects the lot and is genuinely flexible on the kitchen', () => {
-  assert.equal(bucketOf(LOT_BUYER, 'lot'), 'protect')
-  assert.equal(bucketOf(LOT_BUYER, 'kitchen'), 'room')
-  assert.ok(score(LOT_BUYER).dimensions.renovationTolerance > 0.6)
-})
-
-test('a real geographic constraint is reported as tight, and a loose one is not', () => {
-  assert.equal(score(TIGHT_MAP).findings.map, 'tight')
-  assert.equal(score(DECORATOR).findings.map, 'open')
-})
-
-test('the result only speaks about attributes the buyer actually signalled', () => {
-  const { attributes } = score({ location: 'life' })
-  assert.equal(attributes.length, 0, 'one location answer implies nothing about the house')
-})
-
-test('partial and malformed answers score without throwing', () => {
-  assert.equal(score({}).answered, 0)
-  assert.equal(score({ tuesday: 'quiet' }).answered, 1)
-  assert.equal(score({ tuesday: 'not-an-option' }).answered, 0)
-  assert.equal(score({ 'not-a-question': 'quiet' }).answered, 0)
-})
-
-test('every option in the question set is reachable and scores', () => {
+test('no option anywhere carries negative importance', () => {
   for (const question of QUESTIONS) {
     for (const option of question.options) {
-      const result = score({ [question.id]: option.id })
-      assert.equal(result.answered, 1, `${question.id}/${option.id} did not register`)
-    }
-  }
-})
-
-test('no attribute is referenced by an option unless it exists in the registry', () => {
-  const ids = new Set(score({}).attributes.map((entry) => entry.attribute.id))
-  assert.equal(ids.size, 0)
-  for (const question of QUESTIONS) {
-    for (const option of question.options) {
-      for (const attributeId of Object.keys(option.attributes ?? {})) {
-        const result = score({ [question.id]: option.id })
-        assert.ok(
-          result.attributes.some((entry) => entry.attribute.id === attributeId),
-          `${question.id}/${option.id} references unknown attribute ${attributeId}`,
-        )
+      for (const [attributeId, weight] of Object.entries(option.attributes ?? {})) {
+        assert.ok(weight > 0, `${question.id}/${option.id} penalises ${attributeId}`)
       }
     }
   }
 })
 
-test('a hard-to-change attribute the buyer traded away is never called "room"', () => {
-  // The turnkey buyer chose the beautiful renovation on the compromised lot,
-  // which scores the lot NEGATIVELY. "You have room here" would be bad advice:
-  // the lot is the one thing money cannot fix later.
-  assert.equal(bucketOf(TURNKEY, 'lot'), 'getPicky')
+test('losing a tradeoff never reduces direct evidence', () => {
+  // The lot loses in this answer. It must keep whatever importance it had.
+  const withLoss = score({ inherit: 'renovation' })
+  const lot = withLoss.attributes.find((entry) => entry.attribute.id === 'lot')
+  assert.ok(lot)
+  assert.equal(lot.evidence.direct, 0, 'no penalty was applied')
+  assert.equal(lot.evidence.tradeoffLosses, 1, 'but the comparison was recorded')
+})
 
-  const grouped = byBucket(score(TURNKEY))
-  for (const entry of grouped.room) {
-    assert.notEqual(
-      entry.attribute.changeability,
-      'hard',
-      `${entry.attribute.id} is hard to change and must not be in room`,
-    )
+test('every scale normalises inside 0..1 for every persona', () => {
+  for (const answers of [DECORATOR, TURNKEY_OVER_LOT, OUTDOOR_NO_BURDEN, CHARACTER_AND_LAYERS, TIGHT_MAP]) {
+    const { scales } = score(answers)
+    for (const id of SCALE_IDS) assert.ok(scales[id] >= 0 && scales[id] <= 1, `${id} out of range`)
   }
 })
 
-test('nothing hard to change lands in room for any persona', () => {
-  for (const answers of [DECORATOR, TURNKEY, LOT_BUYER, TIGHT_MAP]) {
-    for (const entry of byBucket(score(answers)).room) {
-      assert.notEqual(entry.attribute.changeability, 'hard')
+// ------------------------------------------------------------------ unknowns
+
+test('unasked is never reported as flexible', () => {
+  const result = score({ tuesday: 'quiet' })
+  const named = new Set(result.attributes.map((entry) => entry.attribute.id))
+  for (const attribute of ATTRIBUTES) {
+    if (named.has(attribute.id)) continue
+    assert.ok(
+      result.unknowns.some((unknown) => unknown.id === attribute.id),
+      `${attribute.id} should be unknown, not absent`,
+    )
+  }
+  assert.ok(result.unknowns.length > 0)
+  for (const entry of byState(result).flexibilityToTest) {
+    assert.ok(entry.evidence.mentions > 0 || entry.evidence.tradeoffLosses > 0)
+  }
+})
+
+test('an empty test claims nothing at all', () => {
+  const result = score({})
+  assert.equal(result.attributes.length, 0)
+  assert.equal(result.unknowns.length, ATTRIBUTES.length)
+})
+
+// ------------------------------------------------------------------ personas
+
+test('TURNKEY OVER LOT: the lot is not restored to a priority just for being permanent', () => {
+  // The correction. Changeability belongs to the property; importance belongs
+  // to the buyer. This buyer knowingly chose the finished house.
+  assert.equal(stateOfAttr(TURNKEY_OVER_LOT, 'lot'), 'flexibilityToTest')
+
+  const result = score(TURNKEY_OVER_LOT)
+  const lot = result.attributes.find((entry) => entry.attribute.id === 'lot')
+  // But the permanence of the trade is understood and said out loud.
+  assert.equal(lot?.tradedAwayPermanently, true)
+  assert.equal(result.findings.needsDayOne, true)
+})
+
+test('OUTDOOR WITHOUT BURDEN: usable outdoor life without a property to run', () => {
+  const result = score(OUTDOOR_NO_BURDEN)
+  assert.equal(stateOfAttr(OUTDOOR_NO_BURDEN, 'outdoor'), 'protect')
+  assert.equal(stateOfAttr(OUTDOOR_NO_BURDEN, 'upkeep'), 'protect')
+  assert.equal(result.findings.outdoorWithoutBurden, true)
+  assert.ok(result.scales.operationalBurdenTolerance <= 0.38)
+})
+
+test('HIGH CHARACTER + HIGH PERSONALIZATION: the model never forces a choice', () => {
+  const result = score({ ...CHARACTER_AND_LAYERS, clarify: 'cosmetic' })
+  assert.ok(result.scales.architecturalRequirement >= 0.62, 'wants real bones')
+  assert.ok(result.scales.personalizationAppetite >= 0.62, 'and wants to layer')
+  assert.equal(result.findings.willLayer, true)
+  // Both are true at once, and neither suppresses the other: the house has to
+  // bring character, AND they will add their own layers on top of it.
+  assert.equal(stateOfAttr(CHARACTER_AND_LAYERS, 'character'), 'protect')
+})
+
+test('DECORATOR: papers a house, will not gut a kitchen', () => {
+  const result = score(DECORATOR)
+  assert.ok(result.scales.personalizationAppetite >= 0.62)
+  assert.ok(result.scales.renovationTolerance <= 0.38)
+  // "I will never redo it" is a real criterion about a real project.
+  assert.equal(stateOfAttr(DECORATOR, 'kitchen'), 'protect')
+})
+
+test('the map records constraint strength and nothing about the reason', () => {
+  assert.equal(score(TIGHT_MAP).findings.map, 'fixed')
+  assert.equal(score(OUTDOOR_NO_BURDEN).findings.map, 'fewAreas')
+  assert.equal(score(DECORATOR).findings.map, 'propertyLed')
+})
+
+// ----------------------------------------------------------------- conflicts
+
+test('a genuine contradiction asks exactly one clarification, then stops', () => {
+  const conflicted: Answers = {
+    tuesday: 'errands', dealbreaker: 'layout', daily: ['public'],
+    inherit: 'lot', whitehouse: 'finished', kitchen: 'fixable', location: 'property',
+  }
+  const before = score(conflicted)
+  assert.ok(before.findings.tensions.includes('readinessVersusRenovation'))
+  assert.equal(before.needsClarification, true)
+  assert.equal(nextQuestion(conflicted), 'clarify')
+
+  const after = score({ ...conflicted, clarify: 'cosmetic' })
+  assert.equal(after.needsClarification, false, 'one clarification is enough')
+  assert.equal(nextQuestion({ ...conflicted, clarify: 'cosmetic' }), null)
+})
+
+test('declining a forced tradeoff is recorded as narrow criteria, not indecision', () => {
+  const result = score({ inherit: 'both' })
+  assert.ok(result.findings.tensions.includes('narrowCriteria'))
+})
+
+test('the clarification question is never shown without a conflict', () => {
+  assert.equal(score(DECORATOR).needsClarification, false)
+  assert.equal(nextQuestion(DECORATOR), null)
+})
+
+// -------------------------------------------------------------------- basics
+
+test('multi-select respects its limit', () => {
+  const result = score({ daily: ['dark', 'outdoor', 'public', 'separation'] })
+  assert.equal(result.answered, 2, 'choose 2 means 2')
+})
+
+test('partial and malformed answers score without throwing', () => {
+  assert.equal(score({}).answered, 0)
+  assert.equal(score({ tuesday: 'not-an-option' }).answered, 0)
+  assert.equal(score({ 'not-a-question': 'quiet' }).answered, 0)
+  assert.doesNotThrow(() => score({ daily: [] }))
+})
+
+test('every option in the question set is reachable and scores', () => {
+  for (const question of QUESTIONS) {
+    for (const option of question.options) {
+      assert.equal(score({ [question.id]: option.id }).answered, 1, `${question.id}/${option.id}`)
     }
+  }
+})
+
+test('the 7:14 opener is context, not a verdict', () => {
+  // On its own it must not be able to protect anything.
+  for (const option of QUESTIONS[0].options) {
+    for (const entry of score({ tuesday: option.id }).attributes) {
+      assert.notEqual(entry.state, 'protect', `${option.id} should not protect on its own`)
+    }
+  }
+})
+
+test('protecting a real-project attribute means it has to work on arrival', async () => {
+  const { dayOneItems, personalLayers } = await import('./interpret.ts')
+  const result = score(DECORATOR)
+  const dayOne = dayOneItems(result).map((entry) => entry.attribute.id)
+
+  // The decorator will paper a house and will never gut a kitchen. Both facts
+  // have to survive into the same result without contradicting each other.
+  assert.ok(dayOne.includes('kitchen'), 'the kitchen must already work')
+  assert.ok(personalLayers(result).length > 0, 'and the layers are still theirs')
+
+  // "Make it yours" is cosmetic layers only — never move-in condition, which
+  // is exactly what this buyer was NOT flexible about at the project level.
+  for (const layer of personalLayers(result)) {
+    assert.ok(!/condition|kitchen/i.test(layer), `${layer} does not belong in make it yours`)
   }
 })
