@@ -8,7 +8,7 @@ import { editorialMedia } from '@/lib/content/editorialMedia'
 import { laActuallyPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: 'LA, Actually — Danielle Walder',
+  title: 'LA, Actually · Danielle Walder',
   description:
     'Neighborhood intelligence about routines, access, tradeoffs, and housing across Los Angeles.',
 }

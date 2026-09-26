@@ -11,7 +11,7 @@ import { contactPage, showingInquiry } from '@/lib/content/contact'
  * is deliberately no separate "request a showing" URL to index.
  */
 export const metadata: Metadata = {
-  title: 'Say Hello — Danielle Walder',
+  title: 'Say Hello · Danielle Walder',
   description: 'Get in touch with Danielle Walder about buying, selling, or a Los Angeles neighborhood.',
   alternates: { canonical: '/contact' },
 }

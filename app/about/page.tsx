@@ -4,7 +4,7 @@ import { ImageSlot } from '@/components/ui/ImageSlot'
 import { aboutPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: 'About Danielle — Danielle Walder',
+  title: 'About Danielle · Danielle Walder',
   description:
     'Danielle Walder, a Los Angeles real-estate agent and the person behind Overthinking Real Estate.',
 }

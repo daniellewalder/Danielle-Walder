@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!essay) return {}
 
   return {
-    title: `${essay.title} — Overthinking Real Estate`,
+    title: `${essay.title} · Overthinking Real Estate`,
     description: essay.dek ?? undefined,
     // Substack published it first. The canonical points there so the two
     // copies are not competing in search.

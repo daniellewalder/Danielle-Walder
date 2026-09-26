@@ -82,7 +82,7 @@ export const aboutPage = {
     {
       id: 'how-i-work',
       label: 'How I work',
-      body: 'Before real estate, I worked in cybersecurity and third-party risk management. That means I care about price, timing, negotiation, and neighborhoods—and also the less glamorous parts: clear information, useful process, privacy, and the moments when a transaction becomes harder than it needs to be.',
+      body: 'Before real estate, I worked in cybersecurity and third-party risk management. That means I care about price, timing, negotiation, and neighborhoods. It also means I care about the less glamorous parts: clear information, useful process, privacy, and the moments when a transaction becomes harder than it needs to be.',
     },
     {
       id: 'what-i-care-about',

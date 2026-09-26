@@ -38,7 +38,7 @@ function protectLine(grouped: Record<AttributeState, ReadAttribute[]>): string |
 function tradedAwayLine(result: Result): string | null {
   const permanent = result.attributes.filter((entry) => entry.tradedAwayPermanently)
   if (permanent.length === 0) return null
-  return `You traded ${list(permanent, 2)} for something you care about more. That's a legitimate call — just remember this is the kind of compromise you live with, not one you fix later.`
+  return `You traded ${list(permanent, 2)} for something you care about more. That's a legitimate call. Just remember it's the kind of compromise you live with, not one you fix later.`
 }
 
 function adaptationLine(result: Result): string | null {
@@ -48,14 +48,14 @@ function adaptationLine(result: Result): string | null {
     return "You want the construction and the function handled, but you still want to make it yours. Those aren't in conflict. The house needs to work when you get the keys; the personality can come after."
   }
   if (willLayer && result.scales.renovationTolerance <= 0.38) {
-    return "You're happy to give a house its personality — wallpaper, paint, lighting, all the things you can change without turning it into a construction site. A blank room is an opportunity. A gut job is not."
+    return "You're happy to give a house its personality: wallpaper, paint, lighting, all the things you can change without turning it into a construction site. A blank room is an opportunity. A gut job is not."
   }
   if (willLayer) return "You seem open to making the cosmetic part your own, which means a house doesn't have to arrive completely finished to be worth a look."
   if (needsDayOne) {
     return "You don't want your house to become your second job. That's a real search criterion, not fussiness. Condition and function should be filters, not things we assume you'll fix later."
   }
   if (result.scales.renovationTolerance >= 0.62) {
-    return "You're genuinely open to real work, so condition doesn't have to do as much filtering for you. That doesn't make the fixed stuff negotiable — whatever you protected still stays protected."
+    return "You're genuinely open to real work, so condition doesn't have to do as much filtering for you. That doesn't make the fixed stuff negotiable. Whatever you protected still stays protected."
   }
   return null
 }
@@ -72,7 +72,7 @@ function architectureLine(result: Result): string | null {
 /** Outdoor life is not the same request as grounds to run. */
 function outdoorLine(result: Result): string | null {
   if (!result.findings.outdoorWithoutBurden) return null
-  return "You want somewhere outside you'd actually use — not a property that turns into another job. Worth saying out loud, because those get advertised as the same thing."
+  return "You want somewhere outside you'd actually use, not a property that turns into another job. Worth saying out loud, because those get advertised as the same thing."
 }
 
 function mapLine(result: Result): string | null {
@@ -84,7 +84,7 @@ function mapLine(result: Result): string | null {
     case 'fewAreas':
       return 'You have a real map, just not one ZIP code. That gives us enough room for inventory without turning the search into all of Los Angeles.'
     case 'propertyLed':
-      return "You're describing the life more than the ZIP code. That gives us more of Los Angeles to work with — as long as the property still gets the important things right."
+      return "You're describing the life more than the ZIP code. That gives us more of Los Angeles to work with, as long as the property still gets the important things right."
     case null:
       return null
   }
@@ -93,7 +93,7 @@ function mapLine(result: Result): string | null {
 /** Said only when we genuinely did not establish something. */
 export function unknownsLine(result: Result): string | null {
   if (result.unknowns.length === 0) return null
-  return "There are things this didn't ask about — parking, storage, stairs, upkeep. I'd rather figure those out against real houses than pretend they don't matter."
+  return "Some things only make sense once you're standing in the house."
 }
 
 /**
@@ -155,7 +155,7 @@ export const STATE_NOTES: Record<AttributeState, string> = {
   scrutinize:
     'This matters, and the reality can change a lot from one house to the next. Check the actual property instead of assuming.',
   flexibilityToTest:
-    'This may be somewhere you have more room than you think. The only way to know is to compare actual houses — not decide it in the abstract.',
+    'This may be somewhere you have more room than you think. The only way to know is to compare actual houses, not decide it in the abstract.',
   unknown: "This test didn't establish it. Ask before assuming either way.",
 }
 
@@ -226,4 +226,54 @@ export function projectSummary(result: Result): { label: string; value: string }
     { label: 'Cosmetic changes', value: read(result.scales.personalizationAppetite) },
     { label: 'Major renovation', value: read(result.scales.renovationTolerance) },
   ]
+}
+
+/**
+ * The two-sentence version, for the top of the result.
+ *
+ * The three interpretation paragraphs are the reasoning; this is the answer.
+ * Someone who has just finished seven questions should know what happened
+ * before they decide whether to read further.
+ */
+export function synthesis(result: Result): string[] {
+  if (result.answered === 0) return []
+
+  const protect = byState(result).protect
+  const lines: string[] = []
+
+  if (protect.length > 0) {
+    lines.push(`You kept coming back to ${list(protect, 3)}.`)
+  }
+
+  // Mirrors the branches in adaptationLine, compressed. Kept in the same
+  // order so the short version can never disagree with the long one.
+  const { willLayer, needsDayOne } = result.findings
+  const appetite = willLayer && needsDayOne
+    ? "you want it working on arrival and still want to make it yours"
+    : willLayer
+      ? "you're open to making the cosmetic part your own"
+      : needsDayOne
+        ? 'you want a house that works on arrival'
+        : result.scales.renovationTolerance >= HIGH
+          ? "you're open to real work"
+          : "how much you'd change depends on the house"
+
+  const map = (() => {
+    switch (result.findings.map) {
+      case 'fixed':
+        return "your map doesn't move"
+      case 'strongPreference':
+        return 'your map has some room, just not unlimited room'
+      case 'fewAreas':
+        return 'a handful of areas genuinely work'
+      case 'propertyLed':
+        return 'the property can lead the map'
+      case null:
+        return null
+    }
+  })()
+
+  const sentence = map ? `${appetite}, and ${map}.` : `${appetite}.`
+  lines.push(sentence.charAt(0).toUpperCase() + sentence.slice(1))
+  return lines
 }

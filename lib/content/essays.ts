@@ -29,7 +29,7 @@ export const moreEssays: CuratedEssay[] = [
   },
   {
     title: "But Then I'd Be Living in Texas",
-    dek: 'Why LA housing prices buy location, relationships, weather, work, routine, and place—not only square footage.',
+    dek: 'Why LA housing prices buy location, relationships, weather, work, routine, and place, not only square footage.',
   },
   {
     title: 'Every Agent You Follow Is the Top Agent in LA',

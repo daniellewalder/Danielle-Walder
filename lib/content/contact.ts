@@ -34,7 +34,7 @@ export const contactPage = {
     'Message delivery is being connected. This form is not sending yet, so please check back shortly.',
   submitLabel: 'Send message',
   submitting: 'Sending',
-  success: 'Thank you — your message is on its way. I’ll come back to you directly.',
+  success: 'Thank you. Your message is on its way, and I’ll come back to you directly.',
   failure: 'That did not send. Email is the reliable way to reach me in the meantime.',
   invalid: 'Please complete the required fields so I can reply.',
 }
@@ -101,6 +101,6 @@ export const showingInquiry = {
   submitLabel: 'Send it over',
   submitting: 'Sending',
   /** Reuses the approved contact notice verbatim. Do not reword. */
-  success: "Got it — I'll come back to you directly about this one.",
+  success: "Got it. I'll come back to you directly about this one.",
   invalid: 'Please add your name and email so I can reply.',
 }

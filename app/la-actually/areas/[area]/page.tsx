@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!area) return {}
 
   return {
-    title: `${area.name} — LA, Actually | Danielle Walder`,
+    title: `${area.name} · LA, Actually · Danielle Walder`,
     // Falls back to the site description rather than inventing marketing copy.
     description: area.metaDescription ?? undefined,
     alternates: { canonical: `${siteUrl}/la-actually/areas/${area.slug}` },

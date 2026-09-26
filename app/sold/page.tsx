@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { soldPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: 'Sold — Danielle Walder',
+  title: 'Sold · Danielle Walder',
   description: 'Homes Danielle Walder has helped move through Los Angeles.',
 }
 

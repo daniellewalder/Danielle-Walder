@@ -37,7 +37,7 @@ const figtree = Figtree({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'Danielle Walder — Overthinking Real Estate',
+  title: 'Danielle Walder · Overthinking Real Estate',
   description: 'Los Angeles real estate, housing decisions, and Overthinking Real Estate.',
   // No Open Graph or Twitter image is declared: no real source asset exists
   // yet, and fabricating one is not an option. Add it with the approved

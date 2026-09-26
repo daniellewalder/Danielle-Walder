@@ -5,7 +5,7 @@ import { PropertyShowingCta } from '@/components/ui/PropertyShowingCta'
 import { searchPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: 'Search Homes — Danielle Walder',
+  title: 'Search Homes · Danielle Walder',
   description: 'Los Angeles home search, and how to start it with what you already know.',
 }
 

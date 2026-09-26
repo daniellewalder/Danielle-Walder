@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { tuesdayTestPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: 'The Tuesday Test — Danielle Walder',
+  title: 'The Tuesday Test · Danielle Walder',
   description:
     'Seven decisions about what you would actually regret compromising on, and what that means for the search.',
 }

@@ -31,7 +31,7 @@ const CHECKS: Record<string, string> = {
   separation: "Find the door you'd close when you need to. Is there one?",
   publicRooms: 'Picture the way you actually host. Where does everyone end up standing?',
   circulation: 'Do the stairs twice, carrying something.',
-  utility: 'Where does everyday life go — laundry, bags, pantry, coats, storage?',
+  utility: 'Where does everyday life go? Laundry, bags, pantry, coats, storage.',
   parking: 'Try the driveway and the street, not just the garage count.',
   upkeep: 'Ask what it takes to keep it looking like this, and who has been doing it.',
   expansion: "Ask what is actually permitted here, not what looks possible.",

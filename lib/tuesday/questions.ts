@@ -98,7 +98,7 @@ export const QUESTIONS: readonly Question[] = [
       { id: 'dark', label: 'Dark interior. Not enough meaningful natural light.', attributes: { light: 3 } },
       { id: 'outdoor', label: 'No real connection to usable outdoor space.', attributes: { outdoor: 3 } },
       { id: 'public', label: 'Public rooms that do not work for the way I live, host and cook.', attributes: { publicRooms: 3 } },
-      { id: 'separation', label: 'Not enough separation — an office, a den, a guest room, somewhere to close a door.', attributes: { separation: 3 } },
+      { id: 'separation', label: 'Not enough separation: an office, a den, a guest room, somewhere to close a door.', attributes: { separation: 3 } },
       { id: 'stairs', label: 'Too many stairs, or awkward circulation.', attributes: { circulation: 3 } },
       { id: 'utility', label: 'Laundry, storage and pantry that create constant friction.', attributes: { utility: 3 } },
       {

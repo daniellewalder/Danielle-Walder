@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { homeValuationPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
-  title: "What's My Home Worth? — Danielle Walder",
+  title: "What's My Home Worth? · Danielle Walder",
   description: 'An automated home value estimate for Los Angeles homes.',
 }
 

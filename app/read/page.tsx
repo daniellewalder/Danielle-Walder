@@ -6,7 +6,7 @@ import { readPage } from '@/lib/content/pages'
 import { getEssays, type EssayEntry } from '@/lib/essays'
 
 export const metadata: Metadata = {
-  title: 'Essays — Overthinking Real Estate',
+  title: 'Essays · Overthinking Real Estate',
   description:
     'Original essays about homes, money, Los Angeles, identity, class, status, technology, privacy, and risk.',
 }
