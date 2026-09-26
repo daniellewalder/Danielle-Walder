@@ -81,22 +81,23 @@ export function TuesdayResult() {
   return (
     <>
       {/*
-        Headline and the spoken result share one lockup across the full width.
-        Stacking them in a single narrow column left half the page empty and
-        made the judgment — the actual product — look like a caption.
+        The arrival, in the quiz family's own colour. A result that opens on
+        the same cream as every other page does not feel like the end of
+        anything — and the Tuesday Test is butter and brown everywhere else it
+        appears. Full-bleed band rather than a rounded block, so it is not a
+        second card stacked against the panel below it.
       */}
-      <header className="wrap pt-14 mobile:pt-10">
-        <p className="eyebrow">your search hierarchy</p>
-        <div className="mt-6 grid grid-cols-[0.82fr_1.18fr] gap-x-16 border-b border-hairline pb-12 tablet:grid-cols-1 tablet:gap-y-7 tablet:pb-9">
-          <h1 className="max-w-[13ch] font-mark text-[34px] font-semibold leading-[1.02] tracking-display text-espresso tablet:text-[30px] mobile:text-[26px]">
+      <header className="bg-butter-field px-gutter py-16 text-butter-text tablet:px-gutter-tablet tablet:py-12 mobile:px-gutter-mobile mobile:py-10">
+        <p className="text-[11.5px] font-bold uppercase tracking-attribution text-butter-bronze">
+          your search hierarchy
+        </p>
+        <div className="mt-6 grid grid-cols-[0.82fr_1.18fr] items-center gap-x-16 tablet:grid-cols-1 tablet:items-start tablet:gap-y-6">
+          <h1 className="max-w-[13ch] font-mark text-[34px] font-semibold leading-[1.02] tracking-display tablet:text-[30px] mobile:text-[26px]">
             {resultHeadline(result)}
           </h1>
-          <div className="flex max-w-[56ch] flex-col gap-5">
+          <div className="flex max-w-[56ch] flex-col gap-4">
             {interpret(result).map((line) => (
-              <p
-                key={line}
-                className="font-sans text-[18px] leading-[1.55] text-warmgray mobile:text-[17px]"
-              >
+              <p key={line} className="font-sans text-[18px] leading-[1.55] mobile:text-[17px]">
                 {line}
               </p>
             ))}
@@ -104,53 +105,62 @@ export function TuesdayResult() {
         </div>
       </header>
 
+      {/*
+        Two columns, so a one-line entry sits in a column it can fill instead
+        of stranded at the left edge of the full page width. Same pattern as
+        the area reference: one panel, columns inside it, hairlines between.
+      */}
       <section aria-label="Your hierarchy" className="wrap pt-12 mobile:pt-9">
-        <div className="rounded-block bg-paper px-10 py-4 mobile:rounded-[16px] mobile:px-6 mobile:py-3">
-          {rows.map((row) => (
-            <div
-              key={row.id}
-              className="grid grid-cols-[254px_1fr] gap-x-12 border-t border-hairline py-7 first:border-t-0 tablet:grid-cols-1 tablet:gap-y-3 tablet:py-6"
-            >
-              <div className="min-w-0">
-                <h2 className="text-[11.5px] font-bold uppercase tracking-kicker text-espresso">
+        <div className="rounded-block bg-paper px-10 py-3 mobile:rounded-[16px] mobile:px-6 mobile:py-2">
+          {/*
+            Column FLOW rather than a grid. A grid aligns rows, so a group with
+            one entry sitting beside a group with six leaves a hole the height
+            of five — and with an odd number of groups the last cell is always
+            empty. Flowing lets each block take the height it needs and pack.
+          */}
+          <div className="columns-2 gap-14 tablet:columns-1">
+            {rows.map((row) => (
+              <div
+                key={row.id}
+                className="min-w-0 break-inside-avoid border-t border-hairline py-7 mobile:py-6"
+              >
+                <h2
+                  className={`text-[11.5px] font-bold uppercase tracking-kicker ${
+                    row.accent ? 'text-butter-bronze' : 'text-espresso'
+                  }`}
+                >
                   {row.heading}
                 </h2>
                 {row.note ? (
-                  <p className="mt-2 max-w-[34ch] font-sans text-[14px] leading-[1.5] text-taupe">
+                  <p className="mt-2 max-w-[38ch] font-sans text-[14px] leading-[1.5] text-taupe">
                     {row.note}
                   </p>
                 ) : null}
+                <ul className="mt-4 flex min-w-0 flex-col gap-[9px]">
+                  {row.items.map((item) => (
+                    <li
+                      key={item}
+                      className={`font-sans text-[17px] leading-[1.35] mobile:text-[16px] ${
+                        row.accent ? 'text-butter-text' : 'text-espresso'
+                      }`}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-
-              <ul className="flex min-w-0 flex-col gap-[9px] pt-[1px]">
-                {row.items.map((item) => (
-                  <li
-                    key={item}
-                    className={
-                      row.accent
-                        ? 'font-sans text-[17px] leading-[1.4] text-butter-text mobile:text-[16px]'
-                        : 'font-sans text-[17px] leading-[1.4] text-espresso mobile:text-[16px]'
-                    }
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      <section aria-label="What this did not cover" className="wrap pt-10 mobile:pt-8">
-        <div className="grid grid-cols-[0.82fr_1.18fr] gap-x-16 tablet:grid-cols-1">
-          <div />
-          <p className="max-w-[56ch] font-sans text-[16px] leading-[1.6] text-taupe">
-            {unknownsLine(result)}
-          </p>
-        </div>
+      <section aria-label="What this did not cover" className="wrap pt-9 mobile:pt-7">
+        <p className="max-w-[62ch] font-sans text-[16px] leading-[1.6] text-taupe">
+          {unknownsLine(result)}
+        </p>
       </section>
 
-      <section aria-label="Next" className="wrap pt-10 mobile:pt-8">
+      <section aria-label="Next" className="wrap pt-9 mobile:pt-7">
         <div className="flex flex-wrap items-center gap-8 border-t border-hairline pt-8">
           <Link
             href="/search"
