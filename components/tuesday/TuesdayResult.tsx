@@ -50,17 +50,53 @@ export function TuesdayResult() {
   const layers = personalLayers(result)
   const dayOne = dayOneItems(result)
 
+  /**
+   * The result as one reference panel of labelled rows, not a stack of chip
+   * clouds. Same vocabulary as the area reference: a small label on the left,
+   * the content on the right, hairlines between. A row reads as a line in a
+   * brief somebody wrote for you; a chip reads as a filter you applied.
+   */
+  const rows: { id: string; heading: string; note?: string; items: string[]; accent?: boolean }[] = [
+    ...SHOWN.filter((state) => grouped[state].length > 0).map((state) => ({
+      id: state,
+      heading: STATE_HEADINGS[state],
+      note: STATE_NOTES[state],
+      items: grouped[state].map((entry) => entry.attribute.label),
+    })),
+    ...(dayOne.length > 0
+      ? [
+          {
+            id: 'dayOne',
+            heading: 'Must work on arrival',
+            note: "You protected things that would be a real project to change, so they need to be right when you buy.",
+            items: dayOne.map((entry) => entry.attribute.label),
+          },
+        ]
+      : []),
+    ...(layers.length > 0
+      ? [{ id: 'layers', heading: 'Make it yours', items: [...layers], accent: true }]
+      : []),
+  ]
+
   return (
     <>
+      {/*
+        Headline and the spoken result share one lockup across the full width.
+        Stacking them in a single narrow column left half the page empty and
+        made the judgment — the actual product — look like a caption.
+      */}
       <header className="wrap pt-14 mobile:pt-10">
-        <div className="border-b border-hairline pb-11 mobile:pb-8">
-          <p className="eyebrow">your search hierarchy</p>
-          <h1 className="mt-4 max-w-[18ch] font-mark text-[36px] font-semibold leading-[1] tracking-display text-espresso tablet:text-[32px] mobile:text-[27px]">
+        <p className="eyebrow">your search hierarchy</p>
+        <div className="mt-6 grid grid-cols-[0.82fr_1.18fr] gap-x-16 border-b border-hairline pb-12 tablet:grid-cols-1 tablet:gap-y-7 tablet:pb-9">
+          <h1 className="max-w-[13ch] font-mark text-[34px] font-semibold leading-[1.02] tracking-display text-espresso tablet:text-[30px] mobile:text-[26px]">
             {resultHeadline(result)}
           </h1>
-          <div className="mt-7 flex max-w-measure flex-col gap-4">
+          <div className="flex max-w-[56ch] flex-col gap-5">
             {interpret(result).map((line) => (
-              <p key={line} className="font-sans text-[19px] leading-[1.5] text-warmgray mobile:text-[17px]">
+              <p
+                key={line}
+                className="font-sans text-[18px] leading-[1.55] text-warmgray mobile:text-[17px]"
+              >
                 {line}
               </p>
             ))}
@@ -69,79 +105,66 @@ export function TuesdayResult() {
       </header>
 
       <section aria-label="Your hierarchy" className="wrap pt-12 mobile:pt-9">
-        <div className="flex flex-col gap-10">
-          {SHOWN.filter((state) => grouped[state].length > 0).map((state) => (
-            <div key={state} className="border-t border-hairline pt-7">
-              <h2 className="font-display text-sub leading-none text-espresso tablet:text-sub-tablet mobile:text-sub-mobile">
-                {STATE_HEADINGS[state]}
-              </h2>
-              <p className="mt-3 max-w-measure font-sans text-[16px] leading-[1.5] text-taupe">
-                {STATE_NOTES[state]}
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
-                {grouped[state].map((entry) => (
+        <div className="rounded-block bg-paper px-10 py-4 mobile:rounded-[16px] mobile:px-6 mobile:py-3">
+          {rows.map((row) => (
+            <div
+              key={row.id}
+              className="grid grid-cols-[254px_1fr] gap-x-12 border-t border-hairline py-7 first:border-t-0 tablet:grid-cols-1 tablet:gap-y-3 tablet:py-6"
+            >
+              <div className="min-w-0">
+                <h2 className="text-[11.5px] font-bold uppercase tracking-kicker text-espresso">
+                  {row.heading}
+                </h2>
+                {row.note ? (
+                  <p className="mt-2 max-w-[34ch] font-sans text-[14px] leading-[1.5] text-taupe">
+                    {row.note}
+                  </p>
+                ) : null}
+              </div>
+
+              <ul className="flex min-w-0 flex-col gap-[9px] pt-[1px]">
+                {row.items.map((item) => (
                   <li
-                    key={entry.attribute.id}
-                    className="rounded-badge bg-paper px-[13px] py-[7px] font-sans text-[15px] font-medium text-espresso"
+                    key={item}
+                    className={
+                      row.accent
+                        ? 'font-sans text-[17px] leading-[1.4] text-butter-text mobile:text-[16px]'
+                        : 'font-sans text-[17px] leading-[1.4] text-espresso mobile:text-[16px]'
+                    }
                   >
-                    {entry.attribute.label}
+                    {item}
                   </li>
                 ))}
               </ul>
             </div>
           ))}
-
-          {dayOne.length > 0 ? (
-            <div className="border-t border-hairline pt-7">
-              <h2 className="font-display text-sub leading-none text-espresso tablet:text-sub-tablet mobile:text-sub-mobile">
-                Must work on arrival
-              </h2>
-              <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
-                {dayOne.map((entry) => (
-                  <li
-                    key={entry.attribute.id}
-                    className="rounded-badge bg-paper px-[13px] py-[7px] font-sans text-[15px] font-medium text-espresso"
-                  >
-                    {entry.attribute.label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {layers.length > 0 ? (
-            <div className="rounded-block bg-butter-field px-10 py-9 text-butter-text mobile:rounded-[16px] mobile:px-6 mobile:py-7">
-              <h2 className="font-display text-sub leading-none tablet:text-sub-tablet mobile:text-sub-mobile">
-                Make it yours
-              </h2>
-              <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
-                {layers.map((layer) => (
-                  <li
-                    key={layer}
-                    className="rounded-badge bg-butter-pale px-[13px] py-[7px] font-sans text-[15px] font-medium"
-                  >
-                    {layer}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
         </div>
       </section>
 
       <section aria-label="What this did not cover" className="wrap pt-10 mobile:pt-8">
-        <p className="max-w-measure border-t border-hairline pt-7 font-sans text-[17px] leading-[1.55] text-warmgray">
-          {unknownsLine(result)}
-        </p>
+        <div className="grid grid-cols-[0.82fr_1.18fr] gap-x-16 tablet:grid-cols-1">
+          <div />
+          <p className="max-w-[56ch] font-sans text-[16px] leading-[1.6] text-taupe">
+            {unknownsLine(result)}
+          </p>
+        </div>
       </section>
 
-      <section aria-label="Start again" className="wrap pt-10 mobile:pt-8">
-        <Link
-          href="/tuesday-test"
-          className="font-sans text-[15px] font-medium text-sage-olive underline underline-offset-4 hover:text-sage-deep"
-        >
-          Take it again
-        </Link>
+      <section aria-label="Next" className="wrap pt-10 mobile:pt-8">
+        <div className="flex flex-wrap items-center gap-8 border-t border-hairline pt-8">
+          <Link
+            href="/search"
+            className="rounded-button bg-brown px-6 py-[13px] font-sans text-[15px] font-semibold text-cream hover:bg-wine"
+          >
+            Search homes
+          </Link>
+          <Link
+            href="/tuesday-test"
+            className="font-sans text-[15px] font-medium text-sage-olive underline underline-offset-4 hover:text-sage-deep"
+          >
+            Take it again
+          </Link>
+        </div>
       </section>
     </>
   )
