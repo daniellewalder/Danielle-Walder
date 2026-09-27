@@ -50,9 +50,17 @@ export interface Attribute {
   changeability: Changeability
   /**
    * True for things a house can impose on you every day regardless of how
-   * nice it looks — maintenance, circulation, utility. Surfaced in the brief.
+   * nice it looks: maintenance, circulation, utility. Surfaced in the brief.
    */
   operational?: boolean
+  /**
+   * True when the LABEL enumerates several things that arrived as one bundled
+   * option. "Laundry, storage and pantry" is one click, and the result must
+   * never imply that three separate needs were established. It stays one
+   * signal, and it does not get to sit beside a repeatedly confirmed priority
+   * in the opening line as though it carried the same weight.
+   */
+  bundled?: boolean
 }
 
 export function phraseFor(attribute: Attribute): string {
@@ -117,6 +125,23 @@ export interface Evidence {
   tradeoffLosses: number
   /** Distinct answers that referenced it, for confidence. */
   mentions: number
+  /**
+   * PROVENANCE. The question ids that produced direct evidence for this
+   * attribute.
+   *
+   * This exists because a count is not a measure of emphasis. One answer can
+   * legitimately land in four places downstream: the attribute is protected,
+   * it has to work on arrival, it becomes a practical flag, and it earns a
+   * check at the showing. That is four USES of one thing the buyer told us,
+   * and reading it back as four confirmations produces the specific lie this
+   * field exists to prevent, which is telling someone they "kept coming back
+   * to" something they mentioned once.
+   *
+   * Derived output is never evidence.
+   */
+  sources: readonly string[]
+  /** The question ids where this won a constrained comparison. */
+  tradeoffSources: readonly string[]
 }
 
 export const EMPTY_EVIDENCE: Evidence = {
@@ -124,13 +149,36 @@ export const EMPTY_EVIDENCE: Evidence = {
   tradeoffWins: 0,
   tradeoffLosses: 0,
   mentions: 0,
+  sources: [],
+  tradeoffSources: [],
+}
+
+/**
+ * How many genuinely separate times the buyer told us this, counted by the
+ * question it came from. Two picks inside one multi-select are one question
+ * and therefore one interaction, which is the conservative reading and the
+ * one that keeps the copy honest.
+ */
+export function independentSources(evidence: Evidence): number {
+  return new Set([...evidence.sources, ...evidence.tradeoffSources]).size
+}
+
+/**
+ * The gate for every phrase that claims recurrence: "you kept coming back to",
+ * "you were consistent about", "this came up again". Anything below this says
+ * "you flagged" or names it without the claim.
+ */
+export function isRepeated(evidence: Evidence): boolean {
+  return independentSources(evidence) >= 2
 }
 
 /** Direct-evidence weight at which an attribute is genuinely protected. */
 export const PROTECT_AT = 3
 
 export function confidenceOf(evidence: Evidence): Confidence {
-  const signals = evidence.mentions + evidence.tradeoffWins
+  // Counted by distinct question, not by how many times the answer was reused
+  // downstream. A single answer cannot talk itself up to "strong".
+  const signals = independentSources(evidence)
   if (signals >= 3) return 'strong'
   if (signals === 2) return 'moderate'
   return 'weak'
@@ -204,6 +252,7 @@ export const ATTRIBUTES: readonly Attribute[] = [
     phrase: 'laundry, storage and pantry',
     changeability: 'verifyPerProperty',
     operational: true,
+    bundled: true,
   },
   {
     id: 'parking',
@@ -211,6 +260,7 @@ export const ATTRIBUTES: readonly Attribute[] = [
     phrase: 'parking and charging',
     changeability: 'verifyPerProperty',
     operational: true,
+    bundled: true,
   },
   {
     id: 'upkeep',

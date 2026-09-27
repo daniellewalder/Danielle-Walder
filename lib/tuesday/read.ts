@@ -243,19 +243,60 @@ function wantClause(signals: Signals): string {
   return 'the things you were clearest about'
 }
 
-/** The one or two categories to name. Never more, and never a list of clicks. */
-function topicPhrase(signals: Signals): string | null {
-  const parts = [
-    spatialPhrase(signals.spatial),
-    sitePhrase(signals.site),
-    conditionPhrase(signals.condition),
-    logisticsPhrase(signals.logistics),
-  ].filter((part): part is string => part !== null)
-  if (parts.length === 0) return null
-  if (parts.length === 1) return parts[0]
+/**
+ * The one or two categories to name, and whether naming them may claim
+ * recurrence.
+ *
+ * Clusters holding something the buyer established twice come first, so the
+ * sentence leads on what they actually confirmed rather than on whichever
+ * cluster the registry happens to list first. Never more than two, and never
+ * a list of clicks.
+ */
+function topicOf(signals: Signals): { phrase: string; repeated: boolean } | null {
+  const clusters = [
+    { entries: signals.spatial, phrase: spatialPhrase(signals.spatial) },
+    { entries: signals.site, phrase: sitePhrase(signals.site) },
+    { entries: signals.condition, phrase: conditionPhrase(signals.condition) },
+    { entries: signals.logistics, phrase: logisticsPhrase(signals.logistics) },
+  ]
+    .filter(
+      (cluster): cluster is { entries: readonly ReadAttribute[]; phrase: string } =>
+        cluster.phrase !== null,
+    )
+    .map((cluster) => ({
+      phrase: cluster.phrase,
+      repeated: cluster.entries.some((entry) => entry.repeated),
+      strength: Math.max(...cluster.entries.map((entry) => entry.evidence.direct), 0),
+    }))
+
+  if (clusters.length === 0) return null
+
+  const named = [...clusters]
+    .sort((a, b) => Number(b.repeated) - Number(a.repeated) || b.strength - a.strength)
+    .slice(0, 2)
+
   // Two cluster phrases already contain "and" of their own, so joining them
   // with another one produces a sentence nobody can parse. A comma does it.
-  return `${parts[0]}, plus ${parts[1]}`
+  const phrase =
+    named.length === 1 ? named[0].phrase : `${named[0].phrase}, plus ${named[1].phrase}`
+  return { phrase, repeated: named.some((cluster) => cluster.repeated) }
+}
+
+function topicPhrase(signals: Signals): string | null {
+  return topicOf(signals)?.phrase ?? null
+}
+
+/**
+ * "You kept coming back to X" is only true when X came from two different
+ * questions. One answer reused by four downstream result states is still one
+ * thing the buyer said, so everything else gets the neutral verb.
+ */
+function heldPhrase(signals: Signals, fallback = 'the property itself'): string {
+  const topic = topicOf(signals)
+  if (!topic) return `you're strict about ${fallback}`
+  return topic.repeated
+    ? `you kept coming back to ${topic.phrase}`
+    : `you're strict about ${topic.phrase}`
 }
 
 
@@ -367,7 +408,7 @@ const RULES: readonly Rule[] = [
     when: (s) => s.renovation === 'yes' && (s.site.length >= 1 || s.spatial.length >= 1),
     build: (s) => ({
       headline: "You'd take the right property over the finished one.",
-      evidence: `You'd do real work, and what you kept coming back to is ${topicPhrase(s) ?? 'the property itself'}. No budget produces that.`,
+      evidence: `You'd do real work, and ${heldPhrase(s)}. No budget produces that.`,
       consequence:
         "So condition shouldn't do much of your filtering. Go and see the ones that show badly, and skip the ones on a bad site, because that's the part you can't buy your way out of later.",
       aside: "you'd do the work, so condition isn't what's filtering",
@@ -392,7 +433,7 @@ const RULES: readonly Rule[] = [
     when: (s) => s.mapTight && s.specificity >= 3,
     build: (s) => ({
       headline: 'Your map is tight.',
-      evidence: `Your map is fixed, and you kept coming back to ${topicPhrase(s) ?? 'the property itself'}.`,
+      evidence: `Your map is fixed, and ${heldPhrase(s)}.`,
       consequence:
         `I wouldn't spend much time on ${skipClause(s)}.`,
       aside: 'your map is fixed as well',
@@ -428,7 +469,7 @@ const RULES: readonly Rule[] = [
     when: (s) => s.logistics.length >= 2 && s.specificity <= 2,
     build: (s) => ({
       headline: "It's the everyday stuff that'll decide this.",
-      evidence: `What you kept coming back to is ${logisticsPhrase(s.logistics) ?? 'the practical side'}, and you were looser about the house itself.`,
+      evidence: `${capitalise(heldPhrase(s, 'the practical side'))}, and you were looser about the house itself.`,
       consequence:
         'None of that shows up in photographs, and all of it decides how a house feels after a month. Check it at the showing rather than trying to filter for it.',
       aside: "the everyday stuff is what's filtering",
@@ -459,11 +500,17 @@ export interface Change {
  * tell someone to stop looking at something, so it takes the highest bar.
  */
 export function rejectFaster(signals: Signals): Change | null {
-  const strong = (entries: readonly ReadAttribute[]) =>
-    entries.length >= 2 || entries.some((entry) => entry.confidence !== 'weak')
-
-  // Site problems first: nothing about them improves after you own the house.
-  if (signals.site.length >= 1 && strong(signals.site)) {
+  /*
+   * The bar here is an explicit statement, NOT a repeated one.
+   *
+   * These clusters only ever contain attributes already in the protect state,
+   * which means the buyer named them outright. That is one interaction and it
+   * is enough to skip a listing: a dealbreaker answer is emphatic even though
+   * it was given once. Confidence deliberately does not appear, because it is
+   * now counted by distinct question, and reading a single emphatic answer as
+   * "weak" would have quietly switched this section off for most buyers.
+   */
+  if (signals.site.length >= 1) {
     const named = signals.site
       .map((entry) => SITE_REJECTS[entry.attribute.id])
       .filter((value): value is string => Boolean(value))

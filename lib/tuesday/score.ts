@@ -4,6 +4,7 @@ import {
   PROTECT_AT,
   SCALE_IDS,
   confidenceOf,
+  isRepeated,
   type Attribute,
   type AttributeState,
   type Confidence,
@@ -29,6 +30,11 @@ export interface ReadAttribute {
    * than promoting it back to a priority.
    */
   tradedAwayPermanently: boolean
+  /**
+   * True only when at least two DIFFERENT questions produced this. Gates every
+   * phrase in the copy that claims the buyer returned to something.
+   */
+  repeated: boolean
 }
 
 export type Tension =
@@ -165,13 +171,24 @@ export function score(answers: Answers): Result {
           ...current,
           direct: current.direct + weight * question.weight,
           mentions: current.mentions + 1,
+          // Recorded by question, not by pick. Two options chosen inside one
+          // multi-select are one occasion on which the buyer told us this.
+          sources: current.sources.includes(question.id)
+            ? current.sources
+            : [...current.sources, question.id],
         })
       }
 
       if (option.beats) {
         for (const winner of option.beats.winners) {
           const current = evidenceFor(winner)
-          evidence.set(winner, { ...current, tradeoffWins: current.tradeoffWins + 1 })
+          evidence.set(winner, {
+            ...current,
+            tradeoffWins: current.tradeoffWins + 1,
+            tradeoffSources: current.tradeoffSources.includes(question.id)
+              ? current.tradeoffSources
+              : [...current.tradeoffSources, question.id],
+          })
         }
         for (const loser of option.beats.losers) {
           // No penalty. Ever. One comparison does not unmake a preference.
@@ -216,6 +233,7 @@ export function score(answers: Answers): Result {
       evidence: own,
       state,
       confidence: confidenceOf(own),
+      repeated: isRepeated(own),
       tradedAwayPermanently:
         state === 'flexibilityToTest' &&
         own.tradeoffLosses > 0 &&

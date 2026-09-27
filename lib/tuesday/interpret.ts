@@ -22,9 +22,56 @@ function list(entries: readonly ReadAttribute[], limit = 3): string {
   return `${phrases.slice(0, -1).join(', ')} and ${phrases[phrases.length - 1]}`
 }
 
+/*
+ * WHICH PRIORITIES LEAD, AND WHAT WE ARE ALLOWED TO SAY ABOUT THEM.
+ *
+ * Ranked by how much the buyer actually established, not by the order the
+ * registry happens to be in:
+ *
+ *   0  repeated across two different questions
+ *   1  named as an outright dealbreaker
+ *   2  survived a forced tradeoff
+ *   3  a single direct statement
+ *   4  a single statement about a practical or bundled thing
+ *
+ * Four exists because "laundry, storage and pantry" is one click on one
+ * question, and it should not open the result alongside something the buyer
+ * confirmed twice.
+ */
+function synthesisRank(entry: ReadAttribute): number {
+  if (entry.repeated) return 0
+  if (entry.evidence.sources.includes('dealbreaker')) return 1
+  if (entry.evidence.tradeoffSources.length > 0) return 2
+  if (entry.attribute.operational || entry.attribute.bundled) return 4
+  return 3
+}
+
+function ranked(entries: readonly ReadAttribute[]): ReadAttribute[] {
+  return [...entries].sort(
+    (a, b) => synthesisRank(a) - synthesisRank(b) || b.evidence.direct - a.evidence.direct,
+  )
+}
+
+/**
+ * The gate on every phrase that claims the buyer returned to something.
+ *
+ * One answer can surface in four places downstream, and an earlier version
+ * read that back as emphasis: someone who mentioned storage once was told
+ * they kept coming back to it. Recurrence is now counted by distinct
+ * question, and when nothing qualifies the sentence is not written at all.
+ */
+function repeatedOnly(entries: readonly ReadAttribute[]): ReadAttribute[] {
+  return ranked(entries).filter((entry) => entry.repeated)
+}
+
 function protectLine(grouped: Record<AttributeState, ReadAttribute[]>): string | null {
   if (grouped.protect.length === 0) return null
-  return `You kept coming back to ${list(grouped.protect)}. I'd stay strict there and let the search bend somewhere else.`
+  const repeated = repeatedOnly(grouped.protect)
+  if (repeated.length > 0) {
+    return `You kept coming back to ${list(repeated)}. I'd stay strict there and let the search bend somewhere else.`
+  }
+  // Nothing was said twice, so it is named without the claim of emphasis.
+  return `You were clear about ${list(ranked(grouped.protect))}. I'd stay strict there and let the search bend somewhere else.`
 }
 
 /**
@@ -38,7 +85,7 @@ function protectLine(grouped: Record<AttributeState, ReadAttribute[]>): string |
 function tradedAwayLine(result: Result): string | null {
   const permanent = result.attributes.filter((entry) => entry.tradedAwayPermanently)
   if (permanent.length === 0) return null
-  return `You traded ${list(permanent, 2)} for something you care about more. That's a legitimate call. Just remember it's the kind of compromise you live with, not one you fix later.`
+  return `You traded ${list(permanent, 2)} for something you care about more. Just remember it's the kind of compromise you live with, not one you fix later.`
 }
 
 function adaptationLine(result: Result): string | null {
@@ -151,7 +198,7 @@ export const STATE_HEADINGS: Record<AttributeState, string> = {
  * advice buyers usually get.
  */
 export const STATE_NOTES: Record<AttributeState, string> = {
-  protect: "You kept coming back to these. I'd stay strict here.",
+  protect: "These are the ones I'd stay strict about.",
   scrutinize:
     'This matters, and the reality can change a lot from one house to the next. Check the actual property instead of assuming.',
   flexibilityToTest:
@@ -239,31 +286,37 @@ export function synthesis(result: Result): string[] {
   if (result.answered === 0) return []
 
   const protect = byState(result).protect
+  const repeated = repeatedOnly(protect)
   const lines: string[] = []
 
-  if (protect.length > 0) {
-    lines.push(`You kept coming back to ${list(protect, 3)}.`)
+  // Only written when something genuinely came up twice, on two different
+  // questions. Otherwise the result opens on what the answers add up to
+  // rather than on a list read back with an emphasis nobody expressed.
+  if (repeated.length > 0) {
+    lines.push(`You kept coming back to ${list(repeated, 3)}.`)
   }
 
   // Mirrors the branches in adaptationLine, compressed. Kept in the same
   // order so the short version can never disagree with the long one.
   const { willLayer, needsDayOne } = result.findings
   const appetite = willLayer && needsDayOne
-    ? "you want it working on arrival and still want to make it yours"
-    : willLayer
-      ? "you're open to making the cosmetic part your own"
-      : needsDayOne
-        ? 'you want a house that works on arrival'
-        : result.scales.renovationTolerance >= HIGH
-          ? "you're open to real work"
-          : "how much you'd change depends on the house"
+    ? 'you want it working on arrival and still want to make it yours'
+    : willLayer && result.scales.renovationTolerance <= LOW
+      ? "you're open to cosmetic changes, but you want the parts that are expensive or disruptive to redo to work already"
+      : willLayer
+        ? "you're open to making the cosmetic part your own"
+        : needsDayOne
+          ? 'you want a house that works on arrival'
+          : result.scales.renovationTolerance >= HIGH
+            ? "you're open to real work"
+            : "how much you'd change depends on the house"
 
   const map = (() => {
     switch (result.findings.map) {
       case 'fixed':
         return "your map doesn't move"
       case 'strongPreference':
-        return 'your map has some room, just not unlimited room'
+        return 'your map has some room without being completely open'
       case 'fewAreas':
         return 'a handful of areas genuinely work'
       case 'propertyLed':
@@ -273,7 +326,25 @@ export function synthesis(result: Result): string[] {
     }
   })()
 
-  const sentence = map ? `${appetite}, and ${map}.` : `${appetite}.`
-  lines.push(sentence.charAt(0).toUpperCase() + sentence.slice(1))
+  /*
+   * When nothing was repeated, the strongest single priority is still worth
+   * naming, and it gets the neutral verb. "Outdoor space matters too" is what
+   * the buyer actually told us. "You kept coming back to outdoor space" is
+   * not, and that was the sentence this rewrite exists to delete.
+   */
+  const lead = repeated.length === 0 ? ranked(protect)[0] : null
+
+  if (lead) {
+    lines.push(sentence(appetite))
+    const mention = `${phraseFor(lead.attribute)} matters too`
+    lines.push(sentence(map ? `${mention}, and ${map}` : mention))
+  } else {
+    lines.push(sentence(map ? `${appetite}, and ${map}` : appetite))
+  }
+
   return lines
+}
+
+function sentence(body: string): string {
+  return `${body.charAt(0).toUpperCase()}${body.slice(1)}.`
 }
