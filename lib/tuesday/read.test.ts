@@ -189,7 +189,7 @@ test('an unresolved conflict outranks every other open question', () => {
     inherit: 'lot', kitchen: 'done', whitehouse: 'personality', location: 'fixed',
   })
   assert.ok(signalsOf(conflicted).conflictUnresolved)
-  assert.match(figureOutNext(signalsOf(conflicted))?.question ?? '', /how much work would you actually take on/i)
+  assert.match(figureOutNext(signalsOf(conflicted))?.question ?? '', /how much work would you really take on/i)
 })
 
 test('a scale that could only move one way, and did not, reads as unset', () => {

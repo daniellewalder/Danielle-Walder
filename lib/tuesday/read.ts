@@ -186,9 +186,9 @@ function sitePhrase(entries: readonly ReadAttribute[]): string | null {
   const quiet = has(entries, 'privacy') || has(entries, 'street')
   const open = has(entries, 'light') || has(entries, 'outdoor') || has(entries, 'view')
   const ground = has(entries, 'lot')
-  if (quiet && open) return 'light, privacy and what the property is surrounded by'
+  if (quiet && open) return 'light and privacy'
   if (ground && open) return 'the lot and what it gives you'
-  if (quiet) return 'privacy and what the street is doing'
+  if (quiet) return 'privacy and noise'
   if (open) return 'light and somewhere to be outside'
   if (ground) return 'the lot itself'
   return null
@@ -196,16 +196,16 @@ function sitePhrase(entries: readonly ReadAttribute[]): string | null {
 
 function conditionPhrase(entries: readonly ReadAttribute[]): string | null {
   if (entries.length === 0) return null
-  return has(entries, 'condition') ? 'a house that arrives finished' : 'not taking on the kitchen'
+  return has(entries, 'condition') ? 'a finished house' : 'not taking on the kitchen'
 }
 
 function logisticsPhrase(entries: readonly ReadAttribute[]): string | null {
   if (entries.length === 0) return null
   const near = has(entries, 'proximity') || has(entries, 'convenience')
   const daily = entries.some((entry) => entry.attribute.operational)
-  if (near && daily) return 'staying close to your life and not fighting the house to run it'
-  if (near) return 'staying close to your people and your routine'
-  if (daily) return 'the ordinary logistics of running the place'
+  if (near && daily) return "staying close to things, and a house that isn't a hassle to run"
+  if (near) return 'staying close to your people'
+  if (daily) return 'the everyday running of the place'
   return null
 }
 
@@ -268,12 +268,12 @@ const RULES: readonly Rule[] = [
     id: 'everythingProtected',
     when: (s) => s.specificity >= 5,
     build: (s) => ({
-      headline: 'Almost everything came back as a priority.',
-      evidence: `${spell(s.protectedCount)} separate things came back as priorities, across ${partsOfHouse(s)}.`,
+      headline: 'You protected almost everything.',
+      evidence: `${spell(s.protectedCount)} things came back as must-haves, across ${partsOfHouse(s)}.`,
       consequence:
-        "That's a wish list rather than a filter, and it will behave like one the moment you start seeing houses. The useful next step is finding the two you'd actually give up, which happens standing in a real house and nowhere else.",
-      aside: 'almost everything came back as a priority',
-      topic: "what you'd trade",
+        "That won't narrow anything yet. Go and see two or three houses and find out which two you'd actually give up, because you won't work that out sitting still.",
+      aside: 'almost everything came back as a must-have',
+      topic: "what you'd give up",
     }),
   },
   {
@@ -282,11 +282,11 @@ const RULES: readonly Rule[] = [
     id: 'finishedAndFixed',
     when: (s) => s.dayOne === 'yes' && s.mapTight,
     build: () => ({
-      headline: 'This is a deliberately small search.',
-      evidence: "You want a house that's already finished, and your map doesn't move.",
+      headline: 'You want it finished, and you want it here.',
+      evidence: "You want a house that's already done, and your map doesn't move.",
       consequence:
-        "Two of the three levers are down before we start, so the inventory is genuinely narrow and searching harder won't widen it. The question isn't whether condition or geography gives, it's which secondary preference you'd let go first when the right house is otherwise there.",
-      aside: 'condition and the map are both closed',
+        "That's a short list and looking harder won't lengthen it. What I'd rather know is which of the smaller things you'd let go when a good house does turn up, because that's what gets you into it.",
+      aside: 'the condition and the map are both fixed',
       topic: 'condition',
     }),
   },
@@ -294,12 +294,12 @@ const RULES: readonly Rule[] = [
     id: 'bonesThenLayers',
     when: (s) => s.character && s.personalization === 'yes',
     build: () => ({
-      headline: 'The bones have to be right before you make it yours.',
+      headline: 'The bones have to be right.',
       evidence:
-        'You want architecture the house already has, and you still expect to put your own layer on top of it.',
+        'You want the house itself to have something going for it, and you still want to make it yours.',
       consequence:
-        "Those are one taste, not two, but listings blur them constantly. A blank new build isn't a blank slate: if the architecture itself leaves you cold, nothing you add afterwards rescues it.",
-      aside: 'the house has to bring the architecture you then build on',
+        "Those aren't in conflict, but listings blur them. A brand new white box isn't a blank slate. If the architecture does nothing for you, wallpaper won't fix it.",
+      aside: 'you want the house to bring something of its own',
       topic: 'character',
     }),
   },
@@ -308,11 +308,10 @@ const RULES: readonly Rule[] = [
     when: (s) => s.personalization === 'yes' && s.renovation === 'no',
     build: () => ({
       headline: "You'll decorate. You won't renovate.",
-      evidence:
-        "You're happy to take a house that isn't styled yet, and clear that you're not taking one that needs building work.",
+      evidence: "You'll take a house nobody has styled, but not one that needs building work.",
       consequence:
-        "Those look identical in a listing and need separating at the door: dated finishes are an opportunity and shouldn't cost a house a viewing, while a floor plan or a kitchen that needs real work is a filter, not a project you'll get to.",
-      aside: "the cosmetic layer is yours and the construction isn't",
+        "Those look the same in photos. Dated finishes shouldn't cost a house a viewing. A bad floor plan or a kitchen that needs ripping out should, because you're not going to do it.",
+      aside: "you'll do the decorating, not the construction",
       topic: 'condition',
     }),
   },
@@ -320,12 +319,12 @@ const RULES: readonly Rule[] = [
     id: 'worksBeforeYours',
     when: (s) => s.dayOne === 'yes' && s.personalization === 'yes',
     build: () => ({
-      headline: 'You want the house to work before you make it yours.',
+      headline: 'It has to work on day one. The rest is yours.',
       evidence:
-        'Function and condition are things you want handled at purchase, and the cosmetic layer is the part you want to do yourself.',
+        'You want the condition and the function handled when you buy. The decorating is the part you want to do.',
       consequence:
-        "That's narrower than it sounds, because it rules out the project house and the fully styled one at the same time. What fits is finished and plain, which photographs badly and is usually priced for it.",
-      aside: 'it has to work on arrival and the styling is still yours',
+        "That rules out the project house and the fully styled one at the same time. What's left is finished and plain, which photographs badly and usually gets priced for it. Those are the ones to go and see.",
+      aside: 'it has to work on day one and the decorating is still yours',
       topic: 'condition',
     }),
   },
@@ -333,11 +332,11 @@ const RULES: readonly Rule[] = [
     id: 'propertyOverFinish',
     when: (s) => s.renovation === 'yes' && (s.site.length >= 1 || s.spatial.length >= 1),
     build: (s) => ({
-      headline: 'The property matters more than the finish.',
-      evidence: `You'd take on real work, and what you kept protecting is ${topicPhrase(s) ?? 'the property itself'}. That's the part work can't produce.`,
+      headline: "You'd take the right property over the finished one.",
+      evidence: `You'd do real work, and what you kept protecting is ${topicPhrase(s) ?? 'the property itself'}. No budget produces that.`,
       consequence:
-        "So condition should do almost none of your filtering. A house that shows badly is a candidate. A compromised site isn't, because that's the one thing a renovation budget can't buy back.",
-      aside: "you'd do the work, so condition isn't the filter",
+        "So condition shouldn't do much of your filtering. Go and see the ones that show badly, and skip the ones on a bad site, because that's the part you can't buy your way out of later.",
+      aside: "you'd do the work, so condition isn't what's filtering",
       topic: 'condition',
     }),
   },
@@ -345,12 +344,12 @@ const RULES: readonly Rule[] = [
     id: 'outdoorNotGrounds',
     when: (s) => s.protectedIds.has('outdoor') && s.upkeep === 'no',
     build: () => ({
-      headline: 'You want outdoor life, not grounds to run.',
+      headline: 'You want outdoor space, not another job.',
       evidence:
-        "Being outside is something you'd use, and property maintenance is one of the things you said would wear on you.",
+        'You want to be outside, and you said maintenance is one of the things that would wear on you.',
       consequence:
-        "Those get advertised as the same thing and they aren't. Usability is the test rather than acreage, a pool or elaborate planting, and a small outdoor space you sit in every day beats a large one you manage.",
-      aside: 'the outdoor space has to be usable rather than large',
+        'Those get sold as the same thing. Ask what it takes to keep rather than how big it is. A small patio you sit in every day beats a lawn and a pool you manage.',
+      aside: 'the outdoor space has to be usable, not big',
       topic: 'the outdoor space',
     }),
   },
@@ -358,11 +357,11 @@ const RULES: readonly Rule[] = [
     id: 'narrowByDesign',
     when: (s) => s.mapTight && s.specificity >= 3,
     build: (s) => ({
-      headline: 'Your search is narrow by design.',
-      evidence: `Your map is fixed, and you kept coming back to ${topicPhrase(s) ?? 'the property itself'}.`,
+      headline: 'Your map is tight.',
+      evidence: `It's fixed, and you kept coming back to ${topicPhrase(s) ?? 'the property itself'}.`,
       consequence:
-        'Both of those hold, so the pool is small on purpose and no amount of searching widens it. The work is separating a real requirement from a preference that arrived alongside it, rather than quietly letting the boundary slide to make the numbers look better.',
-      aside: 'your map and your property criteria are both tight',
+        "That's a short list and it won't get longer by looking harder. The useful part now is figuring out which of the rest are actually negotiable.",
+      aside: "your map's tight and so is your list",
       topic: 'the map',
     }),
   },
@@ -370,11 +369,11 @@ const RULES: readonly Rule[] = [
     id: 'mapRoomPropertyNot',
     when: (s) => s.mapOpen && s.specificity >= 3,
     build: (s) => ({
-      headline: "Your map has room. Your house criteria don't.",
-      evidence: `Geography is the part you're willing to move on. What you protected is ${topicPhrase(s) ?? 'the property itself'}, and that's the part you're not.`,
+      headline: 'The house matters more than the ZIP code.',
+      evidence: `You'll move on the map. You won't move on ${topicPhrase(s) ?? 'the property itself'}.`,
       consequence:
-        "So the search runs across several deliberate areas rather than loosening what kept coming up. Widening the property criteria in order to stay in one neighbourhood would be solving the constraint you don't have.",
-      aside: 'the map is the flexible part, not the house',
+        "So we look in a few areas on purpose instead of loosening the house. Staying in one neighbourhood and giving up what you actually want would be the wrong way round.",
+      aside: "you'll move on the map, not on the house",
       topic: 'the map',
     }),
   },
@@ -382,11 +381,11 @@ const RULES: readonly Rule[] = [
     id: 'spatialUnresolvedReno',
     when: (s) => s.spatial.length >= 2 && s.renovation === 'conditional',
     build: (s) => ({
-      headline: "The house has to work. How much you'd change it's still open.",
-      evidence: `You were consistent about ${spatialPhrase(s.spatial) ?? 'the way the house works'}, and undecided about how much work you'd take on to get it.`,
+      headline: "The house has to work. What you'd change is still open.",
+      evidence: `You were clear about ${spatialPhrase(s.spatial) ?? 'the way the house works'}, and not clear about how much work you'd do to get there.`,
       consequence:
-        "Those two answers point at different listings, so the appetite is worth settling against an actual imperfect house rather than in the abstract. Until it is, condition can't filter anything for you.",
-      aside: "the spatial requirements are firm and the renovation appetite isn't",
+        "Those point at different houses. Go and stand in one that's nearly right and needs work, and you'll know. Until then, condition isn't filtering anything.",
+      aside: "you know what the house has to do, not how much you'd change",
       topic: 'condition',
     }),
   },
@@ -394,12 +393,12 @@ const RULES: readonly Rule[] = [
     id: 'logisticsLed',
     when: (s) => s.logistics.length >= 2 && s.specificity <= 2,
     build: (s) => ({
-      headline: 'The day to day is doing the filtering, not the architecture.',
-      evidence: `What you protected is ${logisticsPhrase(s.logistics) ?? 'the practical side'}, and the property itself came back comparatively open.`,
+      headline: "It's the everyday stuff that'll decide this.",
+      evidence: `What you protected is ${logisticsPhrase(s.logistics) ?? 'the practical side'}, and the house itself came back fairly open.`,
       consequence:
-        "That's worth knowing, because those things are invisible in listing photography and decide how a house feels after a month. They belong on the showing list rather than in the search filters.",
-      aside: 'the practical side is doing the filtering',
-      topic: 'the practical side',
+        'None of that shows up in photographs, and all of it decides how a house feels after a month. Check it at the showing rather than trying to filter for it.',
+      aside: "the everyday stuff is what's filtering",
+      topic: 'the everyday side',
     }),
   },
 ]
@@ -458,7 +457,7 @@ export function rejectFaster(signals: Signals): Change | null {
         body:
           named.length > 1
             ? `Houses with ${named[0]} or ${named[1]}. You can renovate a house. You can't renovate either of those.`
-            : `Houses with ${named[0]}. That isn't something a renovation fixes.`,
+            : `Houses with ${named[0]}. A renovation doesn't fix that one.`,
       }
     }
   }
@@ -469,14 +468,14 @@ export function rejectFaster(signals: Signals): Change | null {
       : 'need the floor plan rescued'
     return {
       heading: 'Reject faster',
-      body: `Houses that ${rescue}, or whose main living space doesn't work for the way you cook, host and move around. Neither of those is a cosmetic fix, and you haven't told us you'd take on the work that solves them.`,
+      body: `Houses that ${rescue}, or where the main living space fights the way you cook and host. Neither is a cosmetic fix, and you haven't said you'd take that on.`,
     }
   }
 
   if (signals.condition.length >= 1 && signals.renovation === 'no') {
     return {
       heading: 'Reject faster',
-      body: "Anything that needs real work before you could live in it. Dated is a different problem and stays on the list. This is the house where the kitchen, the systems or the layout is a project you'd have to take on.",
+      body: "Anything that needs real work before you could move in. Dated is a different thing and stays on the list. This is the one where the kitchen, the systems or the layout is a job you'd have to take on.",
     }
   }
 
@@ -509,28 +508,28 @@ export function lookTwice(signals: Signals): Change | null {
   if (signals.personalization === 'yes' && !signals.protectedIds.has('character')) {
     return {
       heading: 'Look twice',
-      body: "A house with the right space and layout that isn't styled yet. You've said the cosmetic layer is yours to add, so a plain one shouldn't lose a viewing to a staged one.",
+      body: "A house with the right space and layout that's cosmetically boring. You said the decorating is yours, so don't let a plain one lose out to a staged one.",
     }
   }
 
   if (signals.renovation === 'yes' && signals.condition.length === 0) {
     return {
       heading: 'Look twice',
-      body: "Houses that show badly. Dated isn't the same as broken, and you've said you'd take the work on, so those are usually where the value is.",
+      body: "Houses that show badly. Dated isn't broken, and you said you'd do the work, so that's usually where the value is.",
     }
   }
 
   if (signals.tradedPermanently.length > 0) {
     return {
       heading: 'Look twice',
-      body: `${capitalise(labels(signals.tradedPermanently, 2))}. You gave that up in a forced choice, which isn't the same as deciding it doesn't matter. Worth checking against a real house whether that was a decision or just the way the question was put.`,
+      body: `${capitalise(labels(signals.tradedPermanently, 2))}. You gave that up in a forced choice, which isn't the same as deciding it doesn't matter. Worth checking against a real house before you treat it as settled.`,
     }
   }
 
   if (signals.renovation === 'conditional' && signals.condition.length === 0) {
     return {
       heading: 'Look twice',
-      body: "Houses that need work but are right in every way you can't change. You haven't ruled that out, and it's worth one viewing before you decide you have.",
+      body: "A house that needs work but is right in every way you can't change. You haven't ruled that out yet, so don't rule it out from the listing.",
     }
   }
 
@@ -557,18 +556,18 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
   if (signals.conflictUnresolved) {
     return {
       topic: 'condition',
-      short: "you have told us both that you want it finished and that you'd take the project on",
-      question: 'How much work would you actually take on for an otherwise exceptional house?',
-      why: "You said both that you want it finished and that you'd take the project on. Until that settles, condition can't filter anything, and it's the filter that changes the list most.",
+      short: "you told me both that you want it finished and that you'd take the project",
+      question: 'How much work would you really take on for an otherwise great house?',
+      why: "You told me both. You want it finished, and you'd take the project on. Until that settles, condition isn't filtering anything, and it's the filter that changes the list most.",
     }
   }
 
   if (signals.renovation === 'conditional' && (signals.spatial.length > 0 || signals.condition.length > 0)) {
     return {
       topic: 'condition',
-      short: "how much work you'd take on hasn't been established",
-      question: 'How much work would you actually take on for an otherwise exceptional house?',
-      why: "It's the difference between a house being wrong and a house being unfinished, and right now it's doing no filtering at all. Worth settling against a real property before you add another hard requirement.",
+      short: "you haven't said how much work you'd really do",
+      question: 'How much work would you really take on for an otherwise great house?',
+      why: "Right now it's doing no filtering at all. It's the difference between a house being wrong and a house being unfinished. Go and see one that needs work before you add another rule.",
     }
   }
 
@@ -576,35 +575,35 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
     return {
       topic: 'the map',
       short: "you've never actually had to test it",
-      question: 'Is the map genuinely fixed, or is it a strong preference you have never had to test?',
-      why: "With this many property requirements the map is doing most of the filtering, which means you may never see the house that would have changed your mind. Worth knowing which one you'd move first.",
+      question: 'If the house is right, how far outside your usual area would you actually go?',
+      why: "With this much riding on the house, the map is doing most of the filtering. You may never see the one that would have changed your mind. Worth knowing now whether the map or the house budges first.",
     }
   }
 
   if (signals.protectedIds.has('outdoor') && signals.upkeep === 'unset') {
     return {
       topic: 'the outdoor space',
-      short: 'we never established how much of it you want to look after',
-      question: 'Do you want outdoor space, or specifically outdoor space you can use without looking after it?',
-      why: 'Those are different houses and they photograph identically. It decides whether a pool and a planted garden read as a feature or as a standing commitment.',
+      short: 'we never got to how much of it you want to look after',
+      question: "Do you need outdoor space, or do you need a yard you'll actually use every day?",
+      why: 'Those are different houses and they photograph the same. It decides whether a pool and a planted garden read as a feature or as a standing job.',
     }
   }
 
   if (signals.protectedIds.has('size') && signals.unknownIds.has('expansion') && signals.renovation !== 'no') {
     return {
       topic: 'space',
-      short: "it isn't clear whether the space has to exist already",
-      question: 'Does the house have to be big already, or could it get there?',
-      why: "You protected space and you haven't closed the door on work. Those two answers point at completely different listings, and one of them is a much larger market.",
+      short: "it's not clear whether it has to be big already",
+      question: 'Does it have to be big already, or could it get there?',
+      why: "You protected space and you haven't ruled out work. Those are two different sets of listings, and one of them is a lot bigger.",
     }
   }
 
   if (signals.declinedTheTrade && signals.specificity <= 3) {
     return {
-      topic: "what you'd trade",
+      topic: "what you'd give up",
       short: 'nothing has been ranked against anything else yet',
-      question: 'What would actually make you choose between two houses that both nearly work?',
-      why: 'You declined the trade, which is a real answer, and it means nothing has been ranked against anything else yet. That ranking usually happens in the second or third house rather than before the first.',
+      question: 'What would actually make you pick one house over another?',
+      why: "You wouldn't take the trade, which is fair enough. It does mean nothing has been ranked yet, and that usually happens in the second or third house rather than before the first.",
     }
   }
 
@@ -614,44 +613,44 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
     {
       id: 'condition',
       topic: 'condition',
-      short: 'we never established how finished it has to be',
-      question: 'How finished does it have to be on the day you move in?',
-      why: "We never established it, and it's the single filter that changes the list most. Everything else is a preference inside whatever answer you give here.",
+      short: 'we never got to how finished it has to be',
+      question: 'How finished does it have to be the day you move in?',
+      why: "We never got to it, and it's the one that changes the list most. Everything else sits inside your answer to it.",
     },
     {
       id: 'size',
       topic: 'space',
-      short: 'we never established how much space you actually need',
+      short: 'we never got to how much space you actually need',
       question: 'How much space do you actually need, as opposed to want?',
-      why: 'The number on a listing and the way a house lives are only loosely related, and this one sets the price band before anything else does.',
+      why: "The number on a listing and the way a house lives aren't the same thing, and this one sets the price band before anything else does.",
     },
     {
       id: 'outdoor',
       topic: 'outdoor space',
       short: 'outdoor space never came up either way',
-      question: 'Do you need outdoor space, or somewhere to be outside?',
+      question: 'Do you need outdoor space, or somewhere to sit outside?',
       why: 'In Los Angeles those are two different budgets and two different parts of the map.',
     },
     {
       id: 'light',
       topic: 'light',
-      short: 'we never established your threshold for light',
+      short: 'we never got to your threshold for light',
       question: 'Does the light have to be good, or does it just have to not be bad?',
-      why: "It's the most common reason a house that looked right in photographs gets ruled out in person, and it's worth knowing your threshold before you spend Sundays finding it.",
+      why: "It's the most common reason a house that looked right online gets ruled out in person. Worth knowing your threshold before you spend Sundays finding it.",
     },
     {
       id: 'privacy',
       topic: 'privacy',
       short: 'privacy never came up either way',
-      question: 'How much privacy do you actually need, and from what?',
-      why: 'Neighbours, the street and sight lines are three different problems with three different fixes, and only one of them is solvable after purchase.',
+      question: 'How much privacy do you need, and from what?',
+      why: 'Neighbours, the street and sight lines are three different problems. Only one of them is fixable after you buy.',
     },
     {
       id: 'upkeep',
       topic: 'upkeep',
-      short: 'we never established how much property you want to look after',
+      short: 'we never got to how much property you want to look after',
       question: 'How much property are you willing to look after?',
-      why: "It doesn't show up in a listing and it decides how the house feels in month three.",
+      why: "It never shows up in a listing, and it decides how the house feels in month three.",
     },
   ]
 
@@ -686,10 +685,10 @@ export function theRead(result: Result): TheRead | null {
     // Not enough established to draw a combination from. Saying so is a real
     // finding, and far more useful than inventing a verdict from one answer.
     const paragraphs = [
-      'Nothing here combines into a filter yet, which is worth knowing before you spend a Sunday on it. Two or three houses will settle more than another questionnaire will.',
+      "There isn't enough here to narrow anything yet. Two or three houses will tell you more than another set of questions will.",
     ]
-    if (open) paragraphs.push(`The place to start is ${open.topic}, and ${open.short}.`)
-    return { headline: "There isn't enough here yet to narrow anything.", paragraphs }
+    if (open) paragraphs.push(`Start with ${open.topic}. ${capitalise(open.short)}.`)
+    return { headline: 'Not enough to go on yet.', paragraphs }
   }
 
   const lead = firing[0]
@@ -709,9 +708,9 @@ export function theRead(result: Result): TheRead | null {
   const second = firing.find((entry) => entry.id !== lead.id && entry.topic !== open?.topic)
 
   if (second && open) {
-    paragraphs.push(`${capitalise(second.aside)}, but the bigger open question is ${open.topic}: ${open.short}.`)
+    paragraphs.push(`${capitalise(second.aside)}. The one I'd settle first is ${open.topic}. ${capitalise(open.short)}.`)
   } else if (open) {
-    paragraphs.push(`The one thing left open is ${open.topic}, and ${open.short}.`)
+    paragraphs.push(`What isn't settled yet is ${open.topic}. ${capitalise(open.short)}.`)
   } else if (second) {
     paragraphs.push(`${second.evidence} ${second.consequence}`)
   }
@@ -736,7 +735,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.protectedIds.has('publicRooms') && s.protectedIds.has('layout'),
-    check: 'Can people cook, sit, eat and move through the main space at the same time without fighting it?',
+    check: 'Can people cook, sit, eat and get past each other in the main space at the same time?',
   },
   {
     when: (s) => s.protectedIds.has('layout') && s.renovation !== 'yes',
@@ -744,7 +743,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.character,
-    check: 'Is the character architectural, or is it finishes and staging that leave with the stager?',
+    check: 'Is the character actually in the house, or is it the staging? The staging leaves.',
   },
   {
     when: (s) => s.renovation === 'conditional' && (s.mapTight || s.mapSemi),
@@ -772,7 +771,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.logistics.some((entry) => entry.attribute.operational),
-    check: 'Walk where everyday life actually goes. Laundry, bags, pantry, coats, bins, parking.',
+    check: 'Where do the bags, coats, laundry and pantry stuff actually go?',
   },
   {
     when: (s) => s.protectedIds.has('light'),
@@ -780,11 +779,11 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.protectedIds.has('privacy') || s.protectedIds.has('street'),
-    check: 'Stand at the windows rather than in the middle of the room, then stand outside on the sidewalk and listen.',
+    check: 'Stand at the windows, not in the middle of the room. Does it still feel private? Then stand out front for five minutes and listen.',
   },
   {
     when: (s) => s.protectedIds.has('lot'),
-    check: 'Walk the property line. What is actually next door, and how close is it?',
+    check: "Walk the property line. What's actually next door, and how close is it?",
   },
   {
     when: (s) => s.protectedIds.has('kitchen'),
@@ -792,7 +791,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.protectedIds.has('proximity') || s.protectedIds.has('convenience'),
-    check: "Do one ordinary errand starting from the front door, at the hour you'd really be doing it.",
+    check: "Do one ordinary errand from the front door, at the hour you'd really be doing it.",
   },
   {
     when: (s) => s.protectedIds.has('view'),
@@ -800,7 +799,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.protectedIds.has('condition') && s.renovation !== 'no',
-    check: "Price the work you can see before you decide it's finished. Then ask what it hides.",
+    check: "Price the work you can see before you call it finished. Then ask what it's hiding.",
   },
 ]
 
@@ -814,9 +813,9 @@ const MIN_CHECKS = 3
  * questionnaire could not tell us.
  */
 const OPENING_CHECKS: readonly string[] = [
-  "Name the one thing in this house you wouldn't accept. That's your first real filter, and it doesn't exist until you stand in something.",
+  "Name the one thing in this house you wouldn't accept. That's your first real filter, and it doesn't exist until you're standing in something.",
   'Walk it once without talking. Then say what you noticed first, before anyone tells you what to think about it.',
-  "Ask what the house makes hard. Every house makes something hard, and the listing won't say which.",
+  "Ask what this house makes hard. They all make something hard, and the listing never says which.",
 ]
 
 export function showingChecks(result: Result): string[] {
@@ -888,8 +887,8 @@ export function searchBrief(result: Result): SearchBrief {
     signals.renovation === 'yes' || priorities.length === 0
       ? null
       : addLater.length === 0
-        ? "Every one of these is something you'd be buying rather than adding."
-        : `Of these, only ${labels(addLater, 2)} could come later. The rest you'd be buying rather than adding.`
+        ? "You'd be buying all of these, not adding them later."
+        : `Only ${labels(addLater, 2)} could come later. The rest you'd be buying.`
 
   return {
     priorities: priorities.map((entry) => entry.attribute.label),
@@ -918,7 +917,7 @@ export function mapSummary(result: Result): string | null {
     case 'fewAreas':
       return 'A handful of areas, not one ZIP code.'
     case 'propertyLed':
-      return 'The property leads. The map follows.'
+      return 'Open, if the house is right.'
     case null:
       return null
   }
