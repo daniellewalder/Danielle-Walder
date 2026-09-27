@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { briefBody, briefMailto } from '@/lib/tuesday/brief'
 import { decodeAnswers } from '@/lib/tuesday/encode'
 import {
   STATE_HEADINGS,
@@ -39,6 +40,25 @@ export function TuesdayResult() {
   const encoded = params.get('a')
   const answers = useMemo(() => decodeAnswers(encoded), [encoded])
   const result = useMemo(() => score(answers), [answers])
+
+  // The shareable URL this page is already at. Read lazily so the component
+  // still renders on the server, where there is no window.
+  const resultUrl = () =>
+    typeof window === 'undefined' ? '' : window.location.href
+  const briefHref = useMemo(
+    () => (result.answered === 0 ? '#' : briefMailto(result, resultUrl())),
+    [result],
+  )
+
+  const [copied, setCopied] = useState<'idle' | 'done' | 'failed'>('idle')
+  const copyBrief = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(briefBody(result, resultUrl()))
+      setCopied('done')
+    } catch {
+      setCopied('failed')
+    }
+  }, [result])
 
   if (result.answered === 0) {
     return (
@@ -97,16 +117,25 @@ export function TuesdayResult() {
 
   return (
     <>
-      <header className="wrap pb-11 pt-14 tablet:pb-9 mobile:pb-8 mobile:pt-10">
-        <p className="eyebrow">your search hierarchy</p>
-        <h1 className="mt-6 max-w-[16ch] font-mark text-[46px] font-semibold leading-[0.98] tracking-display text-espresso tablet:text-[38px] mobile:text-[30px]">
-          {resultHeadline(result)}
-        </h1>
-        <div className="mt-7 flex max-w-[64ch] flex-col gap-3">
+      {/*
+        Two columns on desktop, on the same grid as the blocks below, so the
+        headline and the reading of it sit side by side instead of leaving the
+        right half of the first screen empty. There is no photograph here on
+        purpose: a result page about one person's judgment has nothing honest
+        to show, and stock property imagery would be the wrong claim entirely.
+      */}
+      <header className="wrap grid grid-cols-[1.35fr_0.8fr] items-end gap-5 pb-11 pt-14 tablet:grid-cols-1 tablet:items-start tablet:gap-7 tablet:pb-9 mobile:pb-8 mobile:pt-10">
+        <div className="min-w-0">
+          <p className="eyebrow">your search hierarchy</p>
+          <h1 className="mt-6 max-w-[16ch] font-mark text-[46px] font-semibold leading-[0.98] tracking-display text-espresso tablet:text-[38px] mobile:text-[30px]">
+            {resultHeadline(result)}
+          </h1>
+        </div>
+        <div className="flex min-w-0 flex-col gap-3 border-t border-hairline pt-6 tablet:max-w-[64ch] tablet:border-t-0 tablet:pt-0">
           {synthesis(result).map((line) => (
             <p
               key={line}
-              className="font-sans text-[20px] leading-[1.5] text-warmgray tablet:text-[18px] mobile:text-[17px]"
+              className="font-sans text-[21px] leading-[1.55] text-warmgray tablet:text-[19px] mobile:text-[17.5px]"
             >
               {line}
             </p>
@@ -121,18 +150,27 @@ export function TuesdayResult() {
               Protect these
             </p>
             {protect.length > 0 ? (
-              <ul className="mt-6 flex flex-col gap-3">
+              /*
+                A small cream dot per item. Five lines of serif floating in a
+                rectangle do not read as a list; browser bullets read as a
+                slide. This is the quietest marker that still makes it scan.
+              */
+              <ul className="mt-7 flex flex-col gap-[18px] mobile:gap-4">
                 {protect.map((entry) => (
                   <li
                     key={entry.attribute.id}
-                    className="font-display text-[27px] leading-[1.14] tablet:text-[24px] mobile:text-[21px]"
+                    className="flex items-baseline gap-[14px] font-display text-[27px] leading-[1.14] tablet:text-[24px] mobile:gap-3 mobile:text-[21px]"
                   >
-                    {entry.attribute.label}
+                    <span
+                      aria-hidden="true"
+                      className="mt-[2px] block h-[6px] w-[6px] shrink-0 rounded-full bg-butter-field"
+                    />
+                    <span>{entry.attribute.label}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mt-6 max-w-[34ch] font-sans text-[17px] leading-[1.5] text-onbrown-body">
+              <p className="mt-7 max-w-[34ch] font-sans text-[18px] leading-[1.55] text-onbrown-body">
                 Nothing came through strongly enough to call a must. That is worth knowing too. It
                 usually means the houses themselves will settle it.
               </p>
@@ -144,7 +182,7 @@ export function TuesdayResult() {
               <p className="text-[11.5px] font-bold uppercase tracking-label text-sage-olive">
                 Your map
               </p>
-              <p className="mt-4 max-w-[20ch] font-display text-[23px] leading-[1.2] mobile:text-[21px]">
+              <p className="mt-4 max-w-[20ch] font-display text-[25px] leading-[1.22] mobile:text-[22px]">
                 {map}
               </p>
             </div>
@@ -157,8 +195,8 @@ export function TuesdayResult() {
             <dl className="mt-4 flex flex-col gap-[10px]">
               {projectSummary(result).map((row) => (
                 <div key={row.label} className="flex items-baseline justify-between gap-5">
-                  <dt className="font-sans text-[15px] text-blue-deep">{row.label}</dt>
-                  <dd className="font-display text-[21px] leading-none">{row.value}</dd>
+                  <dt className="font-sans text-[17px] text-blue-deep">{row.label}</dt>
+                  <dd className="font-display text-[22px] leading-none">{row.value}</dd>
                 </div>
               ))}
             </dl>
@@ -183,13 +221,13 @@ export function TuesdayResult() {
                   {row.items.map((item) => (
                     <li
                       key={item}
-                      className="font-sans text-[19px] leading-[1.3] text-espresso mobile:text-[18px]"
+                      className="font-sans text-[20px] leading-[1.35] text-espresso mobile:text-[18px]"
                     >
                       {item}
                     </li>
                   ))}
                 </ul>
-                <p className="mt-5 max-w-[40ch] font-sans text-[14px] leading-[1.55] text-taupe">
+                <p className="mt-5 max-w-[42ch] font-sans text-[17px] leading-[1.55] text-taupe mobile:text-[16.5px]">
                   {row.note}
                 </p>
               </div>
@@ -207,7 +245,7 @@ export function TuesdayResult() {
               </p>
               <ul className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
                 {layers.map((layer, index) => (
-                  <li key={layer} className="font-display text-[21px] leading-[1.3] mobile:text-[19px]">
+                  <li key={layer} className="font-display text-[22px] leading-[1.3] mobile:text-[19.5px]">
                     {layer}
                     {index < layers.length - 1 ? (
                       <span aria-hidden="true" className="ml-5 text-butter-deep">
@@ -239,13 +277,13 @@ export function TuesdayResult() {
                 <span aria-hidden="true" className="font-sans text-[13px] tabular-nums text-blue-deep">
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <span className="max-w-[46ch] font-sans text-[18px] leading-[1.45] mobile:text-[16.5px]">
+                <span className="max-w-[46ch] font-sans text-[19px] leading-[1.5] mobile:text-[17px]">
                   {check}
                 </span>
               </li>
             ))}
           </ol>
-          <p className="mt-10 font-sans text-[15px] italic text-blue-deep mobile:mt-8">
+          <p className="mt-10 font-sans text-[17px] italic leading-[1.5] text-blue-deep mobile:mt-8 mobile:text-[16.5px]">
             {unknownsLine(result)}
           </p>
         </section>
@@ -264,24 +302,52 @@ export function TuesdayResult() {
           <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 mobile:flex-col mobile:items-stretch">
             <Link
               href="/search"
-              className="inline-flex items-center justify-center rounded-button bg-brown px-7 py-[15px] font-sans text-[16px] font-semibold text-cream hover:bg-wine"
+              className="inline-flex items-center justify-center rounded-button bg-brown px-7 py-[15px] font-sans text-[17px] font-semibold text-cream hover:bg-wine"
             >
               Search homes
             </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-button border-[1.5px] border-brown px-7 py-[13.5px] font-sans text-[16px] font-semibold text-brown hover:border-sage-olive hover:bg-sage-olive hover:text-cream"
+            {/*
+              A real mailto carrying the whole brief, not a trip to the
+              generic contact page that loses everything the test just worked
+              out. Nothing is submitted and nothing is stored: the reader's own
+              mail client opens with the message composed, and they press send.
+            */}
+            <a
+              href={briefHref}
+              className="inline-flex items-center justify-center rounded-button border-[1.5px] border-brown px-7 py-[13.5px] font-sans text-[17px] font-semibold text-brown hover:border-sage-olive hover:bg-sage-olive hover:text-cream"
             >
               Send Danielle my search brief
-            </Link>
+            </a>
           </div>
 
-          <Link
-            href="/tuesday-test"
-            className="mt-7 inline-flex font-sans text-[14px] text-taupe underline underline-offset-4 hover:text-wine"
-          >
-            Take it again
-          </Link>
+          {/*
+            Both of these are text links by design, so the 44px tap target has
+            to come from padding rather than from a box. The row pulls back up
+            by the same amount it gains, to keep the spacing under the buttons.
+          */}
+          <div className="-mb-[11px] mt-4 flex flex-wrap items-center gap-x-7">
+            {/* For anyone whose device has no mail client wired up. */}
+            <button
+              type="button"
+              onClick={copyBrief}
+              className="inline-flex min-h-[44px] items-center py-[11px] font-sans text-[15px] font-medium text-sage-olive underline underline-offset-4 hover:text-sage-deep"
+            >
+              {copied === 'done' ? 'Copied' : copied === 'failed' ? 'Copy failed' : 'Copy my brief'}
+            </button>
+            <Link
+              href="/tuesday-test"
+              className="inline-flex min-h-[44px] items-center py-[11px] font-sans text-[15px] text-taupe underline underline-offset-4 hover:text-wine"
+            >
+              Take it again
+            </Link>
+          </div>
+          <p aria-live="polite" className="sr-only">
+            {copied === 'done'
+              ? 'Brief copied to the clipboard.'
+              : copied === 'failed'
+                ? 'The brief could not be copied. Use the send button instead.'
+                : ''}
+          </p>
         </div>
       </section>
     </>
