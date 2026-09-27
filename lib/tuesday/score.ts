@@ -56,6 +56,13 @@ export interface Result {
   unknowns: readonly Attribute[]
   findings: Findings
   answered: number
+  /**
+   * Which questions actually produced an answer. The interpretation layer
+   * needs this to tell "we asked and they were in the middle" apart from "we
+   * never raised it": a scale that no answered question could move is not a
+   * moderate reading, it is an absent one, and unknown is not flexible.
+   */
+  answeredQuestionIds: readonly string[]
   /** True when the clarification question should be asked. */
   needsClarification: boolean
 }
@@ -77,7 +84,7 @@ function chosenIds(answers: Answers, questionId: string): string[] {
  * and the model concluded nothing. A scale should describe the evidence in
  * front of it, not be punished for questions nobody reached.
  */
-function achievableRange(scale: ScaleId, answeredIds: ReadonlySet<string>): { min: number; max: number } {
+export function achievableRange(scale: ScaleId, answeredIds: ReadonlySet<string>): { min: number; max: number } {
   let min = 0
   let max = 0
   for (const question of QUESTIONS) {
@@ -227,6 +234,7 @@ export function score(answers: Answers): Result {
     attributes: read,
     unknowns,
     answered,
+    answeredQuestionIds: [...answeredIds],
     needsClarification: tensions.has('readinessVersusRenovation') && !answers.clarify,
     findings: {
       map,
