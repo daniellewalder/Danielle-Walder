@@ -63,9 +63,6 @@ export interface Signals {
   condition: readonly ReadAttribute[]
   logistics: readonly ReadAttribute[]
   character: boolean
-  /** Everything protected, cosmetic included, so a count in the copy matches
-   *  the list the reader can see underneath it. */
-  protectedCount: number
   protectedIds: ReadonlySet<string>
   scrutinizeIds: ReadonlySet<string>
   unknownIds: ReadonlySet<string>
@@ -144,7 +141,6 @@ export function signalsOf(result: Result): Signals {
     condition,
     logistics,
     character: architecture === 'yes' || protectedIds.has('character'),
-    protectedCount: protectedIds.size,
     protectedIds,
     scrutinizeIds: new Set(
       result.attributes.filter((e) => e.state === 'scrutinize').map((e) => e.attribute.id),
@@ -209,6 +205,44 @@ function logisticsPhrase(entries: readonly ReadAttribute[]): string | null {
   return null
 }
 
+/*
+ * The two clauses that keep the interpretation talking about houses.
+ *
+ * A result is only useful if it can finish the sentence "I wouldn't spend much
+ * time on ...". These build that clause, and its opposite, out of whatever the
+ * buyer actually protected, so the copy names a listing rather than a finding.
+ */
+function skipClause(signals: Signals): string {
+  if (signals.spatial.length > 0) {
+    const small = has(signals.spatial, 'size') || has(signals.spatial, 'ceilings')
+    const works =
+      has(signals.spatial, 'layout') ||
+      has(signals.spatial, 'publicRooms') ||
+      has(signals.spatial, 'separation')
+    if (small && works) return 'houses that are already too small or need the floor plan rescued'
+    if (small) return 'houses that are already too small'
+    return 'houses that need the floor plan rescued'
+  }
+  if (signals.site.length > 0) {
+    const named = signals.site
+      .map((entry) => SITE_REJECTS[entry.attribute.id])
+      .filter((value): value is string => Boolean(value))
+    if (named.length >= 2) return `houses with ${named[0]} or ${named[1]}`
+    if (named.length === 1) return `houses with ${named[0]}`
+  }
+  if (signals.condition.length > 0) return 'houses that need real work before you could move in'
+  return 'houses that miss on the things you were clearest about'
+}
+
+function wantClause(signals: Signals): string {
+  if (signals.spatial.length > 0) return 'the space and layout you want'
+  if (has(signals.site, 'outdoor')) return 'the outdoor space you want'
+  if (has(signals.site, 'light')) return 'the light you want'
+  if (has(signals.site, 'lot')) return 'the lot you want'
+  if (has(signals.site, 'privacy') || has(signals.site, 'street')) return 'the quiet you want'
+  return 'the things you were clearest about'
+}
+
 /** The one or two categories to name. Never more, and never a list of clicks. */
 function topicPhrase(signals: Signals): string | null {
   const parts = [
@@ -268,12 +302,12 @@ const RULES: readonly Rule[] = [
     id: 'everythingProtected',
     when: (s) => s.specificity >= 5,
     build: (s) => ({
-      headline: 'You protected almost everything.',
-      evidence: `${spell(s.protectedCount)} things came back as must-haves, across ${partsOfHouse(s)}.`,
+      headline: 'Almost everything is still a must-have.',
+      evidence: "That may be exactly how you feel. It doesn't tell us what wins when two of them are in the same house.",
       consequence:
-        "That won't narrow anything yet. Go and see two or three houses and find out which two you'd actually give up, because you won't work that out sitting still.",
-      aside: 'almost everything came back as a must-have',
-      topic: "what you'd give up",
+        "Before adding another filter, I'd go and see a few very different houses and find out what actually gives.",
+      aside: 'almost everything is still a must-have',
+      topic: 'what wins when two of them conflict',
     }),
   },
   {
@@ -285,7 +319,7 @@ const RULES: readonly Rule[] = [
       headline: 'You want it finished, and you want it here.',
       evidence: "You want a house that's already done, and your map doesn't move.",
       consequence:
-        "That's a short list and looking harder won't lengthen it. What I'd rather know is which of the smaller things you'd let go when a good house does turn up, because that's what gets you into it.",
+        "Not much matches both at once. What I'd want to know is which of the smaller things you'd let go when a good one does turn up.",
       aside: 'the condition and the map are both fixed',
       topic: 'condition',
     }),
@@ -298,7 +332,7 @@ const RULES: readonly Rule[] = [
       evidence:
         'You want the house itself to have something going for it, and you still want to make it yours.',
       consequence:
-        "Those aren't in conflict, but listings blur them. A brand new white box isn't a blank slate. If the architecture does nothing for you, wallpaper won't fix it.",
+        "A brand-new white box isn't automatically a blank slate. If the architecture does nothing for you, wallpaper won't fix it.",
       aside: 'you want the house to bring something of its own',
       topic: 'character',
     }),
@@ -323,7 +357,7 @@ const RULES: readonly Rule[] = [
       evidence:
         'You want the condition and the function handled when you buy. The decorating is the part you want to do.',
       consequence:
-        "That rules out the project house and the fully styled one at the same time. What's left is finished and plain, which photographs badly and usually gets priced for it. Those are the ones to go and see.",
+        "That rules out the project house and the fully styled one. What's left is finished and plain, which photographs badly and usually gets priced for it. Go and see those.",
       aside: 'it has to work on day one and the decorating is still yours',
       topic: 'condition',
     }),
@@ -333,7 +367,7 @@ const RULES: readonly Rule[] = [
     when: (s) => s.renovation === 'yes' && (s.site.length >= 1 || s.spatial.length >= 1),
     build: (s) => ({
       headline: "You'd take the right property over the finished one.",
-      evidence: `You'd do real work, and what you kept protecting is ${topicPhrase(s) ?? 'the property itself'}. No budget produces that.`,
+      evidence: `You'd do real work, and what you kept coming back to is ${topicPhrase(s) ?? 'the property itself'}. No budget produces that.`,
       consequence:
         "So condition shouldn't do much of your filtering. Go and see the ones that show badly, and skip the ones on a bad site, because that's the part you can't buy your way out of later.",
       aside: "you'd do the work, so condition isn't what's filtering",
@@ -358,10 +392,10 @@ const RULES: readonly Rule[] = [
     when: (s) => s.mapTight && s.specificity >= 3,
     build: (s) => ({
       headline: 'Your map is tight.',
-      evidence: `It's fixed, and you kept coming back to ${topicPhrase(s) ?? 'the property itself'}.`,
+      evidence: `Your map is fixed, and you kept coming back to ${topicPhrase(s) ?? 'the property itself'}.`,
       consequence:
-        "That's a short list and it won't get longer by looking harder. The useful part now is figuring out which of the rest are actually negotiable.",
-      aside: "your map's tight and so is your list",
+        `I wouldn't spend much time on ${skipClause(s)}.`,
+      aside: 'your map is fixed as well',
       topic: 'the map',
     }),
   },
@@ -384,7 +418,7 @@ const RULES: readonly Rule[] = [
       headline: "The house has to work. What you'd change is still open.",
       evidence: `You were clear about ${spatialPhrase(s.spatial) ?? 'the way the house works'}, and not clear about how much work you'd do to get there.`,
       consequence:
-        "Those point at different houses. Go and stand in one that's nearly right and needs work, and you'll know. Until then, condition isn't filtering anything.",
+        "Those point at different houses. Go and stand in one that's nearly right and needs work, and you'll know.",
       aside: "you know what the house has to do, not how much you'd change",
       topic: 'condition',
     }),
@@ -394,7 +428,7 @@ const RULES: readonly Rule[] = [
     when: (s) => s.logistics.length >= 2 && s.specificity <= 2,
     build: (s) => ({
       headline: "It's the everyday stuff that'll decide this.",
-      evidence: `What you protected is ${logisticsPhrase(s.logistics) ?? 'the practical side'}, and the house itself came back fairly open.`,
+      evidence: `What you kept coming back to is ${logisticsPhrase(s.logistics) ?? 'the practical side'}, and you were looser about the house itself.`,
       consequence:
         'None of that shows up in photographs, and all of it decides how a house feels after a month. Check it at the showing rather than trying to filter for it.',
       aside: "the everyday stuff is what's filtering",
@@ -402,23 +436,6 @@ const RULES: readonly Rule[] = [
     }),
   },
 ]
-
-/** Numbers read as words in a sentence, never as a numeral at the start of one. */
-function spell(count: number): string {
-  const WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
-  return WORDS[count] ?? String(count)
-}
-
-/** Which parts of a house the protected things are spread across. */
-function partsOfHouse(signals: Signals): string {
-  const parts: string[] = []
-  if (signals.site.length > 0) parts.push('the site')
-  if (signals.spatial.length > 0) parts.push('the way it works')
-  if (signals.condition.length > 0) parts.push('its condition')
-  if (signals.logistics.length > 0) parts.push('the daily logistics')
-  if (parts.length <= 1) return parts[0] ?? 'the house'
-  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`
-}
 
 export function combinations(signals: Signals): Combination[] {
   return RULES.filter((rule) => rule.when(signals)).map((rule) => ({
@@ -468,7 +485,7 @@ export function rejectFaster(signals: Signals): Change | null {
       : 'need the floor plan rescued'
     return {
       heading: 'Reject faster',
-      body: `Houses that ${rescue}, or where the main living space fights the way you cook and host. Neither is a cosmetic fix, and you haven't said you'd take that on.`,
+      body: `Houses that ${rescue}, or where the main living space fights the way you cook and host.`,
     }
   }
 
@@ -529,7 +546,7 @@ export function lookTwice(signals: Signals): Change | null {
   if (signals.renovation === 'conditional' && signals.condition.length === 0) {
     return {
       heading: 'Look twice',
-      body: "A house that needs work but is right in every way you can't change. You haven't ruled that out yet, so don't rule it out from the listing.",
+      body: `A house with ${wantClause(signals)} that needs work elsewhere. You haven't ruled that out yet.`,
     }
   }
 
@@ -558,16 +575,16 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
       topic: 'condition',
       short: "you told me both that you want it finished and that you'd take the project",
       question: 'How much work would you really take on for an otherwise great house?',
-      why: "You told me both. You want it finished, and you'd take the project on. Until that settles, condition isn't filtering anything, and it's the filter that changes the list most.",
+      why: "You told me both. You want it finished, and you'd take the project on. Those are different houses at different prices, so it's worth knowing which one you meant.",
     }
   }
 
   if (signals.renovation === 'conditional' && (signals.spatial.length > 0 || signals.condition.length > 0)) {
     return {
       topic: 'condition',
-      short: "you haven't said how much work you'd really do",
+      short: "you haven't said how much work you'd really take on for an otherwise great house",
       question: 'How much work would you really take on for an otherwise great house?',
-      why: "Right now it's doing no filtering at all. It's the difference between a house being wrong and a house being unfinished. Go and see one that needs work before you add another rule.",
+      why: "It's the difference between a house being wrong and a house just being unfinished. Go and see one that needs work before you add another rule.",
     }
   }
 
@@ -576,7 +593,7 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
       topic: 'the map',
       short: "you've never actually had to test it",
       question: 'If the house is right, how far outside your usual area would you actually go?',
-      why: "With this much riding on the house, the map is doing most of the filtering. You may never see the one that would have changed your mind. Worth knowing now whether the map or the house budges first.",
+      why: "With this much riding on the house, the map is what's cutting the list. You may never see the one that would have changed your mind.",
     }
   }
 
@@ -601,9 +618,9 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
   if (signals.declinedTheTrade && signals.specificity <= 3) {
     return {
       topic: "what you'd give up",
-      short: 'nothing has been ranked against anything else yet',
+      short: "you haven't had to choose between two things you want yet",
       question: 'What would actually make you pick one house over another?',
-      why: "You wouldn't take the trade, which is fair enough. It does mean nothing has been ranked yet, and that usually happens in the second or third house rather than before the first.",
+      why: "You wouldn't take the trade, which is fair enough. You'll find that answer in the second or third house, not before the first one.",
     }
   }
 
@@ -615,7 +632,7 @@ export function figureOutNext(signals: Signals): OpenQuestion | null {
       topic: 'condition',
       short: 'we never got to how finished it has to be',
       question: 'How finished does it have to be the day you move in?',
-      why: "We never got to it, and it's the one that changes the list most. Everything else sits inside your answer to it.",
+      why: 'We never got to it, and it changes which houses are even worth sending you. Everything else sits inside your answer to it.',
     },
     {
       id: 'size',
@@ -685,7 +702,7 @@ export function theRead(result: Result): TheRead | null {
     // Not enough established to draw a combination from. Saying so is a real
     // finding, and far more useful than inventing a verdict from one answer.
     const paragraphs = [
-      "There isn't enough here to narrow anything yet. Two or three houses will tell you more than another set of questions will.",
+      "Nothing you picked rules much out yet. Two or three houses will tell you more than another set of questions will.",
     ]
     if (open) paragraphs.push(`Start with ${open.topic}. ${capitalise(open.short)}.`)
     return { headline: 'Not enough to go on yet.', paragraphs }
@@ -710,7 +727,7 @@ export function theRead(result: Result): TheRead | null {
   if (second && open) {
     paragraphs.push(`${capitalise(second.aside)}. The one I'd settle first is ${open.topic}. ${capitalise(open.short)}.`)
   } else if (open) {
-    paragraphs.push(`What isn't settled yet is ${open.topic}. ${capitalise(open.short)}.`)
+    paragraphs.push(`${capitalise(open.topic)} is still open. ${capitalise(open.short)}.`)
   } else if (second) {
     paragraphs.push(`${second.evidence} ${second.consequence}`)
   }
@@ -763,7 +780,7 @@ const COMBINATION_CHECKS: readonly { when: (s: Signals) => boolean; check: strin
   },
   {
     when: (s) => s.specificity >= 5,
-    check: "Name the two things you'd give up in this house. If you can't, you haven't ranked them yet.",
+    check: 'Two things you want will compete in this house. Work out which one wins before you leave.',
   },
   {
     when: (s) => s.protectedIds.has('separation'),
