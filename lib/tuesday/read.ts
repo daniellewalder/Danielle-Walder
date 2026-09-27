@@ -486,6 +486,241 @@ export function combinations(signals: Signals): Combination[] {
 }
 
 // ---------------------------------------------------------------------------
+// The agent read.
+//
+// This is the only part of the page that is not the buyer's own result read
+// back to them. The modules underneath already show what they protected, how
+// far the map moves and what they would change; repeating any of that here
+// makes the hero a caption for the cards below it.
+//
+// So this answers a different question: given the way these answers interact,
+// what would Danielle do differently in the actual search? Which lever she
+// would spend, which compromise she would refuse, which listing she would open
+// and which phrase in it she would not believe. Every line is a decision, and
+// every decision is guarded by evidence, because generic agent advice is worse
+// than no advice at all.
+// ---------------------------------------------------------------------------
+
+function sentences(text: string): string[] {
+  return text.split(/(?<=\.)\s+/).filter(Boolean)
+}
+
+function trimTo(text: string, limit: number): string {
+  return sentences(text).slice(0, Math.max(1, limit)).join(' ')
+}
+
+/** What a house this buyer would not take looks like, in one clause. */
+/** How a near-miss on geography is described, which depends on the map. */
+function elsewhere(signals: Signals): string {
+  return signals.mapSemi ? 'slightly outside your usual line' : 'in one of the other areas'
+}
+
+function conditionSkip(signals: Signals): string {
+  if (signals.protectedIds.has('kitchen')) return 'needs the kitchen torn apart'
+  if (signals.protectedIds.has('condition')) return 'needs real work before you could move in'
+  if (signals.protectedIds.has('layout')) return 'needs the floor plan moved'
+  return 'needs a renovation first'
+}
+
+/**
+ * The priority Danielle would give up first: the weakest of the ones that can
+ * actually be given up. Dealbreakers, repeated answers and the permanent
+ * things are excluded, because those are the ones the buyer is buying.
+ */
+function flexFirst(signals: Signals): ReadAttribute | null {
+  const candidates = [...signals.spatial, ...signals.condition, ...signals.logistics].filter(
+    (entry) =>
+      !entry.repeated &&
+      !entry.evidence.sources.includes('dealbreaker') &&
+      entry.attribute.changeability !== 'protectAtPurchase',
+  )
+  if (candidates.length === 0) return null
+  return [...candidates].sort((a, b) => a.evidence.direct - b.evidence.direct)[0]
+}
+
+/** The thing Danielle would refuse to trade: permanent first, best evidenced. */
+function holdMost(signals: Signals): ReadAttribute | null {
+  const ranked = [...signals.site, ...signals.spatial, ...signals.condition].sort(
+    (a, b) =>
+      Number(b.attribute.changeability === 'protectAtPurchase') -
+        Number(a.attribute.changeability === 'protectAtPurchase') ||
+      Number(b.repeated) - Number(a.repeated) ||
+      b.evidence.direct - a.evidence.direct,
+  )
+  return ranked[0] ?? null
+}
+
+interface Move {
+  /** What the sentence is about, so the second paragraph cannot echo the first. */
+  subject: string
+  text: string
+}
+
+/** Which lever gets spent when two houses are close and neither is perfect. */
+function lever(signals: Signals): Move | null {
+  const skip = conditionSkip(signals)
+
+  if ((signals.mapSemi || signals.mapOpen) && signals.renovation === 'no') {
+    return {
+      subject: 'condition',
+      text: `I'd use the map as the flexible part of this search, not condition. A better house ${elsewhere(signals)} is worth seeing. A prettier one that ${skip} probably isn't.`,
+    }
+  }
+
+  if (signals.mapTight && signals.renovation === 'yes') {
+    return {
+      subject: 'condition',
+      text: "The area isn't moving, so condition is the lever I'd actually spend. Inside one part of town, the house that shows badly is usually the only way to get the rest of it.",
+    }
+  }
+
+  // Calling condition the lever would be putting words in their mouth: they
+  // have not said what they would take on. Naming it as the decision to make
+  // is the honest version, and it is still a decision.
+  if (signals.mapTight && signals.renovation === 'conditional') {
+    return {
+      subject: 'condition',
+      text: "The area isn't moving, so the lever is how much work you'd take on, and that's the one you haven't settled. I'd find that out on a real house before I started trimming anything else off the list.",
+    }
+  }
+
+  if (signals.mapTight) {
+    const give = flexFirst(signals)
+    if (give) {
+      return {
+        subject: give.attribute.id,
+        text: `Neither the area nor the condition is going to give, so the first thing I'd flex is ${phraseFor(give.attribute)}. I'd rather give there than start sending you houses you'd have to work on.`,
+      }
+    }
+    return {
+      subject: 'the map',
+      text: "Neither the area nor the condition is going to give, so before we add anything else to the list I'd want to know which of the smaller things you'd let go.",
+    }
+  }
+
+  if (signals.specificity === 0) {
+    return {
+      subject: 'nothing yet',
+      text: "There's nothing here I'd build a search on yet. I'd rather put you in three very different houses and let you rule things out in person, because that happens faster than it does on paper.",
+    }
+  }
+
+  const hold = holdMost(signals)
+  if ((signals.mapSemi || signals.mapOpen) && signals.renovation === 'yes' && hold) {
+    return {
+      subject: hold.attribute.id,
+      text: `You've got room on the map and room on the work, so the one I'd actually hold is ${phraseFor(hold.attribute)}. I'd rather drive further and take on more than settle there.`,
+    }
+  }
+
+  if ((signals.mapSemi || signals.mapOpen) && hold) {
+    return {
+      subject: hold.attribute.id,
+      text: `I'd spend the map before I'd spend anything else. A better house ${elsewhere(signals)} beats compromising on ${phraseFor(hold.attribute)} to stay put.`,
+    }
+  }
+
+  return null
+}
+
+/**
+ * The second move: what to look at differently, what not to believe, or the
+ * compromise that isn't available. Ordered so the most specific fires first.
+ */
+function secondMove(signals: Signals): Move[] {
+  const moves: Move[] = []
+
+  if (signals.protectedIds.has('outdoor')) {
+    moves.push({
+      subject: 'outdoor',
+      text:
+        signals.upkeep === 'no'
+          ? "I'd pay more attention to how the outdoor space actually lives than to how it photographs. A pool and a planted garden look generous right up until somebody has to keep them."
+          : "I'd pay more attention to how the outdoor space actually lives than to how impressive it looks in the listing. Don't let a pool stand in for somewhere you'd sit on a Tuesday.",
+    })
+  }
+
+  if (signals.protectedIds.has('layout') && signals.renovation !== 'yes') {
+    moves.push({
+      subject: 'layout',
+      text: "If the floor plan already bothers you at the showing, don't assume you'll solve it later.",
+    })
+  }
+
+  if (signals.personalization === 'yes') {
+    moves.push({
+      subject: 'finishes',
+      text: "I wouldn't pay a premium for finishes you've already told me you'd change. A house that photographs badly is usually more interesting to you than a new kitchen on the wrong lot.",
+    })
+  }
+
+  if (signals.character) {
+    moves.push({
+      subject: 'character',
+      text: "I'd distrust the word character in a listing. A good amount of what reads as character at an open house leaves with the stager.",
+    })
+  }
+
+  if (signals.protectedIds.has('condition')) {
+    moves.push({
+      subject: 'condition',
+      text: "I'd distrust the word turnkey. It means whatever the seller wants it to mean, so I'd price the work I can see before calling anything finished.",
+    })
+  }
+
+  if (signals.protectedIds.has('size')) {
+    moves.push({
+      subject: 'size',
+      text: "I'd distrust the square footage number. Two houses at the same number live completely differently, and you'll know which one you're in by the second room.",
+    })
+  }
+
+  if (signals.protectedIds.has('light')) {
+    moves.push({
+      subject: 'light',
+      text: "I wouldn't decide on the light from photographs or from one visit. Every listing in this city says bright.",
+    })
+  }
+
+  if (signals.upkeep === 'no') {
+    moves.push({
+      subject: 'upkeep',
+      text: "I'd distrust low maintenance as a phrase. Ask who has been doing it and how long it takes.",
+    })
+  }
+
+  const hold = holdMost(signals)
+  if (hold && hold.attribute.changeability === 'protectAtPurchase') {
+    moves.push({
+      subject: hold.attribute.id,
+      text: `The compromise I wouldn't make is ${phraseFor(hold.attribute)}. That one you're buying rather than solving.`,
+    })
+  }
+
+  return moves
+}
+
+/**
+ * Two short paragraphs, four sentences at the outside. No list, no restatement
+ * of the modules underneath, and nothing at all when the answers do not
+ * support a real decision.
+ */
+export function agentRead(result: Result): string[] {
+  if (result.answered === 0) return []
+
+  const signals = signalsOf(result)
+  const first = lever(signals)
+  const second = secondMove(signals).find((move) => move.subject !== first?.subject)
+
+  if (!first && !second) return []
+  if (!first) return [trimTo(second!.text, 3)]
+
+  const used = sentences(first.text).length
+  if (!second) return [first.text]
+  return [first.text, trimTo(second.text, Math.max(1, 4 - used))]
+}
+
+// ---------------------------------------------------------------------------
 // What this changes.
 // ---------------------------------------------------------------------------
 

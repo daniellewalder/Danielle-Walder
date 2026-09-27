@@ -1,5 +1,6 @@
 import { OUTDOOR_LAYER, PERSONAL_LAYERS, phraseFor, type AttributeState } from './model.ts'
 import { HIGH, LOW, byState, type ReadAttribute, type Result } from './score.ts'
+import { agentRead } from './read.ts'
 
 /**
  * The spoken half of the result.
@@ -257,7 +258,7 @@ export function mapSummary(result: Result): string | null {
     case 'fewAreas':
       return 'A handful of areas, not one ZIP code.'
     case 'propertyLed':
-      return 'The property leads. The map follows.'
+      return 'Open, if the house is right.'
     case null:
       return null
   }
@@ -282,67 +283,22 @@ export function projectSummary(result: Result): { label: string; value: string }
  * Someone who has just finished seven questions should know what happened
  * before they decide whether to read further.
  */
+/**
+ * The hero copy.
+ *
+ * NOT A SUMMARY OF THE MODULES UNDERNEATH. They already show what the buyer
+ * protected, how far the map moves and what they would change. An earlier
+ * version restated all three above them, which made the top of the page a
+ * caption for the cards below it and gave the buyer nothing they could not
+ * have written from memory of their own answers.
+ *
+ * This is the agent read instead: what Danielle would do differently in the
+ * search because of the way these answers interact. It lives in read.ts with
+ * the rest of the combination logic, because it is reasoning rather than
+ * reporting.
+ */
 export function synthesis(result: Result): string[] {
-  if (result.answered === 0) return []
-
-  const protect = byState(result).protect
-  const repeated = repeatedOnly(protect)
-  const lines: string[] = []
-
-  // Only written when something genuinely came up twice, on two different
-  // questions. Otherwise the result opens on what the answers add up to
-  // rather than on a list read back with an emphasis nobody expressed.
-  if (repeated.length > 0) {
-    lines.push(`You kept coming back to ${list(repeated, 3)}.`)
-  }
-
-  // Mirrors the branches in adaptationLine, compressed. Kept in the same
-  // order so the short version can never disagree with the long one.
-  const { willLayer, needsDayOne } = result.findings
-  const appetite = willLayer && needsDayOne
-    ? 'you want it working on arrival and still want to make it yours'
-    : willLayer && result.scales.renovationTolerance <= LOW
-      ? "you're open to cosmetic changes, but you want the parts that are expensive or disruptive to redo to work already"
-      : willLayer
-        ? "you're open to making the cosmetic part your own"
-        : needsDayOne
-          ? 'you want a house that works on arrival'
-          : result.scales.renovationTolerance >= HIGH
-            ? "you're open to real work"
-            : "how much you'd change depends on the house"
-
-  const map = (() => {
-    switch (result.findings.map) {
-      case 'fixed':
-        return "your map doesn't move"
-      case 'strongPreference':
-        return 'your map has some room without being completely open'
-      case 'fewAreas':
-        return 'a handful of areas genuinely work'
-      case 'propertyLed':
-        return 'the property can lead the map'
-      case null:
-        return null
-    }
-  })()
-
-  /*
-   * When nothing was repeated, the strongest single priority is still worth
-   * naming, and it gets the neutral verb. "Outdoor space matters too" is what
-   * the buyer actually told us. "You kept coming back to outdoor space" is
-   * not, and that was the sentence this rewrite exists to delete.
-   */
-  const lead = repeated.length === 0 ? ranked(protect)[0] : null
-
-  if (lead) {
-    lines.push(sentence(appetite))
-    const mention = `${phraseFor(lead.attribute)} matters too`
-    lines.push(sentence(map ? `${mention}, and ${map}` : mention))
-  } else {
-    lines.push(sentence(map ? `${appetite}, and ${map}` : appetite))
-  }
-
-  return lines
+  return agentRead(result)
 }
 
 function sentence(body: string): string {

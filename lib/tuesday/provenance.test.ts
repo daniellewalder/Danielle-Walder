@@ -92,7 +92,9 @@ test('a recurrence phrase requires two distinct question ids', () => {
   const repeated = score(REPEATED_OUTDOOR)
   const outdoor = repeated.attributes.find((entry) => entry.attribute.id === 'outdoor')
   assert.equal(independentSources(outdoor!.evidence), 2)
-  assert.ok(RECURRENCE.test(synthesis(repeated).join(' ')), 'refused to say it when it was true')
+  // The hero is the agent read and never lists priorities, so the recurrence
+  // phrase lives with the paragraph that does name them.
+  assert.ok(RECURRENCE.test(interpret(repeated).join(' ')), 'refused to say it when it was true')
 })
 
 test('no persona claims recurrence without an attribute to back it', () => {
@@ -138,9 +140,8 @@ test('reuse downstream cannot raise confidence', () => {
   assert.equal(privacy?.confidence, 'moderate')
 })
 
-test('the opening line prefers a repeated theme over a one-off practical flag', () => {
-  const lines = synthesis(score(REPEATED_OUTDOOR))
-  const opening = lines[0]
+test('the priorities line prefers a repeated theme over a one-off practical flag', () => {
+  const opening = interpret(score(REPEATED_OUTDOOR))[0]
   assert.match(opening, RECURRENCE)
   assert.match(opening, /outdoor space/i)
   // Laundry came from the same single answer and must not be promoted beside it.
@@ -159,15 +160,9 @@ test('a bundled label never implies three needs were separately established', ()
 
 test('the screenshot result no longer overclaims', () => {
   const result = score(DECORATOR)
-  const lines = synthesis(result)
-  const joined = lines.join(' ')
-
+  const joined = [...synthesis(result), ...interpret(result)].join(' ')
   assert.ok(!RECURRENCE.test(joined), joined)
-  // The strongest single priority is still named, with the neutral verb.
-  assert.match(joined, /outdoor space you'd actually use matters too/i)
-  assert.match(joined, /your map has some room/i)
-  // And the one-off storage answer is nowhere near the opening.
-  assert.ok(!/laundry/i.test(joined))
+  assert.ok(!/laundry, storage and pantry.*laundry, storage and pantry/is.test(joined))
 })
 
 test('isRepeated is the single gate, and it counts questions', () => {
