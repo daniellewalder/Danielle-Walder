@@ -1,234 +1,197 @@
-# The Tuesday Test: proposed instrument (Phase 2, revised)
+# The Tuesday Test: V2 instrument specification
 
-**No code changed.** Proposal for approval.
+**No code changed.** Final architecture for sign-off.
 
-8 core questions, at most 2 conditional follow-ups, plus qualifier taps on
-bundled answers. Price, timeline and search parameters move to an optional
-handoff attached to the brief.
+8 core questions · at most 2 conditional follow-ups · qualifier taps on bundled
+answers · an optional agent handoff after the result.
 
-**Revision note.** Four corrections applied: both dealbreakers now carry full
-protect-level evidence with rank stored separately; `character` is split into
-`architecturalCharacter` and the personalization scale; qualifiers follow any
-bundled selection rather than only the primary; the tradeoff adjacency data now
-encodes only question coherence and contains no market claims.
+**Decisions folded in:** Q3 stays 3 / 2. The site concept returns as `site`,
+asked in Q2 with a qualifier. Minimum bedrooms and property type go to the
+handoff, which is expanded into a real search-parameter layer.
 
 ---
 
-## What changed since the last draft
+# 1. Where `site` lives, and why
 
-| Correction | Consequence |
+You were right that light, privacy, outdoor space and the street do not
+describe a site. A buyer can be happy with all four and still reject the
+property because of slope, shape, how the house sits on the land, what is built
+next to it, or how you get in and out.
+
+## Recommendation: a tenth option in Q2, with a qualifier
+
+Three reasons this beats the alternatives.
+
+**Q2 is already the right kind of question.** A bad site kills a house you
+otherwise love, which is exactly what Q2 asks. It carries full protect-level
+evidence, and `site` is `protectAtPurchase`, so the strength and the class
+match without any special handling.
+
+**The qualifier solves your "do not infer its components" instruction
+structurally.** "The lot itself" is a bundled label by your own definition, so
+it takes a qualifier tap like the Q3 bundles. `site:slope` licenses a statement
+about grade; it licenses nothing about access or neighbouring structures. The
+rule already exists and simply applies here.
+
+**It costs one option and one conditional tap**, against a ninth question you
+have ruled out.
+
+### Alternatives considered and rejected
+
+| Direction | Why not |
 |---|---|
-| Both dealbreakers at full weight | Rank becomes a separate field. Two protected attributes from one question, one provenance source |
-| `character` split properly | `architecturalCharacter` attribute; `finishes` and the `architecturalRequirement` scale **removed**; "plain is fine" becomes a stance, not a negative score |
-| Qualifiers on any bundled pick | Up to two qualifier taps, merged onto one screen |
-| No market claims in the tradeoff | Adjacency data now answers "is this a coherent question?", never "do houses trade this way?" |
-| **Knock-on** | Both one-sided scales disappear. Five scales become **three, all two-sided** |
-| **Knock-on** | `lot` is decomposed into the site cluster and removed. Flagged below as a decision for you |
+| Fold into Q4 as "house or land?" | Forces a false choice. Architecture and site are not alternatives, and "both" at half weight would read as neither being a requirement |
+| Tradeoff candidate only | The tradeoff can only weigh what is already established, so this needs a source first |
+| A Q3 friction option | Q3 is about living in the house. Site is about the parcel, and mixing them muddies both |
+| Attach to Q7 | Q7 is geography. A site is a specific parcel, not an area |
+
+### Distinguishing the two requirements you named
+
+| Requirement | Established by | Means |
+|---|---|---|
+| "I need usable outdoor space" | Q2 `outdoor`, or Q3 `upkeep` context | There must be somewhere outside worth being |
+| "The site itself has to be right" | Q2 `site` + qualifier | The land and the house's relationship to it must work, independent of whether there is a patio on it |
+
+They can both be selected. A buyer whose two dealbreakers are `site` and
+`outdoor` has told us something specific and useful: the parcel must work **and**
+it must yield somewhere to sit. That is not expressible today.
 
 ---
 
-# 1. Revised attribute taxonomy
+# 2. Final attribute taxonomy — 19 attributes, 3 scales, 8 stances
 
-## Attributes — 18, every one reachable
-
-### protectAtPurchase — you buy these or you don't get them
-
-| id | Label | Sources |
-|---|---|---|
-| `light` | Natural light | Q2 |
-| `privacy` | Privacy | Q1, Q2 |
-| `outdoor` | Outdoor space you'd actually use | Q2 |
-| `street` | The street and the noise | Q1, Q2 |
-| `proximity` | Being close to the people you see constantly | Q1, Q2 |
-| `convenience` | Getting daily life done easily | Q1, **Q2 (new)** |
-| `architecturalCharacter` | The architecture itself: proportion, bones, materials | **Q4 (new)** |
-
-### realProject — possible, but money, permits and disruption
-
-| id | Label | Sources |
-|---|---|---|
-| `layout` | The layout | Q2 |
-| `size` | Enough square footage | Q1, Q2 |
-| `separation` | Somewhere to close a door | Q1, Q3 |
-| `publicRooms` | Living space that works for how you cook and host | Q3 |
-| `kitchen` | A kitchen you don't have to redo | Q6 |
-| `condition` | Move-in condition | Q5, Q6, C2 |
-
-### verifyPerProperty — depends on the actual site, structure or rules
+## protectAtPurchase — bought, not created
 
 | id | Label | Sources | Qualifier |
 |---|---|---|---|
-| `expansion` | Room to add on later | **Q6 (new)** | — |
+| `light` | Natural light | Q2 | — |
+| `privacy` | Privacy | Q1, Q2 | — |
+| `outdoor` | Outdoor space you'd actually use | Q2 | — |
+| `street` | The street and the noise | Q1, Q2 | — |
+| `site` | **The land, and how the house sits on it** | **Q2**, tradeoff fallback | **yes** |
+| `proximity` | Being close to the people you see constantly | Q1, Q2 | — |
+| `convenience` | Getting daily life done easily | Q1, Q2 | — |
+| `architecturalCharacter` | The architecture itself: proportion, bones, materials | Q4 | — |
+
+## realProject — possible, but money, permits, disruption
+
+| id | Label | Sources | Qualifier |
+|---|---|---|---|
+| `layout` | The layout | Q2 | — |
+| `size` | Enough square footage | Q1, Q2 | — |
+| `separation` | Somewhere to close a door | Q1, Q3 | — |
+| `publicRooms` | Living space that works for how you cook and host | Q3 | optional |
+| `kitchen` | A kitchen you don't have to redo | Q6 | — |
+| `condition` | Move-in condition | Q5, Q6, C2, tradeoff fallback | — |
+
+## verifyPerProperty — depends on the actual site, structure or rules
+
+| id | Label | Sources | Qualifier |
+|---|---|---|---|
+| `expansion` | Room to add on later | Q6 | — |
 | `circulation` | Stairs and how you move through it | Q3 | — |
 | `utility` | Where everyday life goes | Q3 | **yes** |
 | `parking` | Cars, arriving, getting in and out | Q3 | **yes** |
 | `upkeep` | How much there is to look after | Q3 | **yes** |
 
-### usuallyAdaptable — **empty, deliberately**
+## usuallyAdaptable — empty, deliberately
 
-Nothing in the scored model is genuinely cosmetic. The decorative layer is a
-scale, not an attribute. Keeping the class empty is the honest outcome and it
-removes the current result's backwards claim that "only character could come
-later."
+Nothing scored is genuinely cosmetic. The decorative layer is a scale.
 
 ## Scales — 3, all two-sided
 
-| Scale | Range | Sources | Means |
-|---|---|---|---|
-| `personalizationAppetite` | −3 to +3 | Q5, C2 | How much of the decorative layer the buyer wants to supply |
-| `renovationTolerance` | −3 to +3 | Q6, C1, C2 | How much construction they will take on |
-| `dayOneReadiness` | −2 to +4 | Q5, Q6, C1, C2 | How much must already work at purchase |
+| Scale | Range | Sources |
+|---|---|---|
+| `personalizationAppetite` | −3 … +3 | Q5, C2 |
+| `renovationTolerance` | −3 … +3 | Q6, C1, C2 |
+| `dayOneReadiness` | −2 … +4 | Q5, Q6, C1, C2 |
 
 ## Stances — explicit positions, no score
 
-`wantsFinished` · `willBuild` · **`wantsNeutral`** (new) · `budgetLed` ·
-`timeLed` · `scaleLimited` · `propertyGated` · `narrowCriteria`
+`wantsFinished` · `willBuild` · `wantsNeutral` · `budgetLed` · `timeLed` ·
+`scaleLimited` · `propertyGated` · `narrowCriteria`
 
-## Removed from the scored model
+## Removed
 
-| Removed | Why |
-|---|---|
-| `view` | No source. Largely carried by `light` and the site cluster. Belongs in free text |
-| `ceilings` | A showing observation, not a search filter |
-| `finishes` | **Fully covered by `condition` plus `personalizationAppetite`.** "Finishes matter" means either "they must already be good" (condition) or "I'll replace them" (personalization). Scoring it separately models the same thing twice |
-| `character` | **Renamed and reclassified** to `architecturalCharacter`, protectAtPurchase |
-| `architecturalRequirement` scale | Duplicated the attribute. One representation, not two |
-| `operationalBurdenTolerance` scale | Duplicated `upkeep` being protected. The qualifier now carries the precision the scale was standing in for |
-| `lot` | **Decision needed — see below** |
-
-### On removing `lot`
-
-`lot` currently has one source, the forced trade, and it functions as a proxy
-for "the site as a whole". Under V2 the site is asked directly and in parts:
-light, privacy, outdoor space, the street. Those four *are* the lot for search
-purposes, and each is individually actionable where "the lot itself" is not.
-
-Keeping it would need a tenth option in Q2 ("the lot itself doesn't work"),
-which overlaps three options already there.
-
-**Your call.** I recommend removing it. If you want it kept, the cheapest home
-is that tenth Q2 option, and I'd want your wording.
+`view` (no source, carried by `light` and the site cluster) · `ceilings` (a
+showing observation, not a filter) · `finishes` (fully covered by `condition`
+plus `personalizationAppetite`) · the `architecturalRequirement` scale
+(duplicated the attribute) · the `operationalBurdenTolerance` scale (duplicated
+`upkeep` being protected; the qualifier carries the precision).
 
 ---
 
-# 2. The eight core questions
+# 3. The eight core questions
 
-## Q1 · `tuesday` · context · weight 0.5 · choose 1 · unchanged
+## Q1 · `tuesday` · context · weight 0.5 · choose 1
 
 > It is 7:14 p.m. on a Tuesday. What do you most want your home to make easier?
 
 | Option | Establishes | Weighted |
 |---|---|---|
-| Getting dinner, errands, and the rest of life done without making it a project. | convenience 3 | **1.5** |
-| Having enough room to work, rest, host people, and occasionally avoid everyone. | size 2, separation 2 | **1.0 each** |
-| Being close to the places and people that make Los Angeles worth living in. | proximity 3 | **1.5** |
-| Closing the door and not hearing everyone else's life through the walls. | privacy 3, street 1 | **1.5 / 0.5** |
+| Getting dinner, errands, and the rest of life done without making it a project. | convenience 3 | 1.5 |
+| Having enough room to work, rest, host people, and occasionally avoid everyone. | size 2, separation 2 | 1.0 / 1.0 |
+| Being close to the places and people that make Los Angeles worth living in. | proximity 3 | 1.5 |
+| Closing the door and not hearing everyone else's life through the walls. | privacy 3, street 1 | 1.5 / 0.5 |
 
-No option reaches protect (3). Every attribute it touches has a full-strength
-source elsewhere, so it is a genuine second opinion rather than a hidden first.
+Nothing here reaches protect (3). Every attribute it touches has a
+full-strength source elsewhere.
 
 ---
 
-## Q2 · `dealbreaker` · **up to two, both at full strength** · weight 1
+## Q2 · `dealbreaker` · up to two, **both full strength** · weight 1
 
 > You love the house. What still kills it?
 > *Pick the one that kills it. If there's honestly a second, add it.*
 
-| Option | Establishes | **1st pick** | **2nd pick** |
-|---|---|---|---|
-| It's dark. | light | **3** | **3** |
-| The street is too busy. | street | **3** | **3** |
-| There's nowhere I'd actually want to be outside. | outdoor | **3** | **3** |
-| I'm too far from the people I see constantly. | proximity | **3** | **3** |
-| There's no privacy. | privacy | **3** | **3** |
-| Everything is a drive. *(new)* | convenience | **3** | **3** |
-| The layout fights how I live. | layout | **3** | **3** |
-| I'll outgrow it. | size | **3** | **3** |
-| None of these automatically kill it. | — | — | — |
+| # | Option | Establishes | 1st | 2nd | Bundled |
+|---|---|---|---|---|---|
+| 1 | It's dark. | light | **3** | **3** | no |
+| 2 | There's no privacy. | privacy | **3** | **3** | no |
+| 3 | The street is too busy. | street | **3** | **3** | no |
+| 4 | There's nowhere I'd actually want to be outside. | outdoor | **3** | **3** | no |
+| 5 | **The lot itself. The slope, the shape, the way the house sits on it.** | **site** | **3** | **3** | **yes** |
+| 6 | I'm too far from the people I see constantly. | proximity | **3** | **3** | no |
+| 7 | Everything is a drive. | convenience | **3** | **3** | no |
+| 8 | The layout fights how I live. | layout | **3** | **3** | no |
+| 9 | I'll outgrow it. | size | **3** | **3** | no |
+| 10 | None of these automatically kill it. | — | — | — | no |
 
-### Rank is stored separately from importance
+**Rank is stored separately** as `statedRank: { question: 'dealbreaker',
+position: 1 | 2 }`. Both picks are full dealbreakers. Position is ordering
+information and never reduces importance. It is used for exactly two things:
+seeding the adaptive tradeoff, and letting the brief say which of two
+non-negotiables is the harder one.
 
-Both picks record `statedRank: { question: 'dealbreaker', position: 1 | 2 }`.
-
-The model can now represent the thing it could not before: **both are
-non-negotiable, and if forced to rank them this one comes first.** Position is
-ordering information. It never reduces importance, and a rank-2 dealbreaker is
-still a dealbreaker.
-
-Rank is used for exactly two things: seeding the adaptive tradeoff, and letting
-the brief say which of two non-negotiables is the harder one. It is never used
-to downgrade, filter or omit.
-
-### Provenance
-
-**Two picks are one source.** Both record `dealbreaker`. Two selections inside
-one question are not two independent confirmations, so this cannot manufacture
-recurrence language. That still requires a second *question*.
+**Provenance: two picks are one source.** Both record `dealbreaker`.
 
 ---
 
-## Q3 · `daily` · primary + secondary · weight 1
+## Q3 · `daily` · primary + secondary · weight 1 · **3 / 2**
 
 > Which of these would wear on you first?
 > *And second?*
 
-| Option | Establishes | **1st: 3** | **2nd: 2** | Bundled? |
+| Option | Establishes | 1st | 2nd | Bundled |
 |---|---|---|---|---|
-| The main rooms don't work for how I cook, eat and have people over. | publicRooms | 3 | 2 | **yes** |
-| There's nowhere to close a door. | separation | 3 | 2 | no |
-| Stairs, levels, getting around it. | circulation | 3 | 2 | no |
-| Nowhere for everyday life to go. | utility | 3 | 2 | **yes** |
-| Cars, arriving, getting in and out. | parking | 3 | 2 | **yes** |
-| Keeping the outside up. | upkeep | 3 | 2 | **yes** |
+| The main rooms don't work for how I cook, eat and have people over. | publicRooms | **3** | **2** | optional |
+| There's nowhere to close a door. | separation | **3** | **2** | no |
+| Stairs, levels, getting around it. | circulation | **3** | **2** | no |
+| Nowhere for everyday life to go. | utility | **3** | **2** | **yes** |
+| Cars, arriving, getting in and out. | parking | **3** | **2** | **yes** |
+| Keeping the outside up. | upkeep | **3** | **2** | **yes** |
 | I'd want help thinking about this. | — | — | — | no |
 
-### Why Q3 is weighted 3 / 2 and Q2 is 3 / 3
+**Why 3 / 2 here and 3 / 3 in Q2.** Q2 asks about **membership** in the
+dealbreaker set, which is binary, so both members are full members. Q3 asks for
+a **rank**, and the second is explicitly second. A rank-2 friction lands in
+`scrutinize`: worth checking in person, not a filter.
 
-Different questions. **Q2 asks about membership**: is this a dealbreaker, yes
-or no? Membership is binary, so both members are full members. **Q3 asks for a
-rank**: what wears on you *first*, and *second*? The second is explicitly
-second, and a rank-2 friction genuinely is a lesser signal than a rank-1 one.
-
-A secondary at 2 lands in `scrutinize`, which is correct: worth checking in
-person, not a filter.
+**Provenance: two picks are one source** (`daily`).
 
 ---
 
-## Q3 qualifiers · **on any bundled selection**
-
-A qualifier fires for each bundled pick, primary or secondary. When both picks
-are bundled, both qualifier sets appear **on one screen**, so the cost is two
-taps rather than two question transitions.
-
-| Category | Qualifier options |
-|---|---|
-| **Nowhere for everyday life to go** | Laundry · Storage · Pantry · Honestly, all of it |
-| **Cars, arriving, getting in and out** | Off-street parking · A garage · The driveway and getting in and out · EV charging |
-| **Keeping the outside up** | A pool · Planting and landscape · How much property there is · General maintenance |
-| **The main rooms** *(see note)* | Cooking · Having people over · Everyday eating · All of it |
-
-### Qualifier rules
-
-- **No provenance source.** A qualifier records no question id. `utility`
-  still has exactly one source.
-- **No weight.** It does not raise or lower importance.
-- **It grants vocabulary.** `upkeep:pool` licenses a statement about a pool.
-  `upkeep:planting` does not, and a brief for that buyer must not mention
-  pools.
-- **"All of it" licenses the full bundle**, because they said so. That is the
-  only way the three-part phrasing may ever be used.
-- **No qualifier means no expansion.** If a qualifier is somehow missing, the
-  brief uses the category label and nothing more specific.
-
-> **Note on the main rooms — your call.** This one is arguably a single concept
-> described three ways, unlike laundry/storage/pantry which are three separate
-> systems. I've included the qualifier because it changes what Danielle
-> inspects (a serious cook and a serious host need different kitchens), but it
-> costs a tap and you can cut it without damaging the model.
-
----
-
-## Q4 · `architecture` · **new** · weight 1 · choose 1
+## Q4 · `architecture` · weight 1 · choose 1
 
 > Some houses have something of their own. Others are just well built. Which matters to you?
 
@@ -239,18 +202,12 @@ taps rather than two question transitions.
 | Not really. I care how it works, not what period it is. | — | |
 | I'd rather it be plain, so nothing fights what I bring to it. | — | **`wantsNeutral`** |
 
-**No negative score.** The model's rule that no option may carry negative
-importance is preserved. "Plain is actively preferred" is recorded as a
-*stance*, exactly like `wantsFinished`, which is what removes the need for a
-one-sided `architecturalRequirement` scale.
-
-`architecturalCharacter` is `protectAtPurchase`. You cannot add proportion,
-period detailing or the way a house is built. That is the whole point of
-separating it from decoration.
+No negative score. "Plain is actively preferred" is a stance, which is what
+removes the need for a one-sided scale.
 
 ---
 
-## Q5 · `personalization` · **new** · weight 1 · choose 1
+## Q5 · `personalization` · weight 1 · choose 1
 
 > Once you're in, how much of the look do you want to be yours?
 
@@ -261,14 +218,11 @@ separating it from decoration.
 | Not much. If it's done well I'd rather leave it alone. | **−2** | |
 | I'd rather buy it finished and not think about it. | **−3** | condition 1, dayOne +1 |
 
-**Q4 and Q5 are independent by construction.** "The house must bring real
-architecture" *and* "I'll paper every room" is one coherent person, now
-reachable in a single pass. In the current instrument that combination is
-reachable on 1.19% of paths and only by answering contradictorily first.
+Independent of Q4 by construction.
 
 ---
 
-## Q6 · `project` · changed · weight 1 · choose 1
+## Q6 · `project` · weight 1 · choose 1
 
 > Great house. Very 2007 kitchen.
 
@@ -282,18 +236,18 @@ reachable on 1.19% of paths and only by answering contradictorily first.
 
 ---
 
-## Q7 · `location` · unchanged · weight 1 · choose 1
+## Q7 · `location` · weight 1 · choose 1
 
 > How much does the map actually move?
 
-| Option | Posture | Interpretation rule | Tradeoff candidate? |
+| Option | Posture | Interpretation | Tradeoff candidate |
 |---|---|---|---|
-| It doesn't. One area, and outside it doesn't work for my life. | `fixed` | Geography will not be the lever. Name another one. **Licenses nothing about whether the map was tested, and nothing about inventory** | **Never** |
-| I have a strong preference, but the right house nearby would get a look. | `strongPreference` | Geography is the available lever | **Yes** |
-| There are a handful of areas that genuinely work. | `fewAreas` | Area selection is the lever; choose deliberately rather than drifting | **Yes** |
-| The right property could move me. | `propertyLed` | The property spec is the whole filter | No — already answered |
+| It doesn't. One area, and outside it doesn't work for my life. | `fixed` | Geography is not the lever. Name another. **Licenses nothing about whether the map was tested, and nothing about inventory** | **never** |
+| I have a strong preference, but the right house nearby would get a look. | `strongPreference` | Geography is the available lever | yes |
+| There are a handful of areas that genuinely work. | `fewAreas` | Area selection is the lever; choose deliberately | yes |
+| The right property could move me. | `propertyLed` | The property spec is the whole filter | no, already answered |
 
-Free-text note unchanged: shown for `fixed` and `strong`, **never reaches the
+Free-text note unchanged: offered for `fixed` and `strong`, **never reaches the
 model**, read only by Danielle.
 
 ---
@@ -303,15 +257,161 @@ model**, read only by Danielle.
 > Two of these came up. If you had to pick one, which survives?
 > **[A]** · **[B]** · *I'd keep looking.*
 
-Pair selection in section 4.
+Selection in section 5.
 
 ---
 
-# 3. Conditional follow-ups
+# 4. Qualifier behaviour
 
-## C1 · "depends on what?" · fires when Q6 = *depends*
+A qualifier fires for **every bundled selection**, in Q2 or Q3, primary or
+secondary. When more than one bundled option is picked, all qualifier sets
+appear **on one screen**, so the cost is one tap each rather than one screen
+each.
 
-> Depends on what, mostly?
+| Bundled selection | Qualifier options |
+|---|---|
+| **Q2 · The lot itself** | The land itself: slope, shape, how much is usable flat · How the house sits on it: position, level, orientation · What's built right next to it · Getting in and out · Honestly, the whole thing |
+| **Q3 · Nowhere for everyday life to go** | Laundry · Storage · Pantry · Honestly, all of it |
+| **Q3 · Cars, arriving, getting in and out** | Off-street parking · A garage · The driveway and getting in and out · EV charging |
+| **Q3 · Keeping the outside up** | A pool · Planting and landscape · How much property there is · General maintenance |
+| **Q3 · The main rooms** *(optional, your call)* | Cooking · Having people over · Everyday eating · All of it |
+
+## Qualifier rules
+
+| Rule | |
+|---|---|
+| **No provenance source** | A qualifier records no question id. `site` still has exactly one source |
+| **No weight** | It never raises or lowers importance |
+| **It grants vocabulary only** | `upkeep:pool` licenses a statement about a pool; `upkeep:planting` does not |
+| **"All of it" licenses the bundle** | The only way the multi-part phrasing may ever be used |
+| **Missing qualifier means no expansion** | The brief falls back to the category label and nothing more specific |
+| **Never inferred** | Per your instruction: no component of `site` may be named unless the buyer selected it |
+
+---
+
+# 5. Adaptive tradeoff
+
+## Principle
+
+**The adjacency data says only whether two concepts form a coherent forced
+choice.** It encodes nothing about how houses or markets behave. The pair comes
+entirely from what this buyer established.
+
+## Clusters
+
+| Cluster | Members | Tradeable |
+|---|---|---|
+| SITE | light, privacy, outdoor, street, **site** | yes |
+| ACCESS | proximity, convenience | yes |
+| SPACE | size, separation, publicRooms, layout | yes |
+| CONDITION | condition, kitchen | yes |
+| CHARACTER | architecturalCharacter | yes |
+| BURDEN | upkeep | yes |
+| IN-HOUSE LOGISTICS | circulation, utility, parking | **no** |
+| CAPACITY | expansion | **no** |
+| MAP | pseudo-candidate | only at `strongPreference` or `fewAreas` |
+
+`site` sits in SITE, so it can never be traded against light, privacy, outdoor
+or street. That is correct: those live on the site, and the precondition rule
+would exclude them anyway. Its useful trades are against SPACE, CONDITION,
+CHARACTER, ACCESS, BURDEN and the MAP.
+
+**Why logistics and capacity are excluded.** "Would you rather have storage or
+natural light?" is not answerable, and an answer would not change what gets
+sent. `expansion` is a route to a requirement, not a requirement.
+
+## Universal guards
+
+| Guard | Rule |
+|---|---|
+| Evidence floor | Both sides at **protect** (direct ≥ 3). Never a certainty against a guess |
+| No unset | An attribute with no evidence can never appear |
+| No weak against strong | A Q1 context signal maxes at 1.5 and therefore can never be a side |
+| Fixed map never moves | Map is a candidate only at `strongPreference` or `fewAreas` |
+| No same cluster | Reads as a trick question |
+| No preconditions | Never pair a thing against something it contains or depends on |
+| Qualifier honesty | A qualifier-specific concept appears only if that qualifier was selected |
+| Already resolved | Never re-ask what an earlier answer settled |
+| Abstract only | "If you had to pick one", never "in a house like this" |
+
+## Pair families
+
+### A — two protected property attributes, different clusters
+
+**Eligible:** both at protect, different tradeable clusters, neither a
+precondition of the other.
+**Disqualified:** same cluster · either below protect · either in an excluded
+cluster.
+**A win:** when both cannot be had, this one survives. Ordering only.
+**A loss:** somewhere to compare real houses. **No penalty. It stays protected.**
+**May infer:** lead with the winner when the two compete.
+**May not infer:** that the loser is negotiable, or that any given house forces
+the choice.
+
+### B — a protected property attribute versus the map
+
+**Eligible:** map is `strongPreference` or `fewAreas`, attribute at protect.
+**Disqualified:** map is `fixed` (**never ask a fixed map to move**) or
+`propertyLed` (already answered).
+**Property wins:** geography is the lever this buyer has agreed to spend. The
+strongest result the tradeoff produces.
+**Map wins:** geography is firmer than the stated posture; the property
+criterion is where the search gives.
+**May infer:** which to spend first on a near-miss.
+**May not infer:** that they will move areas generally, or anything about what
+exists where.
+
+### C — a protected property attribute versus condition
+
+**Eligible:** `condition` or `kitchen` at protect, other side at protect in a
+different cluster, project band **not** major.
+**Disqualified:** project band is major, so the question is already answered ·
+either side below protect.
+**Property wins:** finish is the lever; houses that show badly stay on the list.
+**Condition wins:** finish is firmer than the project band suggests. Worth
+surfacing precisely because it contradicts the softer reading.
+**May infer:** whether condition should filter at all.
+**May not infer:** anything about how the two co-occur in listings.
+
+### D — fallback, when nothing above is eligible
+
+Needs no prior attribute evidence. Chosen by map posture, so the fixed-map
+guard is never violated.
+
+| Map | Pair |
+|---|---|
+| `strongPreference`, `fewAreas` | *A house that needs real work, in the area you want* · *A finished house you'd have to go further for* |
+| `fixed`, `propertyLed` | *A great lot and a dated house* · *A beautiful renovation on a compromised lot* |
+
+The fixed-map fallback is the current instrument's trade, kept because it is
+universally legible and it is how a thin-evidence buyer can still establish
+`site`.
+
+**Fallback winners receive direct evidence of 2, not 3.** A forced choice with
+nothing volunteered reveals ordering, not importance, so it lands in
+`scrutinize`. Adaptive winners (A to C) receive no new direct evidence, because
+both sides were already protected.
+
+## Selection algorithm
+
+1. Candidates: every protect-level attribute in a tradeable cluster, plus the
+   map when its posture allows.
+2. Form all pairs; drop any failing a universal guard.
+3. Classify surviving pairs as A, B or C.
+4. Rank by **joint strength**: the *lower* of the two directs, so two strong
+   things are paired rather than a strong against a medium. Ties break on
+   independent source count, then `statedRank` (a rank-1 dealbreaker outranks a
+   rank-2), then a stable attribute order for determinism.
+5. Nothing survives → family D.
+6. Record: winner gets a tradeoff win sourced to `tradeoff`; loser gets a
+   tradeoff loss and **no penalty**; the pair is stored so the brief can name
+   exactly which two things were weighed.
+
+---
+
+# 6. Conditional follow-ups
+
+## C1 · "depends on what?" · fires on Q6 = *depends*
 
 | Option | Scales | Stance |
 |---|---|---|
@@ -320,273 +420,148 @@ Pair selection in section 4.
 | The scale. Rooms, yes. Moving walls, no. | reno **+1** | `scaleLimited` |
 | The house. For the right property I'd do a lot more. | reno **+2** | `propertyGated` |
 
-"Depends" currently drives the open question on **64%** of result paths. This
-turns one bucket into four operationally different buyers.
-
 ## C2 · contradiction · fires on `wantsFinished` + `willBuild`
 
-Unchanged in mechanism, and it will fire far less often now that wanting
-architecture and wanting to decorate are no longer read as a contradiction.
-
-## Clarification rules
-
-- At most **one** clarification per result. C1 takes precedence over C2.
-- A clarification may not raise a new attribute above `scrutinize`. It
-  resolves; it does not add priorities.
-- An unanswered clarification is recorded as unresolved and never defaults to
-  a middle value.
-
----
-
-# 4. Adaptive tradeoff — eligibility matrix
-
-## The principle
-
-**The adjacency data says only whether two concepts form a coherent forced
-choice. It says nothing about how houses or markets behave.** The pair itself
-comes entirely from what this buyer established.
-
-## Clusters, for the same-cluster exclusion
-
-| Cluster | Members | Tradeable? |
+| Option | Scales | Also |
 |---|---|---|
-| SITE | light, privacy, outdoor, street | yes |
-| ACCESS | proximity, convenience | yes |
-| SPACE | size, separation, publicRooms, layout | yes |
-| CONDITION | condition, kitchen | yes |
-| CHARACTER | architecturalCharacter | yes |
-| BURDEN | upkeep | yes |
-| IN-HOUSE LOGISTICS | circulation, utility, parking | **no** |
-| CAPACITY | expansion | **no** |
-| MAP | pseudo-candidate | only when `strongPreference` or `fewAreas` |
+| I enjoy cosmetic changes, not construction. | pers **+3**, reno **−3** | |
+| I'd renovate, but only for an exceptional property. | reno **+1** | `propertyGated` |
+| I'm genuinely open to a major project if the economics work. | reno **+3**, dayOne **−2** | |
+| I mostly want the house finished when I buy it. | dayOne **+3**, reno **−2** | condition 2 |
 
-**Why logistics and capacity are excluded.** "Would you rather have storage or
-natural light?" is not a question a person can answer, and an answer would not
-change what gets sent. `expansion` is a route to a requirement, not a
-requirement, so trading it against one is incoherent.
+## Rules
 
-## Universal guards — applied before any pair is considered
-
-| Guard | Rule |
-|---|---|
-| Evidence floor | Both sides must be at **protect** level (direct ≥ 3). Never pair a certainty against a guess |
-| No unset | An attribute with no evidence can never appear |
-| No weak against strong | A Q1 context signal (max 1.5) can never be a side. This is a consequence of the floor, stated explicitly because it was your specific concern |
-| Fixed map never moves | The map is a candidate only at `strongPreference` or `fewAreas` |
-| No same cluster | Both sides in one cluster is a trick question |
-| No preconditions | Never pair a thing against something it contains or depends on |
-| Qualifier honesty | A qualifier-specific concept may appear only if that qualifier was selected |
-| Already resolved | Never re-ask a pair an earlier answer settled |
-| Abstract only | The question is "if you had to pick one", never "in a house like this" |
-
-## Pair families
-
-### Family A — two protected property attributes, different clusters
-
-| | |
-|---|---|
-| **Eligible when** | Both at protect, different clusters, neither a precondition of the other, neither in an excluded cluster |
-| **Disqualified when** | Same cluster · either below protect · either is in-house logistics or capacity |
-| **A win means** | When both cannot be had, this one survives. Ordering only |
-| **A loss means** | There is somewhere to compare real houses. **No penalty. It remains protected** |
-| **Legitimate inference** | "When these two compete, lead with the winner." The loser stays a non-negotiable that may have to be satisfied differently |
-| **Never infer** | That the loser is negotiable, or that a given house forces this choice |
-
-### Family B — a protected property attribute versus the map
-
-| | |
-|---|---|
-| **Eligible when** | Map is `strongPreference` or `fewAreas`, and the attribute is at protect |
-| **Disqualified when** | Map is `fixed` (**never ask a fixed map to move**) or `propertyLed` (already answered) |
-| **A win for the property** | Geography is the lever this buyer has agreed to spend. The strongest result the tradeoff can produce |
-| **A win for the map** | Geography is firmer than the stated posture. The property criterion is where the search must give |
-| **Legitimate inference** | Which of the two to spend first when a near-miss appears |
-| **Never infer** | That they will move areas in general, or anything about what is available where |
-
-### Family C — a protected property attribute versus condition
-
-| | |
-|---|---|
-| **Eligible when** | `condition` or `kitchen` is at protect, the other side is at protect in a different cluster, and the project band is **not** major |
-| **Disqualified when** | Project band is major — they have already said condition does not filter, so the question is dead · either side below protect |
-| **A win for the property** | Finish is the lever. Houses that show badly stay on the list |
-| **A win for condition** | Finish is firmer than the project band suggests. Worth surfacing, because it contradicts the softer reading |
-| **Legitimate inference** | Whether condition should filter at all |
-| **Never infer** | Anything about how condition and that attribute co-occur in listings |
-
-### Family D — fallback, when nothing above is eligible
-
-Needs no prior attribute evidence. Chosen by map posture, so the fixed-map
-guard is never violated.
-
-| Map | Fallback pair |
-|---|---|
-| `strongPreference`, `fewAreas` | *A house that needs real work, in the area you want* · *A finished house you'd have to go further for* |
-| `fixed`, `propertyLed` | *A smaller house that's finished* · *A bigger one that needs work* |
-
-**Fallback winners receive direct evidence of 2, not 3.** A forced choice with
-nothing volunteered reveals ordering, not importance, so it lands in
-`scrutinize` rather than protect. Adaptive winners (families A to C) receive no
-new direct evidence at all, because both sides were already protected.
-
-## Selection algorithm
-
-1. Build candidates: every protect-level attribute in a tradeable cluster, plus
-   the map when its posture allows.
-2. Form all pairs; drop any failing a universal guard.
-3. Classify each surviving pair as family A, B or C.
-4. Rank by **joint strength**: the *lower* of the two sides' direct values, so
-   two strong things are paired rather than a strong against a medium. Ties
-   break on independent source count, then on `statedRank` from Q2 (a rank-1
-   dealbreaker outranks a rank-2 one), then on a stable attribute order so the
-   same answers always produce the same question.
-5. If nothing survives, use family D.
-6. Record: winner gets a tradeoff win sourced to `tradeoff`; loser gets a
-   tradeoff loss and **no penalty**; the pair is stored so the brief can name
-   exactly which two things were weighed.
-
-The tradeoff is the one mechanism by which a single-source attribute can become
-repeated, because it is a genuinely separate question at a separate moment.
+- At most **one** clarification per result. C1 takes precedence.
+- A clarification may not raise a new attribute above `scrutinize`.
+- Unanswered is recorded as unresolved, never defaulted to a middle value.
 
 ---
 
-# 5. Provenance rules
+# 7. Provenance rules
 
 | Rule | |
 |---|---|
-| Two picks in Q2 | **One source** (`dealbreaker`) |
-| Two picks in Q3 | **One source** (`daily`) |
-| Qualifier taps | **No source, no weight** |
-| Tradeoff win | **A new source** (`tradeoff`) — a separate question at a separate moment |
-| Rank | Stored as `statedRank`, never as importance |
-| Recurrence language | Still requires **two distinct question ids** |
-| Derived result states | Never evidence, however many a single answer reaches |
+| Two picks in Q2 | **one source** (`dealbreaker`) |
+| Two picks in Q3 | **one source** (`daily`) |
+| Qualifier taps | **no source, no weight** |
+| Tradeoff win | **a new source** (`tradeoff`) — a separate question at a separate moment |
+| Rank | `statedRank`, never importance |
+| Recurrence language | still requires **two distinct question ids** |
+| Derived result states | never evidence, however many one answer reaches |
 
-### Repeatable under V2, without the tradeoff
-
-`privacy` · `street` · `proximity` · `convenience` · `size` · `separation` ·
-`condition`
-
-Everything else needs a tradeoff win. That is the accepted price of eight
-questions, and per your instruction I am not proposing a ninth to change it.
+**Repeatable without the tradeoff:** `privacy` · `street` · `proximity` ·
+`convenience` · `size` · `separation` · `condition`. Everything else needs a
+tradeoff win. Accepted, per your instruction not to add a ninth question.
 
 ---
 
-# 6. Optional agent handoff
+# 8. Optional agent handoff
 
-Shown **only** on the brief step, after the result. Clearly optional, skippable
-in one tap.
+Shown **only** after the result, on the brief step. Every field optional, the
+whole thing skippable in one tap, and presented as a short form rather than an
+intake questionnaire.
 
-| Field | Form | Scored? |
-|---|---|---|
-| Approximate range | Bands, never an exact figure | **Never** |
-| Timing | Now · a few months · this year · no rush | **Never** |
-| Areas already considering | Free text | **Never scored, never matched** |
-| Anything else Danielle should know | Free text | **Never** |
-| **Property type** | House · condo · townhouse · open to any | **Never** |
-| **Minimum bedrooms** | Number | **Never** |
+**None of these rescore the test, alter the shareable result, or produce any
+conclusion about the buyer.** They are search parameters.
 
-None of these rescore the test or alter the shareable result.
-
-## On property type and bedrooms — yes to both, for different reasons
-
-**Property type belongs here and is not a duplicate.** Nothing in the test asks
-it, and it changes the search completely. A buyer who protects outdoor space
-and privacy but is open to a condo is a different search from one who is not,
-and the test cannot tell them apart. It is a search parameter rather than a
-preference, which is exactly what the handoff is for.
-
-**Minimum bedrooms belongs, with a constraint.** It partially overlaps `size`
-and `separation`, but not redundantly: those are *qualities* and bedrooms is a
-*filter* that every IDX uses. A buyer who protects separation might need three
-bedrooms or five, and the test deliberately cannot tell you which.
-
-The constraint: **ask for the number, never the reason.** Familial status is
-protected under the Fair Housing Act. "Minimum bedrooms" is a property
-specification and is safe. "How many people live with you", "do you have
-children", "is anyone moving in with you" are not, and must never appear.
-
-This is the same discipline already applied to the map: we record the strength
-of a constraint and never its reason.
-
----
-
-# 7. Five answer paths
-
-Nothing in the third row is derivable from any single answer.
-
----
-
-### Path A — architecture and layers, reachable in one pass
-
-*Q1 quiet · Q2 dark **(rank 1)**, privacy **(rank 2)** · Q3 main rooms → hosting; separation second · Q4 a lot · Q5 all of it · Q6 never redo · Q7 fewAreas · Q8 light vs architecturalCharacter → light*
-
-| | |
+### Price
+| Field | Form |
 |---|---|
-| **Directly told us** | Dark kills it, and no privacy kills it too, with dark the harder of the two. Hosting is the daily friction, a door to close is second. The house needs its own architecture. All the styling is theirs. They'll never redo the kitchen. A handful of areas. Forced to choose, light beats architecture. |
-| **The combination adds** | Two full dealbreakers with an order, which the current instrument cannot express at all. Architecture is *required* and the decorative layer is *theirs* — separable for the first time. And the tradeoff settles something neither answer contains: when a characterful house is dark, the architecture gives. |
-| **Danielle does differently** | Screens on light before period. Sends the plainer bright house over the darker characterful one, and says why. Filters on a kitchen that already works, since they will not touch it. Does not send the flipped house with a new kitchen and no point of view. Raises privacy as the second hard line, not an afterthought. |
+| Target range | Two numbers, or a band |
+| Hard ceiling | Optional single number |
 
----
-
-### Path B — storage, specifically
-
-*Q1 errands · Q2 everything is a drive **(rank 1)** · Q3 everyday life → **storage**; cars second → **EV charging** · Q4 not really · Q5 not much · Q6 move in and be done · Q7 fixed · Q8 fallback: smaller finished vs bigger needing work → smaller finished*
-
-| | |
+### Timing
+| Field | Form |
 |---|---|
-| **Directly told us** | Errands matter and "everything is a drive" kills it. **Storage** is the friction, not laundry or pantry. **Charging** is second. Architecture does not matter. Wants it finished. One area. Smaller and finished beats bigger and unfinished. |
-| **The combination adds** | Convenience is confirmed across two questions *and* is a dealbreaker: it is the hardest criterion in the search. The fallback tradeoff then establishes that size is the give, which nothing they said directly reveals. The practical program is exact: closet and storage volume, and a charger or the panel capacity to add one. |
-| **Danielle does differently** | Leads on walkable location, then finish, and treats square footage as the adjustable number. Checks storage volume and electrical capacity in person, both invisible in listings. **Says nothing about laundry or pantry**, because those were not what they picked. |
+| Where they are | Casually looking · Hoping to buy this year · Actively looking now |
+| Specific timing | Optional free text |
 
----
-
-### Path C — strong preference, and it moves
-
-*Q1 quiet · Q2 no privacy **(rank 1)** · Q3 separation; main rooms second → everyday eating · Q4 rather plain (`wantsNeutral`) · Q5 not much · Q6 move in and be done · Q7 strongPreference · Q8 **privacy vs the map** → privacy*
-
-| | |
+### Where
+| Field | Form |
 |---|---|
-| **Directly told us** | Privacy kills it, confirmed by Q1 as well. Needs a door to close. Would rather the house be plain. Wants it finished. Strong area preference. Privacy beats the map. |
-| **The combination adds** | They said the map has give, and then confirmed it under pressure by choosing a property quality over geography. So geography is not merely the available lever, it is the one they have already agreed to spend. `wantsNeutral` means blandness is not a filter, which widens the list considerably for a buyer who otherwise looks fussy. |
-| **Danielle does differently** | Presents finished houses outside the usual line first and without apology. Screens hard on privacy geometry before anything else. Stops discounting plain houses. Skips the project inside the area, which is the default thing to show a strong-preference buyer. |
+| Already considering | Free text, buyer-entered |
+| Already ruled out | Optional free text |
+| Geographic notes | Optional free text |
 
----
-
-### Path D — one "depends", two searches
-
-Identical through Q5: *Q2 I'll outgrow it · Q3 main rooms → cooking · Q6 depends · Q7 fixed*
-
-| | **D1 · C1 = the money** | **D2 · C1 = the time** |
-|---|---|---|
-| **Directly told us** | Scope follows the numbers | Cannot live in a construction site |
-| **Combination adds** | Inside a fixed map, condition is the available lever and its limit is budget. A larger project is on the table if the maths works. | Inside a fixed map, condition is the lever but capped by disruption, not cost. Occupied-during-works becomes a filter, and `dayOneReadiness` rises even though renovation tolerance did not fall. |
-| **Danielle does differently** | Sends houses needing real work and frames the conversation as scope against price. | Sends cosmetically dated but structurally sound houses. Screens out anything needing a permit timeline. Never sends the gut job. |
-
----
-
-### Path E — a pair the fixed question could never ask
-
-*Q1 room · Q2 nowhere to be outside **(rank 1)**, I'll outgrow it **(rank 2)** · Q3 main rooms → having people over; keeping it up second → **planting** · Q4 some · Q5 all of it · Q6 fixable · Q7 propertyLed · Q8 **outdoor vs size** → outdoor*
-
-| | |
+### Schools and districts
+| Field | Form |
 |---|---|
-| **Directly told us** | Outdoor space kills it, and outgrowing it kills it too, with outdoor the harder. Hosting is the friction, **planting** is second. Will decorate, will renovate, property-led. Outdoor beats size. |
-| **The combination adds** | Two full dealbreakers that genuinely compete for the same site, resolved by the tradeoff: on a constrained lot, the outdoor room wins and interior square footage gives. Renovation tolerance is high, so interior space is recoverable and the outdoor relationship is not. And the qualifier says the burden is **planting**, not a pool. |
-| **Danielle does differently** | Filters on the indoor-outdoor relationship ahead of square footage. Treats heavy planting as a cost and flags it at the showing. Sends the compromised interior on the right site, because the interior is the part this buyer will change. **Says nothing about pools.** |
+| A school, district or boundary to respect | Optional free text, **buyer-entered only** |
+
+### Regular destinations
+| Field | Form |
+|---|---|
+| Places they want reasonable access to | Optional free text, buyer-entered |
+
+### Property basics
+| Field | Form |
+|---|---|
+| Property type | House · Condo · Townhouse · Open to any |
+| Minimum bedrooms | Number |
+| Minimum bathrooms | Optional number |
+| Minimum square footage | Optional number |
+
+### Hard filters
+| Field | Form |
+|---|---|
+| Parking or garage | Required · Preferred · No preference |
+| Stairs | Step-free needed · Prefer minimal · No preference |
+| Pool | Yes · No · No preference |
+| EV charging | Required · Preferred · No preference |
+| Other physical requirement | Optional free text |
+
+### Anything else Danielle should know
+Free text.
+
+## Handling rules
+
+| Rule | |
+|---|---|
+| Never scored | No handoff field touches the model, the result, or the shareable URL |
+| Never inferred from | A blank field means nothing. It is not evidence of flexibility |
+| Recorded verbatim | Free text is passed to Danielle as written, never parsed into categories |
+| **Free text only for schools and destinations** | No pickers, no lists, no ratings. A category picker invites protected-class data; a ratings source would turn a buyer's boundary into an automated area-quality judgement |
+| Never ask why | Not for bedrooms, not for schools, not for destinations, not for step-free access, not for areas ruled out |
+| Exclusions are notes, not rules | "Already ruled out" is recorded for Danielle. The tool never propagates it into an automated filter |
+
+## Fair-housing discipline
+
+The same rule the map already follows: **record the constraint, never the
+reason.**
+
+- **Bedrooms** is a property specification. Familial status is protected, so
+  the number is asked and the household never is.
+- **Schools** is a buyer-supplied boundary Danielle honours, not an area-quality
+  signal. No ratings data enters the product, and nothing about schools is ever
+  surfaced that the buyer did not type.
+- **Destinations** are recorded as the buyer wrote them. No categories, because
+  a category list would collect things like places of worship.
+- **Step-free access** is a property filter. Disability is protected, so the
+  requirement is asked and the reason never is.
+- **Areas ruled out** is recorded and shown to Danielle. Whether and how to act
+  on a buyer-supplied exclusion is her professional judgement with her
+  brokerage, and the tool should not automate it.
+
+## One useful interaction, and it is a flag rather than a rescore
+
+If the handoff says **pool: yes** and the test recorded **`upkeep:pool`**, those
+disagree. The brief should surface that to Danielle as a discrepancy to raise.
+It must not change the result or the scoring; it is a note that two things the
+buyer said do not line up, which is exactly the kind of thing an agent should
+catch before spending a Saturday on it.
 
 ---
 
-# 8. Honest costs
+# 9. What still needs your call
 
-1. **Taps.** 8 questions, 8 to 12 taps depending on bundles and the follow-up.
-   Today it is 7 and 8.
-2. **`lot` is removed** pending your decision.
-3. **Existing result links break.** The codec changes shape; old links should
-   degrade to a partial result rather than an error, which is how the decoder
-   already behaves.
-4. **The tradeoff adjacency data is still judgement**, even stripped of market
-   claims. The cluster assignments and the two excluded clusters are calls I
-   have made and you should check.
-5. **Seven attributes are repeatable without the tradeoff.** The rest need a
-   tradeoff win. Accepted, per your instruction not to add a ninth question.
+1. **The main-rooms qualifier in Q3.** Included, but it is arguably one concept
+   described three ways rather than three systems. Cutting it saves a tap and
+   costs nothing structural.
+2. **The Q2 `site` wording.** I have "The lot itself. The slope, the shape, the
+   way the house sits on it." The enumeration is deliberate, to make the
+   category legible before the qualifier resolves it.
+3. **Cluster assignments in the tradeoff**, and the two excluded clusters.
+   These are judgement calls and they determine which questions can ever be
+   asked.
+
+Once those are settled the instrument is ready to build.
