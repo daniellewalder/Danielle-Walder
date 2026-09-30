@@ -48,7 +48,7 @@ test('04 architecture high and personalization high, in one pass', () => {
   const result = fixture('architectureAndPersonalization')
   assert.equal(of('architectureAndPersonalization', 'architecturalCharacter')?.state, 'protect')
   assert.equal(bandOf('personalizationAppetite', result), 'yes')
-  assert.equal(result.conflict.present, false, 'this is one coherent person, not a contradiction')
+  assert.equal(result.needs, null, 'this is one coherent person, not a contradiction')
 })
 
 test('05 wants it plain and will still decorate', () => {
@@ -122,14 +122,18 @@ test('15 a low-information buyer gets no invented verdict', () => {
   assert.equal(result.unknowns.length >= 15, true)
 })
 
-test('16 the contradiction fires, and the follow-up settles it', () => {
-  const open = fixture('contradictionOpen')
-  assert.equal(open.conflict.present, true)
-  assert.equal(open.needs, 'contradiction')
+test('16 the one real unresolved state, open and then settled', () => {
+  const open = fixture('projectUnresolved')
+  assert.equal(open.needs, 'depends', 'the only conditional in V2 did not fire')
+  assert.ok(!open.stances.has('budgetLed'))
 
-  const settled = fixture('contradictionResolved')
-  assert.equal(settled.conflict.resolvedBy, 'cosmetic')
-  assert.equal(settled.needs, null)
+  const settled = fixture('projectResolved')
+  assert.equal(settled.needs, null, 'a settled follow-up must stop asking')
+  assert.ok(settled.stances.has('budgetLed'))
+  assert.ok(
+    settled.scales.renovationTolerance > open.scales.renovationTolerance,
+    'settling it changed nothing',
+  )
 })
 
 test('the pair the engine would choose is always allowed and never invented', () => {

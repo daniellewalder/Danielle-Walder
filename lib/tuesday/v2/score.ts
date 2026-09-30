@@ -28,18 +28,6 @@ export interface ReadAttribute {
   qualifier: string | null
 }
 
-export interface Conflict {
-  /** The buyer said both "I want it finished" and "I'd take the project on". */
-  present: boolean
-  /**
-   * The follow-up answer that settled it, or null while it stands.
-   *
-   * A resolved conflict must not keep reading as an open contradiction
-   * downstream, which is why this is a resolution and not a second flag.
-   */
-  resolvedBy: string | null
-}
-
 export interface Result {
   version: 2
   scales: Scales
@@ -47,13 +35,12 @@ export interface Result {
   unknowns: readonly Attribute[]
   stances: ReadonlySet<StanceId>
   map: MapConstraint | null
-  conflict: Conflict
   /** Declined the forced choice. Narrow criteria, not indecision. */
   declinedTradeoff: boolean
   answered: number
   answeredQuestionIds: readonly string[]
-  /** Which follow-up, if any, should be put on screen. */
-  needs: 'depends' | 'contradiction' | null
+  /** Which follow-up, if any, should be put on screen. Only one exists. */
+  needs: 'depends' | null
   /** The tradeoff exactly as presented, echoed so the brief never re-derives it. */
   tradeoff: { pair: readonly [string, string]; winner: string | null; family: string } | null
 }
@@ -175,7 +162,6 @@ export function score(answers: V2Answers): Result {
   if (answers.project) applyOption('project', answers.project, null)
   if (answers.location) applyOption('location', answers.location, null)
   if (answers.depends) applyOption('depends', answers.depends, null)
-  if (answers.clarify) applyOption('clarify', answers.clarify, null)
 
   /*
    * The tradeoff. Ordering and corroboration only.
@@ -215,14 +201,6 @@ export function score(answers: V2Answers): Result {
     (Object.keys(rawScales) as ScaleId[]).map((id) => [id, normalise(rawScales[id], id, answeredIds)]),
   ) as Scales
 
-  // A contradiction is information. It is not averaged away, and once the
-  // follow-up settles it, it stops reading as open.
-  const contradiction = stances.has('wantsFinished') && stances.has('willBuild')
-  const conflict: Conflict = {
-    present: contradiction,
-    resolvedBy: contradiction && answers.clarify ? answers.clarify : null,
-  }
-
   const read: ReadAttribute[] = []
   const unknowns: Attribute[] = []
   for (const attribute of ATTRIBUTES) {
@@ -254,11 +232,10 @@ export function score(answers: V2Answers): Result {
     unknowns,
     stances,
     map,
-    conflict,
     declinedTradeoff,
     answered,
     answeredQuestionIds: [...answeredIds],
-    needs: nextFollowUp(answers, conflict),
+    needs: nextFollowUp(answers),
     tradeoff: answers.tradeoff ?? null,
   }
 }
@@ -269,11 +246,9 @@ export function score(answers: V2Answers): Result {
  * A buyer who has already answered one is not asked the other: the point is to
  * resolve the single biggest uncertainty, not to interrogate.
  */
-function nextFollowUp(answers: V2Answers, conflict: Conflict): 'depends' | 'contradiction' | null {
-  if (answers.depends || answers.clarify) return null
-  if (answers.project === 'depends') return 'depends'
-  if (conflict.present) return 'contradiction'
-  return null
+function nextFollowUp(answers: V2Answers): 'depends' | null {
+  if (answers.depends) return null
+  return answers.project === 'depends' ? 'depends' : null
 }
 
 export function byState(result: Result): Record<AttributeState, ReadAttribute[]> {

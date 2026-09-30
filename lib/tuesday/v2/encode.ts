@@ -41,7 +41,6 @@ const KEYS = {
   location: 'l',
   tradeoff: 'x',
   depends: 'c',
-  clarify: 'q',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -103,7 +102,6 @@ export function encode(answers: V2Answers): string {
     put(KEYS.tradeoff, [pair[0], pair[1], winner ?? DECLINED, family].join(MULTI))
   }
   put(KEYS.depends, answers.depends)
-  put(KEYS.clarify, answers.clarify)
   return segments.join(SEGMENT)
 }
 
@@ -131,7 +129,6 @@ const SINGLE_FIELDS = {
   [KEYS.project]: 'project',
   [KEYS.location]: 'location',
   [KEYS.depends]: 'depends',
-  [KEYS.clarify]: 'clarify',
 } as const satisfies Record<string, keyof V2Answers>
 
 const CONCEPTS = new Set([...Object.keys(ALLOWED), MAP])
@@ -200,8 +197,7 @@ export function decode(encoded: string | null | undefined): DecodeResult {
       case KEYS.personalization:
       case KEYS.project:
       case KEYS.location:
-      case KEYS.depends:
-      case KEYS.clarify: {
+      case KEYS.depends: {
         const field = SINGLE_FIELDS[key]
         if (!validOption(field, value)) {
           dropped.push(`${field}.${value}: unknown option`)

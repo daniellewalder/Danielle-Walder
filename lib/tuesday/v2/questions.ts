@@ -3,6 +3,14 @@ import type { MapConstraint, ScaleId, StanceId } from './model.ts'
 /**
  * The V2 question set.
  *
+ * ONE CONDITIONAL, NOT TWO. V1 carried a contradiction follow-up for the buyer
+ * who said both "I want it finished" and "I'd take the project on". In V2 both
+ * positions arrive from `project`, which is single choice, so they can never
+ * collide and the follow-up could never fire. It is removed rather than kept
+ * alive by broadening what another answer means: a conditional exists because
+ * the evidence can genuinely produce the state, not because we want it to be
+ * reachable.
+ *
  * COPY STATUS: approved wording. The weights and structure are product logic.
  *
  * NO OPTION MAY CARRY NEGATIVE IMPORTANCE. A position against something is
@@ -47,7 +55,7 @@ export interface Question {
   /** True when the second pick is explicitly optional and explicitly weaker. */
   ordered?: boolean
   options: readonly QuestionOption[]
-  showWhen?: 'depends' | 'contradiction'
+  showWhen?: 'depends'
 }
 
 export const QUESTIONS: readonly Question[] = [
@@ -215,12 +223,11 @@ export const QUESTIONS: readonly Question[] = [
         id: 'finished',
         label: "I'd rather buy it finished and not think about it.",
         attributes: { condition: 1 },
+        // Low personalization appetite and some preference for day-one finish.
+        // Deliberately NOT `wantsFinished`: preferring a finished-looking house
+        // is not a refusal to renovate, and widening it to keep a conditional
+        // reachable would be inventing a position the buyer never took.
         scales: { personalizationAppetite: -3, dayOneReadiness: 1 },
-        // This is a wantsFinished position, and it is the only one that can
-        // arrive from a DIFFERENT question than the project answer. Without it
-        // the contradiction follow-up is unreachable, because wantsFinished and
-        // willBuild would both come from `project`, which is single choice.
-        stances: ['wantsFinished'],
       },
     ],
   },
@@ -329,38 +336,6 @@ export const QUESTIONS: readonly Question[] = [
     ],
   },
 
-  {
-    id: 'clarify',
-    kicker: 'one more',
-    prompt: 'You said two things that pull against each other. Which is closer to the truth?',
-    weight: 1,
-    showWhen: 'contradiction',
-    options: [
-      {
-        id: 'cosmetic',
-        label: 'I enjoy cosmetic changes, not construction.',
-        scales: { personalizationAppetite: 3, renovationTolerance: -3 },
-      },
-      {
-        id: 'exceptional',
-        label: "I'd renovate, but only for an exceptional property.",
-        scales: { renovationTolerance: 1 },
-        stances: ['propertyGated'],
-      },
-      {
-        id: 'major',
-        label: "I'm genuinely open to a major project if the economics work.",
-        scales: { renovationTolerance: 3, dayOneReadiness: -2 },
-        stances: ['structuralWorkOkay'],
-      },
-      {
-        id: 'finished',
-        label: 'I mostly want the house finished when I buy it.',
-        attributes: { condition: 2 },
-        scales: { dayOneReadiness: 3, renovationTolerance: -2 },
-      },
-    ],
-  },
 ]
 
 export function questionById(id: string): Question | undefined {

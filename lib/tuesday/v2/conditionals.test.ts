@@ -6,28 +6,60 @@ import type { V2Answers } from './answers.ts'
 
 const A = (partial: Omit<V2Answers, 'version'>): V2Answers => ({ version: 2, ...partial })
 
-test('every conditional question is actually reachable', () => {
-  /*
-   * A follow-up that can never fire is dead code pretending to be a feature.
-   * The contradiction needs `wantsFinished` and `willBuild` from two DIFFERENT
-   * questions, because one question is single choice and cannot produce both.
-   */
-  const stanceSources = new Map<string, Set<string>>()
-  for (const question of QUESTIONS) {
+/*
+ * THE RULE: a conditional exists because the evidence can genuinely produce
+ * the state, not because we want the conditional to remain reachable.
+ *
+ * This brute-forces every single answer to every base question and collects
+ * which follow-ups the engine ever asks for. Anything declared but never
+ * reached is dead logic, and the only honest fixes are to remove it or to find
+ * a real path. Broadening what another answer means, to keep it alive, is
+ * exactly the overreach this test exists to prevent.
+ */
+test('no conditional exists unless a real answer path triggers it', () => {
+  const base = QUESTIONS.filter((question) => !question.showWhen)
+  const reachable = new Set<string>()
+
+  const walk = (index: number, answers: Record<string, unknown>) => {
+    if (index === base.length) {
+      const needs = score({ version: 2, ...answers } as V2Answers).needs
+      if (needs) reachable.add(needs)
+      return
+    }
+    const question = base[index]
     for (const option of question.options) {
-      for (const stance of option.stances ?? []) {
-        if (!stanceSources.has(stance)) stanceSources.set(stance, new Set())
-        stanceSources.get(stance)!.add(question.id)
-      }
+      const value =
+        question.choose === 2 ? [{ option: option.id }] : option.id
+      walk(index + 1, { ...answers, [question.id]: value })
     }
   }
-  const finished = stanceSources.get('wantsFinished') ?? new Set()
-  const build = stanceSources.get('willBuild') ?? new Set()
-  const canCollide = [...finished].some((a) => [...build].some((b) => a !== b))
-  assert.ok(
-    canCollide,
-    'wantsFinished and willBuild only arrive from the same single-choice question, so the contradiction can never fire',
+  walk(0, {})
+
+  const declared = QUESTIONS.filter((question) => question.showWhen).map((q) => q.showWhen!)
+  for (const conditional of declared) {
+    assert.ok(
+      reachable.has(conditional),
+      `the "${conditional}" follow-up is declared but no answer path can trigger it`,
+    )
+  }
+  assert.deepEqual([...reachable].sort(), [...new Set(declared)].sort())
+})
+
+test('the contradiction follow-up is gone, not hidden', () => {
+  // The union no longer contains it, so this compares as a plain string: the
+  // type system is itself part of the proof that it is gone.
+  assert.equal(
+    QUESTIONS.some((question) => String(question.showWhen) === 'contradiction'),
+    false,
   )
+  // And the answer that was widened to keep it alive is back to what it means.
+  const finished = QUESTIONS.find((q) => q.id === 'personalization')?.options.find(
+    (o) => o.id === 'finished',
+  )
+  assert.equal(finished?.stances, undefined, 'preferring a finished house is not a refusal to renovate')
+  const result = score({ version: 2, personalization: 'finished', project: 'fixable' })
+  assert.equal(result.needs, null, 'a manufactured contradiction is still firing')
+  assert.ok(!result.stances.has('wantsFinished'))
 })
 
 test('the depends follow-up fires on the depends answer and nothing else', () => {
@@ -36,53 +68,9 @@ test('the depends follow-up fires on the depends answer and nothing else', () =>
   assert.equal(score(A({ project: 'done' })).needs, null)
 })
 
-test('the contradiction fires when the two positions arrive from two questions', () => {
-  const conflicted = score(A({ personalization: 'finished', project: 'fixable' }))
-  assert.ok(conflicted.stances.has('wantsFinished'))
-  assert.ok(conflicted.stances.has('willBuild'))
-  assert.equal(conflicted.conflict.present, true)
-  assert.equal(conflicted.needs, 'contradiction')
-})
-
-test('agreeing answers produce no contradiction', () => {
-  const agreed = score(A({ personalization: 'finished', project: 'done' }))
-  assert.equal(agreed.conflict.present, false)
-  assert.equal(agreed.needs, null)
-})
-
-test('a resolved contradiction stops reading as open', () => {
-  const open = score(A({ personalization: 'finished', project: 'fixable' }))
-  const settled = score(A({ personalization: 'finished', project: 'fixable', clarify: 'cosmetic' }))
-
-  assert.equal(open.conflict.resolvedBy, null)
-  assert.equal(open.needs, 'contradiction')
-
-  assert.equal(settled.conflict.present, true, 'the history is kept')
-  assert.equal(settled.conflict.resolvedBy, 'cosmetic', 'but it is settled')
-  assert.equal(settled.needs, null, 'a settled contradiction must not keep asking')
-})
-
-test('the resolution actually moves the reading, it does not just get recorded', () => {
-  const open = score(A({ personalization: 'finished', project: 'fixable' }))
-  const cosmetic = score(A({ personalization: 'finished', project: 'fixable', clarify: 'cosmetic' }))
-  const major = score(A({ personalization: 'finished', project: 'fixable', clarify: 'major' }))
-
-  assert.ok(
-    cosmetic.scales.renovationTolerance < open.scales.renovationTolerance,
-    'choosing cosmetic did not lower renovation tolerance',
-  )
-  assert.ok(
-    major.scales.renovationTolerance > cosmetic.scales.renovationTolerance,
-    'the two resolutions read the same, so the follow-up changed nothing',
-  )
-  assert.ok(major.stances.has('structuralWorkOkay'))
-})
-
-test('only one follow-up is ever asked, and depends takes precedence', () => {
-  const both = score(A({ personalization: 'finished', project: 'depends' }))
-  assert.equal(both.needs, 'depends')
-  const answered = score(A({ personalization: 'finished', project: 'depends', depends: 'money' }))
-  assert.equal(answered.needs, null)
+test('a follow-up stops being asked once it is answered', () => {
+  assert.equal(score(A({ project: 'depends' })).needs, 'depends')
+  assert.equal(score(A({ project: 'depends', depends: 'money' })).needs, null)
 })
 
 test('the depends follow-up splits one bucket into four different buyers', () => {

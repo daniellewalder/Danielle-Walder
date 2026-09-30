@@ -47,10 +47,8 @@ export interface V2Answers {
   project?: string
   location?: string
   tradeoff?: TradeoffAnswer
-  /** The "depends on what" follow-up. */
+  /** The "depends on what" follow-up. The only conditional in V2. */
   depends?: string
-  /** The contradiction follow-up. */
-  clarify?: string
 }
 
 export const EMPTY: V2Answers = { version: INSTRUMENT_VERSION }
@@ -90,6 +88,5 @@ export function answeredCount(answers: V2Answers): number {
   if (answers.location) total += 1
   if (answers.tradeoff) total += 1
   if (answers.depends) total += 1
-  if (answers.clarify) total += 1
   return total
 }

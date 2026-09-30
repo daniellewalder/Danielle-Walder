@@ -133,27 +133,143 @@ export const FIXTURES: Readonly<Record<string, { why: string; answers: V2Answers
       location: 'strong',
     }),
   },
-  contradictionOpen: {
-    why: 'wants it finished AND would do the work: the contradiction, unresolved',
+  projectUnresolved: {
+    why: 'the one real unresolved state: depends how much work, before the follow-up',
     answers: V({
       dealbreaker: [{ option: 'outgrow' }],
       architecture: 'some',
-      // wantsFinished from personalization, willBuild from project: two
-      // different questions, which is the only way this can collide.
       personalization: 'finished',
-      project: 'fixable',
+      project: 'depends',
       location: 'fixed',
     }),
   },
-  contradictionResolved: {
-    why: 'the same contradiction, settled by the follow-up so it stops reading as open',
+  projectResolved: {
+    why: 'the same buyer, after the follow-up settles what it depends on',
     answers: V({
       dealbreaker: [{ option: 'outgrow' }],
       architecture: 'some',
       personalization: 'finished',
-      project: 'fixable',
+      project: 'depends',
       location: 'fixed',
-      clarify: 'cosmetic',
+      depends: 'money',
+    }),
+  },
+
+  // --- targeted: the ten cases Danielle asked to see explicitly ------------
+  t1_strongMapLowRenoCosmetic: {
+    why: 'strong map + low renovation + cosmetic flexibility',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }],
+      daily: [{ option: 'public' }],
+      architecture: 'notreally',
+      personalization: 'all',
+      project: 'never',
+      location: 'strong',
+    }),
+  },
+  t2_fixedMapHighReno: {
+    why: 'fixed map + high renovation',
+    answers: V({
+      dealbreaker: [{ option: 'layout' }],
+      daily: [{ option: 'separation' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'fixed',
+    }),
+  },
+  t3_outdoorPoolConcern: {
+    why: 'outdoor protected + pool-specific upkeep concern',
+    answers: V({
+      dealbreaker: [{ option: 'outside' }],
+      daily: [{ option: 'upkeep', qualifier: 'pool' }],
+      project: 'depends',
+      location: 'few',
+    }),
+  },
+  t4_outdoorPlantingConcern: {
+    why: 'outdoor protected + planting-specific upkeep concern: must never mention a pool',
+    answers: V({
+      dealbreaker: [{ option: 'outside' }],
+      daily: [{ option: 'upkeep', qualifier: 'planting' }],
+      project: 'depends',
+      location: 'few',
+    }),
+  },
+  t5_evQualifier: {
+    why: 'EV charging qualifier',
+    answers: V({
+      dealbreaker: [{ option: 'drive' }],
+      daily: [{ option: 'parking', qualifier: 'charging' }],
+      project: 'done',
+      location: 'fixed',
+    }),
+  },
+  t6_pantryQualifier: {
+    why: 'pantry qualifier',
+    answers: V({
+      dealbreaker: [{ option: 'layout' }],
+      daily: [{ option: 'utility', qualifier: 'pantry' }],
+      project: 'never',
+      location: 'strong',
+    }),
+  },
+  t7_characterAndPersonalization: {
+    why: 'architectural character + high personalization',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }],
+      architecture: 'alot',
+      personalization: 'all',
+      project: 'fixable',
+      location: 'few',
+    }),
+  },
+  t8_sizeAndStructural: {
+    why: 'size protected + structural work okay',
+    answers: V({
+      tuesday: 'room',
+      dealbreaker: [{ option: 'outgrow' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'few',
+    }),
+  },
+  t9_rankOneWinsQ8: {
+    why: 'two protected dealbreakers, the FIRST-ranked one wins Q8',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }, { option: 'outside' }],
+      project: 'never',
+      location: 'fixed',
+      tradeoff: { pair: ['light', 'outdoor'], winner: 'light', family: 'setting' },
+    }),
+  },
+  t10_rankTwoWinsQ8: {
+    why: 'the same two, but the SECOND-ranked one wins Q8',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }, { option: 'outside' }],
+      project: 'never',
+      location: 'fixed',
+      tradeoff: { pair: ['light', 'outdoor'], winner: 'outdoor', family: 'setting' },
+    }),
+  },
+  t11_declinedTradeoff: {
+    why: 'declined the forced choice: no ordering established',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }, { option: 'outside' }],
+      project: 'never',
+      location: 'fixed',
+      tradeoff: { pair: ['light', 'outdoor'], winner: null, family: 'setting' },
+    }),
+  },
+  t12_characterWithoutPersonalization: {
+    why: 'architectural character protected AND low personalization: it has to arrive with both',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }],
+      architecture: 'alot',
+      personalization: 'notmuch',
+      project: 'never',
+      location: 'few',
     }),
   },
 }
@@ -178,10 +294,7 @@ export function dump(name: string, answers: V2Answers): string {
       `  dayOne=${bandOf('dayOneReadiness', result)}`,
   )
   out.push(`stances        ${[...result.stances].join(', ') || 'none'}`)
-  out.push(
-    `conflict       present=${result.conflict.present} resolvedBy=${result.conflict.resolvedBy ?? 'none'}` +
-      `   needsFollowUp=${result.needs ?? 'none'}`,
-  )
+  out.push(`followUp       ${result.needs ?? 'none outstanding'}`)
   out.push(
     `tradeoff       ${
       result.tradeoff
