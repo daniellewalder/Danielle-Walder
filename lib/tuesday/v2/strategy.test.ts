@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { FIXTURES } from './fixtures.ts'
 import { score } from './score.ts'
+import { QUESTIONS } from './questions.ts'
+import type { V2Answers } from './answers.ts'
 import { RULE_IDS, strategyFor, type AgentAction, type Strategy } from './strategy.ts'
 
 const all = Object.entries(FIXTURES).map(([name, { answers }]) => ({
@@ -328,18 +330,158 @@ test('a dealbreaker is never offered as the lever', () => {
   }
 })
 
-test('"no lever established" is a real answer and never sits beside a lever', () => {
+/*
+ * THE THREE STATES.
+ *
+ * "No lever" was one label for two completely different findings, and the
+ * audit showed the split mattered: before the concept levers existed, 71% of
+ * no-lever results were a missing rule rather than a closed search.
+ */
+test('the lever state is one of three, and never conflated', () => {
   for (const { name, strategy } of all) {
+    const { lever } = strategy.derived
     const levers = strategy.derived.flexFirst
-    if (!levers.some((action) => action.id === 'flex.none')) continue
-    assert.equal(levers.length, 1, `${name}: claimed no lever exists while offering one`)
+    if (lever.state === 'identified') {
+      assert.ok(levers.length > 0, `${name}: identified a lever but produced none`)
+    } else {
+      assert.equal(levers.length, 0, `${name}: state is ${lever.state} but a lever was produced`)
+    }
+    assert.ok(
+      lever.state === 'identified' ? lever.reason === null : lever.reason !== null,
+      `${name}: state and reason disagree`,
+    )
   }
-  // A fixed map with no renovation appetite genuinely has none.
+})
+
+test('closed and notEstablished cannot be conflated', () => {
+  for (const { name, strategy } of all) {
+    const { lever } = strategy.derived
+    if (lever.state === 'closed') {
+      // Closed means the buyer's own answers shut every route, so at least one
+      // veto must be a decision they made rather than an absence of evidence.
+      assert.equal(lever.reason, 'closedByExplicitConstraints', name)
+      assert.ok(
+        lever.candidates.some((c) =>
+          ['isDealbreaker', 'hardFiltered', 'fixedGeography', 'lowRenovation'].includes(c.vetoedBy ?? ''),
+        ),
+        `${name}: claimed closed with no buyer-made veto`,
+      )
+      assert.ok(
+        strategy.buyerEvidence.protect.length > 0,
+        `${name}: claimed closed with nothing established`,
+      )
+    }
+    if (lever.state === 'notEstablished') {
+      assert.ok(
+        ['noSecondaryPreferenceEstablished', 'insufficientEvidence'].includes(lever.reason ?? ''),
+        name,
+      )
+    }
+  }
+})
+
+test('a rule gap cannot silently fall through to no lever', () => {
+  // The diagnosis is the reference answer. If it finds a lever the rules did
+  // not produce, that is a missing rule, and it must fail loudly rather than
+  // appear as a buyer with no flexibility.
+  for (const { name, strategy } of all) {
+    const { lever } = strategy.derived
+    if (lever.state !== 'identified') continue
+    assert.ok(
+      strategy.derived.flexFirst.length > 0,
+      `${name}: rule gap. The evidence supports ${lever.eligible.join(', ')} but no rule produced it`,
+    )
+  }
+})
+
+test('a closed search is never given a manufactured lever', () => {
   const stuck = one('turnkey')
-  assert.deepEqual(
-    stuck.derived.flexFirst.map((action) => action.subject),
-    ['none'],
+  assert.equal(stuck.derived.lever.state, 'closed')
+  assert.equal(stuck.derived.lever.reason, 'closedByExplicitConstraints')
+  assert.deepEqual(stuck.derived.flexFirst, [])
+})
+
+test('high personalization exposes cosmetic finish without implying renovation', () => {
+  const s = one('t1_strongMapLowRenoCosmetic')
+  const cosmetic = s.derived.flexFirst.find((action) => action.subject === 'cosmeticFinish')
+  assert.ok(cosmetic, 'a buyer who will paper every room was given no cosmetic lever')
+  assert.ok(cosmetic.because.some((fact) => /implies nothing about renovation/.test(fact)))
+  // And it must not have quietly made condition or renovation flexible.
+  assert.equal(s.buyerEvidence.bands.renovation, 'no')
+  assert.ok(!s.derived.flexFirst.some((action) => action.subject === 'condition'))
+  assert.ok(s.derived.doNotFlex.some((action) => action.subject === 'condition'))
+})
+
+test('the size route is a lever, and size itself is not', () => {
+  const s = one('t8_sizeAndStructural')
+  assert.ok(s.derived.flexFirst.some((action) => action.subject === 'sizeRoute'))
+  assert.ok(
+    !s.derived.flexFirst.some((action) => action.subject === 'size'),
+    'size itself was made flexible; only the route to it may be',
   )
+  assert.ok(s.buyerEvidence.protect.some((entry) => entry.id === 'size'))
+})
+
+test('geography becomes the lever when the map loses a forced choice', () => {
+  // The map losing means the buyer chose the property over the area, so
+  // geography is what they have agreed to spend. An earlier version read this
+  // backwards and marked geography as do-not-flex.
+  const s = one('tradeoffAgainstMap')
+  assert.equal(s.buyerEvidence.tradeoff?.winner, 'outdoor')
+  const geography = s.derived.flexFirst.find((action) => action.subject === 'geography')
+  assert.ok(geography, 'the map lost the trade and was not offered as the lever')
+  assert.ok(!s.derived.doNotFlex.some((action) => action.subject === 'geography'))
+})
+
+test('all three lever states are reachable', () => {
+  const states = new Set(all.map(({ strategy }) => strategy.derived.lever.state))
+  assert.deepEqual([...states].sort(), ['closed', 'identified', 'notEstablished'])
+})
+
+test('notEstablished is never reported as the buyer being inflexible', () => {
+  const s = one('t13_leverNotEstablished')
+  assert.equal(s.derived.lever.state, 'notEstablished')
+  assert.equal(s.derived.lever.reason, 'insufficientEvidence')
+  assert.equal(s.buyerEvidence.protect.length, 0, 'nothing was established to be inflexible about')
+  assert.deepEqual(s.derived.filterHard, [])
+})
+
+test('no rule gap anywhere in a sample of the answer space', () => {
+  /*
+   * The fixture sweep only covers the paths we thought to write down. This
+   * walks a deterministic slice of the real answer space and fails if the
+   * diagnosis ever finds a lever the rules do not produce, which is how the
+   * missing cosmetic-finish and condition levers were found.
+   */
+  const pickList = (id: string) => QUESTIONS.find((q) => q.id === id)!.options.map((o) => o.id)
+  const gaps: string[] = []
+  let checked = 0
+
+  for (const dealbreaker of pickList('dealbreaker')) {
+    for (const daily of pickList('daily')) {
+      for (const personalization of pickList('personalization')) {
+        for (const project of pickList('project')) {
+          for (const location of pickList('location')) {
+            const result = score({
+              version: 2,
+              dealbreaker: [{ option: dealbreaker }],
+              daily: [{ option: daily }],
+              personalization,
+              project,
+              location,
+            } as V2Answers)
+            const strategy = strategyFor(result)
+            checked += 1
+            if (strategy.derived.lever.state === 'identified' && strategy.derived.flexFirst.length === 0) {
+              gaps.push(`${dealbreaker}/${daily}/${personalization}/${project}/${location} -> ${strategy.derived.lever.eligible.join(',')}`)
+            }
+          }
+        }
+      }
+    }
+  }
+  assert.ok(checked > 2000, `only checked ${checked} paths`)
+  assert.deepEqual(gaps.slice(0, 5), [], `${gaps.length} rule gaps found`)
 })
 
 test('a low-information buyer gets no filters and no invented levers', () => {

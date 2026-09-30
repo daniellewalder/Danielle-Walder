@@ -1,6 +1,7 @@
 import { type MapConstraint, type StanceId } from './model.ts'
 import { bandOf, type Band, type ReadAttribute, type Result } from './score.ts'
 import { MAP } from './tradeoff.ts'
+import { diagnoseLever, type LeverDiagnosis } from './lever.ts'
 
 /**
  * The search-strategy engine.
@@ -96,6 +97,14 @@ export interface Strategy {
     doNotSubstitute: readonly AgentAction[]
     expectedTradeoff: ExpectedTradeoff | null
     unresolvedLever: UnresolvedLever | null
+    /**
+     * Whether a lever exists, and when it does not, which of the two findings
+     * that is. `closed` means the buyer's own answers shut every route, which
+     * is real information. `notEstablished` means we never gathered anything
+     * that could move, which is our gap and must never be reported as though
+     * the buyer were inflexible.
+     */
+    lever: LeverDiagnosis
   }
   /** Factual operational checklist. Not analysis. */
   practicalProgram: readonly AgentAction[]
@@ -289,62 +298,11 @@ const RULES: readonly Rule[] = [
     id: 'fixedMapLowReno',
     tier: 2,
     when: (s) => s.map === 'fixed' && (s.reno === 'no' || s.dayOne === 'yes'),
-    emit: (s) => {
-      /*
-       * A DEALBREAKER CANNOT BE THE LEVER.
-       *
-       * By definition it is the thing that ends a viewing, so offering it as
-       * the give contradicts the answer that produced it. Nor can anything a
-       * filter rule eliminates on, nor an operational need, which is checked
-       * per property rather than traded.
-       *
-       * What remains is often nothing, and that is the honest output. A fixed
-       * map with no renovation appetite genuinely has no third lever, and
-       * saying so is more useful than inventing one.
-       */
-      const givable = [...s.protectedIds]
-        .map((id) => s.byId.get(id)!)
-        .filter(
-          (entry) =>
-            !OPERATIONAL.includes(entry.attribute.id) &&
-            !s.hardFiltered.has(entry.attribute.id) &&
-            !entry.evidence.directSources.includes('dealbreaker'),
-        )
-        .sort((a, b) => a.evidence.direct - b.evidence.direct)
-      const weakest = givable[0]
-      return {
-        actions: [
-          act('doNotFlex', 'doNotFlex.condition', 'condition', ['map = fixed', band('renovation', s.reno)], ['location', 'project'], 'fixedMapLowReno'),
-          weakest
-            ? act('flexFirst', `flex.${weakest.attribute.id}`, weakest.attribute.id,
-                ['map = fixed', band('renovation', s.reno), `${weakest.attribute.id} is the least evidenced criterion that is not a dealbreaker`],
-                ['location', 'project', ...weakest.evidence.directSources], 'fixedMapLowReno', { order: 30 })
-            : act('flexFirst', 'flex.none', 'none',
-                ['map = fixed', band('renovation', s.reno), 'every protected criterion is a dealbreaker or a hard filter'],
-                ['location', 'project', 'dealbreaker'], 'fixedMapLowReno', { order: 90 }),
-        ],
-        veto: ['flex.condition'],
-      }
-    },
-  },
-  {
-    id: 'fixedMapHighReno',
-    tier: 2,
-    when: (s) => s.map === 'fixed' && s.reno === 'yes',
     emit: (s) => ({
       actions: [
-        act('flexFirst', 'flex.condition', 'condition', ['map = fixed', band('renovation', s.reno)], ['location', 'project'], 'fixedMapHighReno', { order: 10 }),
+        act('doNotFlex', 'doNotFlex.condition', 'condition', ['map = fixed', band('renovation', s.reno)], ['location', 'project'], 'fixedMapLowReno'),
       ],
-    }),
-  },
-  {
-    id: 'movableMap',
-    tier: 2,
-    when: (s) => s.map === 'strongPreference' || s.map === 'fewAreas',
-    emit: (s) => ({
-      actions: [
-        act('flexFirst', 'flex.geography', 'geography', [`map = ${s.map}`], ['location'], 'movableMap', { order: 20 }),
-      ],
+      veto: ['flex.condition'],
     }),
   },
   {
@@ -353,20 +311,9 @@ const RULES: readonly Rule[] = [
     when: (s) => (s.map === 'strongPreference' || s.map === 'fewAreas') && s.reno === 'no',
     emit: (s) => ({
       actions: [
-        act('flexFirst', 'flex.geography', 'geography', [`map = ${s.map}`, band('renovation', s.reno)], ['location', 'project'], 'movableMapLowReno', { order: 5 }),
         act('doNotFlex', 'doNotFlex.condition', 'condition', [`map = ${s.map}`, band('renovation', s.reno)], ['location', 'project'], 'movableMapLowReno'),
       ],
       veto: ['flex.condition'],
-    }),
-  },
-  {
-    id: 'movableMapHighReno',
-    tier: 2,
-    when: (s) => (s.map === 'strongPreference' || s.map === 'fewAreas') && s.reno === 'yes',
-    emit: (s) => ({
-      actions: [
-        act('flexFirst', 'flex.condition', 'condition', [`map = ${s.map}`, band('renovation', s.reno)], ['location', 'project'], 'movableMapHighReno', { order: 15 }),
-      ],
     }),
   },
   {
@@ -375,7 +322,6 @@ const RULES: readonly Rule[] = [
     when: (s) => s.map === 'propertyLed' && s.specificity >= 3,
     emit: (s) => ({
       actions: [
-        act('flexFirst', 'flex.geography', 'geography', ['map = propertyLed', `${s.specificity} protected criteria`], ['location', 'dealbreaker'], 'propertyLedStrict', { order: 5 }),
         ...s.protectedIn([...SPATIAL, ...SITE_QUALITIES]).map((entry) =>
           act('doNotFlex', `doNotFlex.${entry.attribute.id}`, entry.attribute.id,
             ['map = propertyLed', `${entry.attribute.id} = protect`], ['location', ...entry.evidence.directSources], 'propertyLedStrict'),
@@ -397,6 +343,63 @@ const RULES: readonly Rule[] = [
   },
 
   // --- tier 3: the tradeoff -----------------------------------------------
+  /*
+   * CONCEPT LEVERS.
+   *
+   * A lever is a property of the evidence, not of the map posture. Writing one
+   * rule per posture meant a property-led buyer who would happily renovate was
+   * never told condition could give, and a buyer who will paper every room was
+   * never told an unstyled house counts as a give. These say it once.
+   */
+  {
+    id: 'geographyLever',
+    tier: 2,
+    when: (s) => s.map === 'strongPreference' || s.map === 'fewAreas' || s.map === 'propertyLed',
+    emit: (s) => ({
+      actions: [
+        act('flexFirst', 'flex.geography', 'geography', [`map = ${s.map}`], ['location'], 'geographyLever', { order: 20 }),
+      ],
+    }),
+  },
+  {
+    id: 'conditionLever',
+    tier: 2,
+    when: (s) => s.reno === 'yes' && !s.projectUnresolved,
+    emit: (s) => ({
+      actions: [
+        act('flexFirst', 'flex.condition', 'condition', [band('renovation', s.reno), 'work is on the table'], ['project'], 'conditionLever', { order: 15 }),
+      ],
+    }),
+  },
+  {
+    id: 'cosmeticFinishLever',
+    tier: 2,
+    when: (s) => s.pers === 'yes',
+    emit: (s) => ({
+      actions: [
+        // A give on PRESENTATION, and nothing else. Saying an unstyled house is
+        // acceptable implies nothing whatever about moving a wall, so this
+        // never touches condition or renovation tolerance.
+        act('flexFirst', 'flex.cosmeticFinish', 'cosmeticFinish',
+          [band('cosmetic', s.pers), 'an unstyled house is acceptable', 'implies nothing about renovation'],
+          ['personalization'], 'cosmeticFinishLever', { order: 10 }),
+      ],
+    }),
+  },
+  {
+    id: 'sizeRouteLever',
+    tier: 2,
+    when: (s) => s.protectedIds.has('size') && s.stances.has('structuralWorkOkay'),
+    emit: (s) => ({
+      actions: [
+        // The ROUTE to the required size, not the size. Size stays protected;
+        // what can move is whether it already exists.
+        act('flexFirst', 'flex.sizeRoute', 'sizeRoute',
+          ['size = protect', 'structuralWorkOkay', 'the size may be created rather than found'],
+          [...(s.byId.get('size')?.evidence.directSources ?? []), 'project'], 'sizeRouteLever', { order: 25 }),
+      ],
+    }),
+  },
   {
     id: 'tradeoffBothProtected',
     tier: 3,
@@ -430,11 +433,31 @@ const RULES: readonly Rule[] = [
       const [a, b] = s.tradeoff!.pair
       const winner = s.tradeoff!.winner!
       const loser = a === winner ? b : a
+      /*
+       * WHICH WAY THE MAP WENT.
+       *
+       * The map LOSING means the buyer chose the property over the area, so
+       * geography is the thing they have already agreed to spend. An earlier
+       * version read that backwards and marked geography as do-not-flex, which
+       * is the opposite of what the answer says.
+       *
+       * The map WINNING means geography is firmer than the stated posture, and
+       * the property criterion is where the search gives.
+       */
       if (loser === MAP) {
         return {
           actions: [
+            act('flexFirst', 'flex.geography', 'geography',
+              ['geography lost a forced choice', 'the property criterion won', 'they have agreed to spend the map'],
+              ['tradeoff', 'location'], 'tradeoffLoserWeaker', { order: 5 }),
+          ],
+        }
+      }
+      if (winner === MAP) {
+        return {
+          actions: [
             act('doNotFlex', 'doNotFlex.geography', 'geography',
-              ['geography lost a forced choice', 'the property criterion won'],
+              ['geography won a forced choice', 'firmer than the stated posture'],
               ['tradeoff', 'location'], 'tradeoffLoserWeaker'),
           ],
           veto: ['flex.geography'],
@@ -719,14 +742,7 @@ function collapse(actions: readonly AgentAction[]): AgentAction[] {
 
   const all = [...merged.values()]
   const filtered = new Set(all.filter((a) => a.kind === 'filterHard').map((a) => a.subject))
-  const hasRealLever = all.some((a) => a.kind === 'flexFirst' && a.subject !== 'none')
-  return all.filter(
-    (action) =>
-      !(action.kind === 'doNotFlex' && filtered.has(action.subject)) &&
-      // "No lever established" is a claim about the whole result, so it cannot
-      // survive next to an actual lever.
-      !(action.id === 'flex.none' && hasRealLever),
-  )
+  return all.filter((action) => !(action.kind === 'doNotFlex' && filtered.has(action.subject)))
 }
 
 export function strategyFor(result: Result): Strategy {
@@ -751,9 +767,57 @@ export function strategyFor(result: Result): Strategy {
     }
   }
 
-  const kept = collapse(actions).filter(
+  let kept = collapse(actions).filter(
     (action) => !(action.kind === 'flexFirst' && vetoes.has(action.id)),
   )
+
+  /*
+   * LAST RESORT, DECIDED AFTER EVERY RULE HAS SPOKEN.
+   *
+   * When no concept lever survives, the softest protected criterion can still
+   * be the first thing tested against real inventory. It must not be a
+   * dealbreaker, must not be something a filter eliminates on, and must not be
+   * an operational need. A Q8 loss makes it the obvious candidate and does NOT
+   * demote it: it stays protected, and this is only about what to test first.
+   *
+   * If nothing qualifies, no lever is manufactured.
+   */
+  if (!kept.some((action) => action.kind === 'flexFirst')) {
+    const lostQ8 = new Set(
+      s.tradeoff?.winner
+        ? s.tradeoff.pair.filter((side) => side !== s.tradeoff!.winner)
+        : [],
+    )
+    const givable = [...s.protectedIds]
+      .map((id) => s.byId.get(id)!)
+      .filter(
+        (entry) =>
+          !OPERATIONAL.includes(entry.attribute.id) &&
+          !s.hardFiltered.has(entry.attribute.id) &&
+          !entry.evidence.directSources.includes('dealbreaker'),
+      )
+      .sort(
+        (a, b) =>
+          Number(lostQ8.has(b.attribute.id)) - Number(lostQ8.has(a.attribute.id)) ||
+          a.evidence.direct - b.evidence.direct,
+      )
+    const weakest = givable[0]
+    if (weakest) {
+      kept = [
+        ...kept,
+        act('flexFirst', `flex.${weakest.attribute.id}`, weakest.attribute.id,
+          [
+            `${weakest.attribute.id} = protect`,
+            'not a dealbreaker and nothing filters on it',
+            ...(lostQ8.has(weakest.attribute.id) ? ['lost a forced choice but stays protected'] : []),
+            'test it against real inventory first',
+          ],
+          [...weakest.evidence.directSources, ...(lostQ8.has(weakest.attribute.id) ? ['tradeoff'] : [])],
+          'softestProtectedGive', { order: 40 }),
+      ]
+      fired.push('softestProtectedGive')
+    }
+  }
   const of = (kind: ActionKind) =>
     kept
       .filter((action) => action.kind === kind)
@@ -795,6 +859,7 @@ export function strategyFor(result: Result): Strategy {
       unresolvedLever: unresolved
         ? { id: unresolved.id, because: unresolved.because, sources: unresolved.sources }
         : null,
+      lever: diagnoseLever(s),
     },
     // Factual, not analysis: the qualifiers and operational needs as a checklist.
     practicalProgram: protectedEntries

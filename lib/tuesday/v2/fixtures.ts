@@ -272,6 +272,18 @@ export const FIXTURES: Readonly<Record<string, { why: string; answers: V2Answers
       location: 'few',
     }),
   },
+  t13_leverNotEstablished: {
+    why: 'fixed map and nothing else established: we never found what could move',
+    answers: V({
+      tuesday: 'errands',
+      dealbreaker: [{ option: 'none' }],
+      daily: [{ option: 'unsure' }],
+      architecture: 'notreally',
+      personalization: 'notmuch',
+      project: 'depends',
+      location: 'fixed',
+    }),
+  },
 }
 
 /** A plain-text dump of everything the engine established. No result copy. */
