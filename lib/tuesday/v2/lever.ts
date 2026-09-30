@@ -38,6 +38,15 @@ export type VetoReason =
   | 'unresolvedProject'
   /** Personalization appetite does not support giving on finish. */
   | 'noCosmeticAppetite'
+  /**
+   * The renovation question was never answered, so we have no reading at all.
+   *
+   * SEPARATE FROM `lowRenovation` ON PURPOSE. Silence is not a low appetite,
+   * and this reason must never be counted as the buyer closing a route.
+   */
+  | 'renovationNotEstablished'
+  /** The personalization question was never answered. Same rule applies. */
+  | 'personalizationNotEstablished'
   /** Size is not protected, or structural work was never accepted. */
   | 'noStructuralRoute'
 
@@ -64,12 +73,32 @@ export interface LeverDiagnosis {
   eligible: readonly string[]
 }
 
-/** Vetoes that represent a buyer decision rather than an absence of evidence. */
+/**
+ * Vetoes that represent a buyer decision rather than an absence of evidence.
+ *
+ * This list is the whole difference between `closed` and `notEstablished`, so
+ * a reason only belongs here when the buyer actually said something. A reason
+ * that can be reached by never answering a question must stay out of it: two
+ * fixtures were being reported as buyers who had closed every route when they
+ * had simply not been asked about renovation or personalization.
+ */
 const BUYER_CLOSED: readonly VetoReason[] = [
   'isDealbreaker',
   'hardFiltered',
   'fixedGeography',
   'lowRenovation',
+]
+
+/**
+ * Vetoes that mean we never took a reading, not that the buyer took a position.
+ *
+ * Every one of these is our gap. None may contribute to `closed`, and the
+ * brief has to be able to say which question would have settled it.
+ */
+const NOT_MEASURED: readonly VetoReason[] = [
+  'renovationNotEstablished',
+  'personalizationNotEstablished',
+  'unresolvedProject',
 ]
 
 const OPERATIONAL = ['circulation', 'utility', 'parking', 'upkeep']
@@ -93,6 +122,7 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
   // --- condition ----------------------------------------------------------
   if (s.projectUnresolved) add('condition', 'unresolvedProject')
   else if (s.reno === 'yes') add('condition', null)
+  else if (s.reno === 'unset') add('condition', 'renovationNotEstablished')
   else add('condition', 'lowRenovation')
 
   /*
@@ -103,6 +133,7 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
    * whatever about their willingness to move a wall.
    */
   if (s.pers === 'yes') add('cosmeticFinish', null)
+  else if (s.pers === 'unset') add('cosmeticFinish', 'personalizationNotEstablished')
   else add('cosmeticFinish', 'noCosmeticAppetite')
 
   /*
@@ -132,17 +163,25 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
   /*
    * Nothing is eligible. Which of the two findings is it?
    *
-   * If the buyer established hard constraints and their own answers closed
-   * every route, the search really is closed. If they established almost
-   * nothing, we simply never asked the question that would have found the
-   * lever, and saying "nothing can move" would be inventing a finding.
+   * `closed` says the buyer's own answers shut every route. It therefore
+   * requires that EVERY route was actually measured. One route left unmeasured
+   * is enough to make the claim false: a buyer who named two dealbreakers and a
+   * fixed map, and was never asked about renovation or personalization, has not
+   * closed the search. We just stopped asking.
+   *
+   * That was the live defect. `closedByBuyer` used `some`, so a single earned
+   * veto reported the whole search closed while two other routes sat
+   * unmeasured, which is the exact conflation the three states exist to end.
    */
+  const unmeasured = candidates.filter(
+    (candidate) => candidate.vetoedBy && NOT_MEASURED.includes(candidate.vetoedBy),
+  )
   const closedByBuyer = candidates.some(
     (candidate) => candidate.vetoedBy && BUYER_CLOSED.includes(candidate.vetoedBy),
   )
   const hasHardConstraints = [...s.protectedIds].some((id) => !OPERATIONAL.includes(id))
 
-  if (closedByBuyer && hasHardConstraints) {
+  if (closedByBuyer && hasHardConstraints && unmeasured.length === 0) {
     return { state: 'closed', reason: 'closedByExplicitConstraints', candidates, eligible }
   }
   return {
@@ -151,4 +190,9 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
     candidates,
     eligible,
   }
+}
+
+/** Which vetoes the brief may report as a gap in our own questioning. */
+export function isMeasurementGap(reason: VetoReason): boolean {
+  return NOT_MEASURED.includes(reason)
 }

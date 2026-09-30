@@ -6,10 +6,10 @@ import { QUESTIONS } from './questions.ts'
 import type { V2Answers } from './answers.ts'
 import { RULE_IDS, strategyFor, type AgentAction, type Strategy } from './strategy.ts'
 
-const all = Object.entries(FIXTURES).map(([name, { answers }]) => ({
-  name,
-  strategy: strategyFor(score(answers)),
-}))
+const all = Object.entries(FIXTURES).map(([name, { answers }]) => {
+  const result = score(answers)
+  return { name, result, strategy: strategyFor(result) }
+})
 const one = (name: keyof typeof FIXTURES) => strategyFor(score(FIXTURES[name].answers))
 const ids = (actions: readonly AgentAction[]) => actions.map((action) => action.id)
 const derivedActions = (s: Strategy): AgentAction[] => [
@@ -20,6 +20,89 @@ const derivedActions = (s: Strategy): AgentAction[] => [
   ...s.derived.showingTests,
   ...s.derived.doNotSubstitute,
 ]
+
+/*
+ * The diagnosis is the reference answer, so the rules have to agree with it.
+ *
+ * Checking only that an `identified` diagnosis produced SOME lever let the two
+ * disagree per concept: `geographyLever` offered a property-led buyer their own
+ * answer back while the diagnosis vetoed it as `geographyAlreadyOpen`.
+ */
+/*
+ * SILENCE IS NOT A POSITION.
+ *
+ * A veto that can be reached by never answering a question must never be
+ * reported as the buyer's decision, and must never count towards `closed`.
+ */
+test('an unanswered question never produces a veto that blames the buyer', () => {
+  const BLAMES_BUYER = ['lowRenovation', 'noCosmeticAppetite', 'isDealbreaker', 'fixedGeography', 'hardFiltered']
+  const paths: V2Answers[] = []
+  for (const project of [undefined, 'never', 'done', 'depends', 'fixable', 'further']) {
+    for (const personalization of [undefined, 'all', 'some', 'notmuch', 'finished']) {
+      for (const location of ['fixed', 'strong', 'few', 'property']) {
+        const answers: V2Answers = { version: 2, dealbreaker: [{ option: 'dark' }], location }
+        if (project) answers.project = project
+        if (personalization) answers.personalization = personalization
+        paths.push(answers)
+      }
+    }
+  }
+  for (const answers of paths) {
+    const result = score(answers)
+    const strategy = strategyFor(result)
+    const askedProject = result.answeredQuestionIds.includes('project')
+    const askedPers = result.answeredQuestionIds.includes('personalization')
+    for (const candidate of strategy.derived.lever.candidates) {
+      if (!candidate.vetoedBy || !BLAMES_BUYER.includes(candidate.vetoedBy)) continue
+      if (candidate.concept === 'condition' && candidate.vetoedBy === 'lowRenovation') {
+        assert.ok(askedProject, `lowRenovation from silence: ${JSON.stringify(answers)}`)
+      }
+      if (candidate.concept === 'cosmeticFinish' && candidate.vetoedBy === 'noCosmeticAppetite') {
+        assert.ok(askedPers, `noCosmeticAppetite from silence: ${JSON.stringify(answers)}`)
+      }
+    }
+  }
+})
+
+test('closed requires every route to have been measured', () => {
+  for (const answers of [
+    // Two dealbreakers and a fixed map, but renovation and finish never asked.
+    { version: 2 as const, dealbreaker: [{ option: 'dark' }, { option: 'privacy' }], location: 'fixed' },
+    // Renovation settled, finish never asked.
+    { version: 2 as const, dealbreaker: [{ option: 'dark' }], project: 'never', location: 'fixed' },
+  ]) {
+    const lever = strategyFor(score(answers)).derived.lever
+    assert.notEqual(lever.state, 'closed', `reported closed with a route unmeasured: ${JSON.stringify(answers)}`)
+    assert.equal(lever.state, 'notEstablished')
+  }
+  // The same buyer, once every question is answered, is legitimately closed.
+  const complete = strategyFor(score(FIXTURES.turnkey.answers)).derived.lever
+  assert.equal(complete.state, 'closed')
+  assert.equal(complete.reason, 'closedByExplicitConstraints')
+})
+
+test('no rule offers a lever the diagnosis vetoed', () => {
+  for (const { name, strategy } of all) {
+    for (const action of strategy.derived.flexFirst) {
+      const candidate = strategy.derived.lever.candidates.find((c) => c.concept === action.subject)
+      if (!candidate) continue
+      assert.ok(
+        candidate.accepted,
+        `${name}: ${action.id} offers ${action.subject}, which the diagnosis vetoed as ${candidate.vetoedBy}`,
+      )
+    }
+  }
+})
+
+test('an identified lever is always actually offered by a rule', () => {
+  for (const { name, strategy } of all) {
+    if (strategy.derived.lever.state !== 'identified') {
+      assert.deepEqual(strategy.derived.flexFirst, [], `${name}: no lever, yet one was offered`)
+      continue
+    }
+    assert.ok(strategy.derived.flexFirst.length > 0, `${name}: a lever was identified but never offered`)
+  }
+})
 
 // ---------------------------------------------------------------------------
 // The three layers stay apart
@@ -191,15 +274,18 @@ test('a lever is never invented just because the search needs one', () => {
 // ---------------------------------------------------------------------------
 
 test('a qualifier-specific action never names a qualifier the buyer did not pick', () => {
-  for (const { name, strategy } of all) {
+  for (const { name, result, strategy } of all) {
     const chosen = new Set(
       [...derivedActions(strategy), ...strategy.practicalProgram]
         .map((action) => action.qualifier)
         .filter(Boolean),
     )
-    const declared = new Set(
-      strategy.buyerEvidence.protect.map((entry) => entry.qualifier).filter(Boolean),
-    )
+    /*
+     * Checked against every qualifier the buyer actually chose, at any state.
+     * Reading only the protected ones called `upkeep:pool` invented when the
+     * buyer had picked it as a secondary concern.
+     */
+    const declared = new Set(result.attributes.map((entry) => entry.qualifier).filter(Boolean))
     for (const qualifier of chosen) {
       assert.ok(declared.has(qualifier as string), `${name}: invented the qualifier ${qualifier}`)
     }

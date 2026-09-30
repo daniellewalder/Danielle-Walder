@@ -354,7 +354,14 @@ const RULES: readonly Rule[] = [
   {
     id: 'geographyLever',
     tier: 2,
-    when: (s) => s.map === 'strongPreference' || s.map === 'fewAreas' || s.map === 'propertyLed',
+    /*
+     * NOT `propertyLed`. That buyer already told us the property leads and the
+     * area is open, so "give on geography first" is their own answer read back
+     * to them, and there is no constraint left there to trade. The lever
+     * diagnosis vetoes it as `geographyAlreadyOpen`; this rule used to offer it
+     * anyway, and the two disagreed silently.
+     */
+    when: (s) => s.map === 'strongPreference' || s.map === 'fewAreas',
     emit: (s) => ({
       actions: [
         act('flexFirst', 'flex.geography', 'geography', [`map = ${s.map}`], ['location'], 'geographyLever', { order: 20 }),
@@ -861,12 +868,27 @@ export function strategyFor(result: Result): Strategy {
         : null,
       lever: diagnoseLever(s),
     },
-    // Factual, not analysis: the qualifiers and operational needs as a checklist.
-    practicalProgram: protectedEntries
-      .filter((entry) => OPERATIONAL.includes(entry.attribute.id) || entry.qualifier)
+    /*
+     * Factual, not analysis: the functional requirements, as a checklist.
+     *
+     * EVERY ESTABLISHED STATE, not just protect. This is the literal list
+     * Danielle works from, so a secondary need belongs on it too: filtering to
+     * protect level dropped `upkeep:pool` at scrutinize, which is exactly the
+     * one-off practical signal this section exists to carry.
+     *
+     * A concept appearing here and as a non-negotiable is not duplication. The
+     * two say different things, and `conceptIndex` records which one describes
+     * it and which one refers to it.
+     */
+    practicalProgram: result.attributes
+      .filter(
+        (entry) =>
+          (entry.state === 'protect' || entry.state === 'scrutinize') &&
+          (OPERATIONAL.includes(entry.attribute.id) || Boolean(entry.qualifier)),
+      )
       .map((entry) =>
         act('practicalProgram', `program.${entry.attribute.id}`, entry.attribute.id,
-          [`${entry.attribute.id} = protect`, ...(entry.qualifier ? [`qualifier = ${entry.qualifier}`] : [])],
+          [`${entry.attribute.id} = ${entry.state}`, ...(entry.qualifier ? [`qualifier = ${entry.qualifier}`] : [])],
           [...entry.evidence.directSources], 'practicalProgram',
           entry.qualifier ? { qualifier: entry.qualifier } : {}),
       ),
