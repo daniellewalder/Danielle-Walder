@@ -34,8 +34,8 @@ const BUYER_SECTIONS: readonly SectionId[] = [
 const BUYER_HEADING: Readonly<Partial<Record<SectionId, string>>> = {
   facts: 'What I am looking for',
   filter: 'Has to have',
-  flex: 'Where I have room',
-  noLever: 'Where I do not have room',
+  flex: 'Where I can move',
+  noLever: 'Where I cannot move',
   leverUnknown: 'Still working out',
   showing: 'Worth checking when we see something',
   unresolved: 'One thing I have not settled',

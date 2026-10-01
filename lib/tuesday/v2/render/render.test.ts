@@ -111,14 +111,14 @@ test('both renderings agree about whether a lever exists', () => {
   for (const { name, brief } of all) {
     const [agent, buyer] = texts(brief)
     const agentHasFlex = agent.includes('USE THIS AS THE FLEX')
-    const buyerHasFlex = buyer.includes('Where I have room')
+    const buyerHasFlex = buyer.includes('Where I can move')
     assert.equal(agentHasFlex, buyerHasFlex, `${name}: the two disagree about the lever`)
     assert.equal(agentHasFlex, brief.flexOrder.state === 'identified', name)
   }
 })
 
 test('the buyer copy carries the sections the email needs, in order', () => {
-  const ORDER = ['What I am looking for', 'Has to have', 'Where I have room', 'Worth checking when we see something', 'One thing I have not settled']
+  const ORDER = ['What I am looking for', 'Has to have', 'Where I can move', 'Worth checking when we see something', 'One thing I have not settled']
   for (const { name, brief } of all) {
     const text = renderBuyerCopy(brief, { resultUrl: 'https://example.test/x' })
     const positions = ORDER.map((heading) => text.indexOf(heading)).filter((index) => index >= 0)
@@ -140,10 +140,15 @@ test('every buyer copy fits comfortably in a mailto body', () => {
 // The snapshot is strategy, not a recap
 // ---------------------------------------------------------------------------
 
-test('the snapshot is two to four sentences', () => {
+test('the snapshot is one to four sentences, and never padded', () => {
+  /*
+   * Four is the ceiling. One is allowed: `twoDealbreakers` establishes a
+   * movable map and two hard stops, and there is no second honest sentence in
+   * that, so it gets one rather than a line added for rhythm.
+   */
   for (const { name, brief } of all) {
     const { snapshot } = compose(brief)
-    assert.ok(snapshot.length >= 2 && snapshot.length <= 4, `${name}: ${snapshot.length} sentences`)
+    assert.ok(snapshot.length >= 1 && snapshot.length <= 4, `${name}: ${snapshot.length} sentences`)
     for (const entry of snapshot) {
       assert.ok(entry.agent.trim().length > 0, name)
       assert.ok(entry.buyer.trim().length > 0, name)
@@ -166,9 +171,12 @@ test('the snapshot never just lists the non-negotiables', () => {
      */
     const INSTRUCTIONS = [
       /\bI would\b/, /\bI'd\b/, /\bDo not\b/, /\bLook for\b/, /\bWatch\b/,
-      /second thing to try, not the first/, /has to arrive with the house/,
-      /answered in the house, not on the listing/, /showings are the instrument/,
-      /Fewer, better showings/, /lead with/,
+      /next thing I would test/, /next thing to put in front of them/,
+      /the only part I would push on/, /the first place I would push/,
+      /Worth asking before narrowing anything/, /Watch which way/,
+      /treat the area as the wider field/, /keep the search narrow/,
+      /stop screening on/, /they can do themselves/, /will tell us more/,
+      /I would show them houses/, /Look for the usable version/,
     ]
     assert.ok(
       INSTRUCTIONS.some((pattern) => pattern.test(text)),
@@ -177,16 +185,53 @@ test('the snapshot never just lists the non-negotiables', () => {
   }
 })
 
-test('the snapshot contrasts two search dimensions, never a dealbreaker', () => {
-  // "Use the map before asking them to take on natural light" is both nonsense
-  // and something the buyer already knows.
+test('the snapshot never carries abstract engine language', () => {
+  /*
+   * The internal vocabulary is useful in the engine and nowhere near a reader.
+   * "The finish has room in it" is correct and still makes the buyer translate
+   * the scoring model before they can use the sentence.
+   */
+  const ABSTRACT = [
+    /\bsoft give\b/i, /\bhas room in it\b/i, /\bthe lever\b/i, /\bspend the map\b/i,
+    /\bthis dimension\b/i, /\bproperty posture\b/i, /\broute is closed\b/i,
+    /\bconstraint set\b/i, /\bwiden anything about the house\b/i, /\bposture\b/i,
+    /\buse the map before\b/i, /\bsecond thing to try\b/i, /\bthe give\b/i,
+  ]
   for (const { name, brief } of all) {
-    const text = compose(brief).snapshot.map((entry) => entry.agent).join(' ')
-    const match = text.match(/^(.+?) has room in it\. (.+?) does not\./)
-    if (!match) continue
-    const dimensions = ['the map', 'a renovation', 'the finish', 'how the space gets there']
-    assert.ok(dimensions.includes(match[1].toLowerCase()), `${name}: leads with "${match[1]}"`)
-    assert.ok(dimensions.includes(match[2].toLowerCase()), `${name}: blocks on "${match[2]}"`)
+    const composed = compose(brief)
+    const strategic = [
+      ...composed.snapshot,
+      ...composed.sections
+        .filter((section) => ['flex', 'noLever', 'leverUnknown', 'secondLook', 'skip', 'tradeoff', 'unresolved'].includes(section.id))
+        .flatMap((section) => section.lines),
+    ]
+    for (const entry of strategic) {
+      for (const pattern of ABSTRACT) {
+        for (const text of [entry.agent, entry.buyer]) {
+          const hit = text.match(pattern)
+          assert.equal(hit, null, `${name}: "${hit?.[0]}" in "${text}"`)
+        }
+      }
+    }
+  }
+})
+
+test('no sentence exists only to sound polished', () => {
+  // Slogan endings. A short sharp line is fine when it clarifies; it is not
+  // fine as punctuation for a paragraph that felt unfinished.
+  const SLOGANS = [
+    /Fewer, better showings/i, /That route is closed/i, /Use the map before the house/i,
+    /Spend the geography/i, /The property wins/i, /showings are the instrument/i,
+  ]
+  for (const { name, brief } of all) {
+    const composed = compose(brief)
+    const lines = [...composed.snapshot, ...composed.sections.flatMap((section) => section.lines)]
+    for (const entry of lines) {
+      for (const pattern of SLOGANS) {
+        assert.equal(entry.agent.match(pattern), null, `${name}: slogan in "${entry.agent}"`)
+        assert.equal(entry.buyer.match(pattern), null, `${name}: slogan in "${entry.buyer}"`)
+      }
+    }
   }
 })
 
@@ -209,7 +254,10 @@ test('a closed lever is presented as strategy, not as a failure', () => {
     const agent = renderAgentBrief(brief)
     assert.ok(agent.includes('NO OBVIOUS LEVER'), name)
     assert.ok(!/fail|unfortunately|sorry|cannot help|too picky|unrealistic/i.test(agent), name)
-    assert.ok(agent.includes('Fewer, better showings.'), `${name}: no instruction for a closed search`)
+    assert.ok(
+      agent.includes('I would keep the search narrow rather than loosen one of these'),
+      `${name}: no instruction for a closed search`,
+    )
   }
 })
 

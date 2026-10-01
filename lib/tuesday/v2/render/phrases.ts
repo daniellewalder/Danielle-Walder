@@ -97,31 +97,72 @@ export const QUALIFIER_CRITERION: Readonly<Record<string, string>> = {
 
 /** What can move, and what moving it means. Never "be flexible". */
 export const LEVER: Readonly<Record<string, Phrase>> = {
+  /*
+   * These are the scannable WHAT, with the reason attached. The snapshot is the
+   * HOW, in prose, so the two sections are not the same sentence twice.
+   */
   geography: {
-    agent: 'Widen the area before you widen anything about the house.',
-    buyer: 'The area. I have more room on where than on what.',
+    agent: 'Area. A few streets out from the preferred line is worth testing.',
+    buyer: 'Area. A few streets out from where I said is worth a look.',
   },
   condition: {
-    agent: 'A house that needs work is fair game. The work is on the table.',
-    buyer: 'A house that needs work is fine by me.',
+    agent: 'Condition. Work on the house is on the table.',
+    buyer: 'Condition. Work on the house is on the table.',
   },
   cosmeticFinish: {
-    agent: 'The finish. Paint, paper and lighting are theirs to change anyway.',
-    buyer: "The finish. Paint, paper and lighting I'll change anyway.",
+    agent: 'Finishes. Paint, paper and lighting they are changing anyway.',
+    buyer: "Finishes. Paint, paper and lighting I'm changing anyway.",
   },
   sizeRoute: {
-    agent: 'How the space gets there, not how much of it there is. The amount stays fixed.',
-    buyer: 'How I get the space, not how much of it I need.',
+    agent: 'How the square footage arrives, not how much of it they need.',
+    buyer: 'How I get the square footage, not how much I need.',
   },
 }
 
 /**
+ * The same four, varied by the situation that produced them.
+ *
+ * Geography is an available lever for most buyers, so one sentence for it
+ * appeared in eleven of fifteen briefs. The engine already knows which kind of
+ * movement this is: a preferred line with the right house just past it is not
+ * the same instruction as a set of areas that already work. Keyed
+ * `lever|map|rank`, falling back to `LEVER`.
+ */
+export const LEVER_BY_SITUATION: Readonly<Record<string, Phrase>> = {
+  'geography|strongPreference|1': {
+    agent: 'Area. They have a line they prefer. The right house just past it should still get shown.',
+    buyer: 'Area. I have a line I prefer, but the right house just past it should still get shown to me.',
+  },
+  'geography|strongPreference|2': {
+    agent: 'Area. If nothing else opens it up, a few streets past the preferred line.',
+    buyer: 'Area. If nothing else opens it up, a few streets past my preferred line.',
+  },
+  'geography|fewAreas|1': {
+    agent: 'Area. More than one neighbourhood already works, so stretch inside that set before anything else.',
+    buyer: 'Area. More than one neighbourhood already works for me, so stretch that set first.',
+  },
+  'geography|fewAreas|2': {
+    agent: 'Area. If nothing else opens it up, the neighbourhoods that already work can stretch.',
+    buyer: 'Area. If nothing else opens it up, the neighbourhoods that already work can stretch.',
+  },
+  'condition|2': {
+    agent: 'Condition. If the finishes alone are not enough, real work is on the table too.',
+    buyer: 'Condition. If the finishes alone are not enough, real work is on the table too.',
+  },
+}
+
+/** A protected attribute offered as the softest give. */
+export const LEVER_FALLBACK = (criterion: string, buyer: string): Phrase => ({
+  agent: `Of everything they named, ${criterion} is the one I would push on first.`,
+  buyer: `Of everything on my list, ${buyer} is the one I'd push on first.`,
+})
+
+/**
  * The four search dimensions, as opposed to the buyer's own criteria.
  *
- * The snapshot's asymmetry has to be between two of THESE. Contrasting a lever
- * against a dealbreaker produces both nonsense ("use the map before asking
- * them to take on natural light") and a sentence the buyer could have written
- * themselves, which is the no-shit-sherlock line.
+ * The opening instruction has to be about one of THESE. A dealbreaker is not a
+ * compromise anyone was going to offer, so naming one produces a sentence the
+ * buyer already knows.
  */
 export const SEARCH_DIMENSIONS: readonly string[] = [
   'geography',
@@ -131,58 +172,112 @@ export const SEARCH_DIMENSIONS: readonly string[] = [
 ]
 
 /**
- * What leading with a dimension actually means, per dimension.
+ * The opening instruction, keyed by what can move and what cannot.
  *
- * "I would use a renovation" does not read. Each dimension gets the verb that
- * fits it, for the same reason the negative side below does.
+ * NOT A TEMPLATE. "X has room in it, Y does not" read like a strategy memo and
+ * made every buyer sound alike, so each pair gets the sentence Danielle would
+ * actually say. A `first|blocked` key is preferred over the bare `first`.
  */
-export const THE_GIVE: Readonly<Record<string, Phrase>> = {
-  geography: { agent: 'widen the map', buyer: 'widen the map' },
-  condition: {
-    agent: 'look at houses that need work',
-    buyer: 'look at houses that need work',
+export const LEAD: Readonly<Record<string, Phrase>> = {
+  geography: {
+    agent: 'I would look a little outside the preferred area before asking them to drop anything they said they needed.',
+    buyer: "I'd look a little outside my preferred area before dropping anything I said I needed.",
   },
-  cosmeticFinish: { agent: 'look at plain houses', buyer: 'look at plain houses' },
-  sizeRoute: {
-    agent: 'look at how the space could get there',
-    buyer: 'look at how I could get the space',
+  'geography|condition': {
+    agent: 'I would look a little outside the preferred area before taking on a house that needs real work.',
+    buyer: "I'd look a little outside my preferred area before taking on a house that needs real work.",
+  },
+  'geography|cosmeticFinish': {
+    agent: 'I would look a little outside the preferred area. A house that just looks plain is not the compromise they want.',
+    buyer: "I'd look a little outside my preferred area. A house that just looks plain isn't the compromise I want.",
+  },
+  'geography|sizeRoute': {
+    agent: 'I would look a little outside the preferred area. The square footage has to be there already.',
+    buyer: "I'd look a little outside my preferred area. The square footage has to be there already.",
+  },
+  condition: {
+    agent: 'They are open to doing work, so a house that needs updating is worth showing.',
+    buyer: "I'm open to doing work, so a house that needs updating is worth seeing.",
+  },
+  'condition|cosmeticFinish': {
+    agent: 'They are open to doing work. Decorating is not the draw, so a house that needs something structural will land better than one that just needs painting.',
+    buyer: "I'm open to doing work. Decorating isn't the draw, so a house that needs something structural suits me better than one that just needs painting.",
+  },
+  'condition|geography': {
+    // Two facts and no instruction was a recap. The useful half is what to put
+    // in front of them inside a boundary that is not moving.
+    agent: 'The area stays where it is. Inside that line I would show them houses that need something done rather than waiting for a finished one.',
+    buyer: "My area stays where it is. Inside it I'd rather see houses that need something done than wait for a finished one.",
+  },
+  cosmeticFinish: {
+    agent: 'I would not rule out a house because the paint, the lighting or the finishes are boring.',
+    buyer: "I wouldn't rule out a house because the paint, the lighting or the finishes are boring.",
+  },
+  'cosmeticFinish|condition': {
+    agent: 'I would not rule out a house because the paint, the lighting or the finishes are boring. Anything that needs real work is a different conversation.',
+    buyer: "I wouldn't rule out a house because the paint, the lighting or the finishes are boring. Anything that needs real work is a different conversation.",
+  },
+  'cosmeticFinish|geography': {
+    agent: 'I would not rule out a house because the finishes are boring. The area itself stays where it is.',
+    buyer: "I wouldn't rule out a house because the finishes are boring. The area stays where it is.",
+  },
+}
+
+/** The dimension as a short noun, for "the only part I would push on". */
+export const PUSH_ON: Readonly<Record<string, Phrase>> = {
+  geography: { agent: 'the area', buyer: 'the area' },
+  condition: { agent: 'the condition', buyer: 'the condition' },
+  cosmeticFinish: { agent: 'the finishes', buyer: 'the finishes' },
+  sizeRoute: { agent: 'how the square footage arrives', buyer: 'how I get the square footage' },
+}
+
+/** When geography is not a lever because the buyer already opened it. */
+export const PROPERTY_LED: Phrase = {
+  agent: 'I would search for the house first and treat the area as the wider field.',
+  buyer: "I'd look for the house first and treat the area as the wider field.",
+}
+
+/** The next thing to try, once the first is exhausted. */
+export const SECOND: Readonly<Record<string, Phrase>> = {
+  geography: {
+    agent: 'If that still does not open enough up, the area is the next thing I would test.',
+    buyer: "If that doesn't open enough up, the area is the next thing I'd test.",
+  },
+  condition: {
+    agent: 'If that is not enough, houses that need real work are the next thing to put in front of them.',
+    buyer: "If that isn't enough, houses that need real work are next.",
+  },
+  cosmeticFinish: {
+    agent: 'If that is not enough, I would stop screening on how finished a house looks.',
+    buyer: "If that isn't enough, I'd stop screening on how finished a house looks.",
   },
 }
 
 /**
- * What NOT leading with a dimension actually means, per dimension.
+ * The four size routes, as four visibly different searches.
  *
- * One template cannot cover these. You take on a renovation, you move someone
- * off a map, and you offer a plain house; they are different relations and a
- * single verb makes at least two of them read as gibberish.
+ * Each leads the snapshot when it is set, because what a buyer will do about a
+ * house that is too small changes more about the search than anything else
+ * they told us.
  */
-export const NOT_THE_GIVE: Readonly<Record<string, Phrase>> = {
-  // The agent side follows "before", so it is a gerund. The buyer side follows
-  // "I'd rather X than", so it is a bare infinitive. Mixing them produced
-  // "I'd rather look at houses that need work than assuming I can add space".
-  condition: {
-    agent: 'asking them to take on a renovation',
-    buyer: 'take on a renovation',
+export const SIZE_ROUTE_LEAD: Readonly<Record<string, Phrase>> = {
+  existingOnly: {
+    agent: 'They are open to work, just not as a way to create the square footage. I would look at houses that need updating, but I would not keep an undersized house in play hoping it can grow.',
+    buyer: "I'm open to work, just not as a way to create the square footage. Houses that need updating are fine. An undersized one is not.",
   },
-  cosmeticFinish: {
-    agent: 'offering a plain house as the compromise',
-    buyer: 'settle for a plain house',
+  additionOkay: {
+    agent: 'The house does not have to be big enough today. If the property is otherwise right, I would keep a smaller one in play long enough to find out whether adding on is realistic.',
+    buyer: "The house doesn't have to be big enough today. If it's otherwise right, I'd want to find out whether adding on is realistic before ruling it out.",
   },
-  geography: {
-    agent: 'moving them off the map',
-    buyer: 'move off the map',
+  reconfigureOkay: {
+    agent: 'I would not chase more square footage just because the plan is bad. If the area is there, a badly arranged house is still worth looking at.',
+    buyer: "I don't need more square footage just because the plan is bad. If the area is there, a badly arranged house is still worth seeing.",
   },
-  sizeRoute: {
-    agent: 'assuming the space can be created later',
-    buyer: 'assume I can add the space later',
+  propertySpecific: {
+    agent: 'I would not make the size call from the listing. This is one they have to stand in to know whether the house could work.',
+    buyer: "I can't make the size call from a listing. I'd have to stand in it.",
   },
 }
-
-/** A protected attribute offered as the softest give. */
-export const LEVER_FALLBACK = (criterion: string, buyer: string): Phrase => ({
-  agent: `${criterion.charAt(0).toUpperCase()}${criterion.slice(1)}, which is the softest thing they named.`,
-  buyer: `${buyer.charAt(0).toUpperCase()}${buyer.slice(1)}, which is what I'd give on first.`,
-})
 
 /** Why a lever is off the table. Buyer evidence, never our own gap. */
 export const VETO: Readonly<Record<string, Phrase>> = {
@@ -432,8 +527,8 @@ export const TRADEOFF: Readonly<Record<string, Phrase>> = {
      * general, which is the market layer we do not have. This says only what
      * they told us and what to do about it.
      */
-    agent: 'They want the outside and they do not want to look after it. Watch which way they lean when a real house makes them pick.',
-    buyer: 'I want the outside without wanting to look after it.',
+    agent: 'Watch which way they lean when a real house makes them pick between the two.',
+    buyer: 'Watch which way I lean when a real house makes me pick.',
   },
 }
 
@@ -444,8 +539,10 @@ export const UNRESOLVED: Readonly<Record<string, Phrase>> = {
     buyer: "How much work I'd really take on.",
   },
   whatWouldGive: {
-    agent: 'What they would give on when a house makes them choose. Nothing has settled it yet.',
-    buyer: "What I'd give on when a house makes me choose.",
+    // "What they would give on" put the engine's word for a lever in front of
+    // the reader. "Bend on" is what an agent would actually say.
+    agent: 'What they would actually bend on when a house forces the choice. Nothing has settled that yet.',
+    buyer: "What I'd actually bend on when a house forces the choice.",
   },
   mustSpaceExistAlready: {
     agent: 'Whether the space has to exist now or could be created. It decides what even counts as a candidate.',

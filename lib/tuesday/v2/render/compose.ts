@@ -2,9 +2,11 @@ import type { StructuredBrief } from '../brief.ts'
 import { attributeById } from '../model.ts'
 import {
   BUYER_DECISION_VETOES, CRITERION, CRITERION_BUYER, DISCREPANCY, FACT_LABEL,
-  LEVER, LEVER_FALLBACK, NO_SUBSTITUTE, PROGRAM, PROGRAM_QUALIFIED, QUALIFIER_CRITERION,
-  NOT_THE_GIVE, REQUIREMENT, SEARCH_DIMENSIONS, SECOND_LOOK, SHOWING, SKIP, THE_GIVE, TIMING,
-  TRADEOFF, UNRESOLVED, VETO,
+  LEAD, LEVER, LEVER_BY_SITUATION, LEVER_FALLBACK, NO_SUBSTITUTE, PROGRAM,
+  PROGRAM_QUALIFIED,
+  PROPERTY_LED, QUALIFIER_CRITERION, REQUIREMENT, SEARCH_DIMENSIONS, SECOND,
+  PUSH_ON, SECOND_LOOK, SHOWING, SIZE_ROUTE_LEAD, SKIP, TIMING, TRADEOFF, UNRESOLVED,
+  VETO,
   type Phrase,
 } from './phrases.ts'
 
@@ -138,30 +140,34 @@ const IMPLICATIONS: readonly {
   phrase: Phrase
   /** Suppressed when the tradeoff section is already making this point. */
   alsoTheTradeoff?: string
+  /** Suppressed when a size route is set, because the lead already says it. */
+  alsoTheSizeRoute?: boolean
 }[] = [
   {
     needs: ['secondLook.cosmeticallyPlain', 'reject.condition'],
     phrase: {
-      agent: 'Plain is fine. A project is not. That is a narrower gap than it sounds.',
-      buyer: "Plain is fine. A project isn't.",
+      agent: 'A plain house is fine. One that needs real work is not.',
+      buyer: "A plain house is fine. One that needs real work isn't.",
     },
   },
   {
     needs: ['reject.lacksArchitecturalCharacter', 'flex.cosmeticFinish'],
     phrase: {
-      agent: 'The character has to arrive with the house. The finish does not.',
-      buyer: 'The character has to come with the house. The finish I can do.',
+      agent: 'The character has to come with the house. The finishes they can do themselves.',
+      buyer: 'The character has to come with the house. The finishes I can do myself.',
     },
   },
   {
     needs: ['hold.sizeRoute'],
+    alsoTheSizeRoute: true,
     phrase: {
-      agent: 'Do not keep a small house in play hoping it can grow. That route is closed.',
+      agent: 'Do not keep a small house in play hoping it can grow.',
       buyer: "Don't keep a small house in play hoping it can grow.",
     },
   },
   {
     needs: ['secondLook.smallerWithPotential'],
+    alsoTheSizeRoute: true,
     phrase: {
       agent: 'A smaller house can work, but only where adding on is actually possible here.',
       buyer: 'A smaller house can work if adding on is actually possible.',
@@ -169,6 +175,7 @@ const IMPLICATIONS: readonly {
   },
   {
     needs: ['secondLook.badlyArrangedNotSmall'],
+    alsoTheSizeRoute: true,
     phrase: {
       agent: 'The area may well be enough. The plan is the thing that has to change.',
       buyer: 'The area is probably enough. The plan is the problem.',
@@ -176,6 +183,7 @@ const IMPLICATIONS: readonly {
   },
   {
     needs: ['inspect.sizeSolvableHere'],
+    alsoTheSizeRoute: true,
     phrase: {
       agent: 'The size question gets answered in the house, not on the listing.',
       buyer: "I'd answer the size question in the house, not on the listing.",
@@ -184,13 +192,12 @@ const IMPLICATIONS: readonly {
   {
     needs: ['secondLook.datedButSound'],
     phrase: {
-      agent: 'Dated is fine where the plan and the site are right. Those two are the ones that cannot be fixed.',
-      buyer: 'Dated is fine if the plan and the site are right.',
+      agent: 'Dated is fine where the plan and the lot are right. Those two are the parts nobody can change later.',
+      buyer: 'Dated is fine if the plan and the lot are right.',
     },
   },
   {
     needs: ['inspect.outdoorUsability', 'inspect.upkeep'],
-    alsoTheTradeoff: 'wantsTheOutsideButNotTheMaintenance',
     phrase: {
       agent: 'Look for the usable version of the outside, not the biggest one.',
       buyer: 'Look for the usable version of the outside, not the biggest one.',
@@ -206,8 +213,8 @@ const IMPLICATIONS: readonly {
   {
     needs: ['inspect.firstRejection'],
     phrase: {
-      agent: 'There is nothing narrow enough to search on yet. The showings are the instrument.',
-      buyer: "I don't have a filter yet. Seeing houses is how I get one.",
+      agent: 'Nothing they said is narrow enough to search on yet. A few very different houses will tell us more than another question would.',
+      buyer: "I don't have a real filter yet. Seeing a few very different houses is probably how I get one.",
     },
   },
 ]
@@ -224,98 +231,86 @@ function snapshotFor(brief: StructuredBrief): Line[] {
 
   const available = leversOf(brief)
   const closed = closedLeversOf(brief)
+  const route = brief.searchPattern.sizeRoute
 
-  /*
-   * The asymmetry, then the ordering it implies.
-   *
-   * This is the whole job of the section: not what matters to this buyer, but
-   * what to spend first and what not to reach for. The `doNotFlex` instruction
-   * is preferred over a vetoed lever for the thing not to reach for, because
-   * it is an instruction rather than a state.
-   */
-  if (available.length > 0) {
+  if (route && SIZE_ROUTE_LEAD[route]) {
+    /*
+     * The size route leads. What a buyer will do about a house that is too
+     * small changes more about the search than anything else they told us, and
+     * the four answers have to read as four different searches.
+     */
+    /*
+     * The size lead stands alone. Two of the four are already two sentences,
+     * and appending the geography clause made the same formulaic line the
+     * ending of all four size routes while adding nothing to any of them.
+     * Geography is still in the flex section, where it belongs.
+     */
+    out.push(line(SIZE_ROUTE_LEAD[route]))
+  } else if (available.length > 0) {
     const first = available[0].lever
+    const blocked = closed.find((entry) => SEARCH_DIMENSIONS.includes(entry.lever))?.lever
+    const hardStops = closed.some((entry) => entry.veto === 'isDealbreaker')
+    const lead = (blocked && LEAD[`${first}|${blocked}`]) || LEAD[first]
     /*
-     * The thing not to reach for has to be another SEARCH DIMENSION. A
-     * dealbreaker is not a compromise anyone was going to offer, so naming one
-     * here produces a sentence the buyer already knows and, worse, one that
-     * does not parse: you cannot ask someone to take on natural light.
+     * One thing can move, nothing is blocking it, and the rest are outright
+     * dealbreakers. The hard-stop sentence says all of that at once; leading
+     * with the generic instruction first made the two sentences repeat.
      */
-    const blocked =
-      closed.find((entry) => SEARCH_DIMENSIONS.includes(entry.lever))?.lever ??
-      brief.doNotFlex.find((entry) => SEARCH_DIMENSIONS.includes(entry.subject))?.subject
-    if (blocked && NOT_THE_GIVE[blocked] && THE_GIVE[first]) {
+    if (!blocked && !available[1] && hardStops && PUSH_ON[first]) {
       out.push({
-        agent: `${upper(short(first))} has room in it. ${upper(short(blocked))} does not.`,
-        buyer: `${upper(short(first, true))} has room in it. ${upper(short(blocked, true))} doesn't.`,
+        agent: `Everything else they named is a hard stop, so ${PUSH_ON[first].agent} is the only part I would push on.`,
+        buyer: `Everything else on my list is a hard stop, so ${PUSH_ON[first].buyer ?? PUSH_ON[first].agent} is the only part worth pushing on.`,
       })
-      out.push({
-        agent: `I would ${THE_GIVE[first].agent} before ${NOT_THE_GIVE[blocked].agent}.`,
-        buyer: `I'd rather ${THE_GIVE[first].buyer ?? THE_GIVE[first].agent} than ${NOT_THE_GIVE[blocked].buyer ?? NOT_THE_GIVE[blocked].agent}.`,
-      })
+    } else if (lead) {
+      out.push(line(lead))
     } else {
-      out.push({
-        agent: `${upper(short(first))} is the thing with room in it.`,
-        buyer: `${upper(short(first, true))} is where I have room.`,
-      })
+      // A protected attribute offered as the softest give. No dimension
+      // sentence fits, so say the one true thing and stop.
+      const phrase = LEVER_FALLBACK(
+        CRITERION[first] ?? first,
+        CRITERION_BUYER[first] ?? first,
+      )
+      out.push(line(phrase))
     }
-    /*
-     * A single lever with nothing to contrast it against leaves the snapshot
-     * as one bare observation, which is a fact rather than an instruction. Say
-     * what to do with it instead.
-     */
-    if (available.length === 1) {
-      const verb = THE_GIVE[first]
-      out.push({
-        agent: verb
-          ? `Nothing else they named has give in it, so I would ${verb.agent} rather than soften one of the rest.`
-          : 'Nothing else they named has give in it, so lead with that rather than softening one of the rest.',
-        buyer: verb
-          ? `Nothing else on my list has give in it, so I'd rather ${verb.buyer ?? verb.agent} than soften one of the rest.`
-          : "Nothing else on my list has give in it, so I'd lead with that.",
-      })
-    }
-    if (available[1]) {
-      out.push({
-        agent: `${upper(short(available[1].lever))} is the second thing to try, not the first.`,
-        buyer: `After that, ${short(available[1].lever, true)}.`,
-      })
-    }
+    const second = available[1]
+    if (second && SECOND[second.lever]) out.push(line(SECOND[second.lever]))
+    // The buyer already opened the map, so the instruction is about sequencing
+    // the search rather than about widening anything.
+    if (brief.searchPattern.map === 'propertyLed') out.push(line(PROPERTY_LED))
   } else if (brief.flexOrder.state === 'closed') {
     /*
-     * The constraint list belongs to the NO OBVIOUS LEVER section. Repeating it
-     * here would make the two halves of the brief say the same thing twice, so
-     * the snapshot carries only the consequence.
+     * The constraints themselves are listed in the no-lever section. This says
+     * what to do about them, in words that do not require translating the
+     * engine.
      */
     out.push({
-      agent: 'There is no soft give here.',
-      buyer: 'There is no soft give on my list.',
+      agent: 'Nothing obvious should move here.',
+      buyer: 'Nothing obvious should move on my list.',
     })
     out.push({
-      agent: 'I would not loosen one on paper just to get more listings on the page. Fewer, better showings.',
-      buyer: "I'd rather see fewer houses than loosen one of these to pad the list.",
+      agent: 'I would keep the search narrow rather than loosen one of these just to create more options.',
+      buyer: "I'd rather see fewer houses than loosen one of these just to have more to look at.",
     })
   } else {
     out.push({
-      agent: 'Nothing softer than the hard constraints has come out yet, so there is no give to name.',
-      buyer: "I haven't worked out what I'd give on yet.",
+      agent: 'Nothing has come out softer than the hard requirements, so I cannot say yet what they would move on.',
+      buyer: "I haven't worked out yet what I'd move on.",
     })
     out.push({
-      agent: 'That is a gap in what we asked, not a buyer digging in. I would ask before narrowing anything.',
+      agent: 'That is a question we did not ask, not a buyer digging in. Worth asking before narrowing anything.',
       buyer: 'Worth asking me before we narrow anything.',
     })
   }
 
   /*
-   * The implication of the combination. One, the most useful available, and
-   * never one that restates the tradeoff section. "They want the outside
-   * without the maintenance" was arriving in both places in slightly different
-   * words, which is the duplication this renderer exists to stop.
+   * The consequence of the combination. One, the most useful available, and
+   * never one that restates the tradeoff section or the size-route lead.
    */
   const implication = IMPLICATIONS.find(
     (entry) =>
       entry.needs.every((id) => ids.has(id)) &&
-      !(entry.alsoTheTradeoff && entry.alsoTheTradeoff === brief.expectedTradeoff?.why),
+      !(entry.alsoTheTradeoff && entry.alsoTheTradeoff === brief.expectedTradeoff?.why) &&
+      !(entry.alsoTheSizeRoute && route),
   )
   if (implication) out.push(line(implication.phrase))
 
@@ -431,7 +426,11 @@ export function compose(brief: StructuredBrief): Composed {
   const available = leversOf(brief)
   if (brief.flexOrder.state === 'identified') {
     const lines = available.slice(0, 2).map((entry) => {
+      // Most specific first: the situation that produced this lever, then the
+      // lever on its own, then a protected attribute offered as the give.
       const phrase =
+        LEVER_BY_SITUATION[`${entry.lever}|${brief.searchPattern.map}|${entry.rank}`] ??
+        LEVER_BY_SITUATION[`${entry.lever}|${entry.rank}`] ??
         LEVER[entry.lever] ??
         LEVER_FALLBACK(CRITERION[entry.lever] ?? entry.lever, CRITERION_BUYER[entry.lever] ?? entry.lever)
       return line(phrase, entry.lever)
