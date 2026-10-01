@@ -177,6 +177,8 @@ test('the snapshot never just lists the non-negotiables', () => {
       /treat the area as the wider field/, /keep the search narrow/,
       /stop screening on/, /they can do themselves/, /will tell us more/,
       /I would show them houses/, /Look for the usable version/,
+      /I would ask before narrowing/, /has to be somewhere they would sit/,
+      /not another job/, /comes with a landscaping job/,
     ]
     assert.ok(
       INSTRUCTIONS.some((pattern) => pattern.test(text)),
@@ -214,6 +216,99 @@ test('the snapshot never carries abstract engine language', () => {
       }
     }
   }
+})
+
+test('willingness to renovate is never rendered as a preference for renovating', () => {
+  /*
+   * PERMISSION IS NOT PREFERENCE. The same rule the model enforces.
+   *
+   * `structuralWorkOkay` and a high renovation reading mean a real project is
+   * acceptable. They do not mean the buyer wants one, and a low
+   * personalization reading does not mean they would rather move a wall than
+   * paint a room. One line said a structural project "will land better than
+   * one that just needs painting", which claimed exactly that.
+   */
+  const PREFERENCE = [
+    /rather (do|take on|have|buy|see) [^.]*(work|renovat|structural|project|gut)/i,
+    /prefers?[^.]*(project|renovation|structural work|gut)/i,
+    /will land better/i,
+    /suits? (them|me) better/i,
+    /looking for (a|something) (project|to do|to work on)/i,
+    /wants? (a |real |some )?(project|renovation|structural work)/i,
+    /\bthe draw\b/i,
+    /enjoys? (the )?(work|renovat|project)/i,
+    /\beager\b/i, /\bkeen (to|on)\b/i, /\bexcited\b/i,
+    /the more work the better/i,
+    /\bideally[^.]*(work|renovat|project)/i,
+  ]
+  for (const { name, brief } of all) {
+    const composed = compose(brief)
+    const strategic = [
+      ...composed.snapshot,
+      ...composed.sections
+        .filter((section) =>
+          ['flex', 'noLever', 'leverUnknown', 'secondLook', 'skip', 'tradeoff', 'unresolved'].includes(section.id),
+        )
+        .flatMap((section) => section.lines),
+    ]
+    for (const entry of strategic) {
+      for (const text of [entry.agent, entry.buyer]) {
+        for (const pattern of PREFERENCE) {
+          const hit = text.match(pattern)
+          assert.equal(hit, null, `${name}: renders work as something they want, via "${hit?.[0]}" in "${text}"`)
+        }
+      }
+    }
+  }
+})
+
+test('the renovation reading is rendered as permission', () => {
+  // And the positive half: where a real project is acceptable and it reaches
+  // the snapshot, the sentence has to be about it being allowed.
+  const result = score(FIXTURES.structuralBuilder.answers)
+  const brief = assembleBrief(result, strategyFor(result))
+  const snapshot = compose(brief).snapshot.map((entry) => entry.agent).join(' ')
+  assert.match(snapshot, /open to real work/)
+  assert.doesNotMatch(snapshot, /better|rather|prefer|draw/i)
+})
+
+test('nothing frames the buyer as rigid, difficult or indecisive', () => {
+  const ADVERSARIAL = [
+    /digging in/i, /dug in/i, /\brigid\b/i, /inflexible/i, /\bdifficult\b/i,
+    /indecisive/i, /resistant/i, /\bstubborn\b/i, /\bfussy\b/i, /\bpicky\b/i,
+    /unwilling/i, /refuses/i, /\bdemanding\b/i, /won't budge/i,
+  ]
+  // And no apology for the instrument.
+  const APOLOGETIC = [/unfortunately/i, /we failed/i, /the test could not/i, /sorry/i, /our fault/i]
+  for (const { name, brief } of all) {
+    for (const text of texts(brief)) {
+      for (const pattern of [...ADVERSARIAL, ...APOLOGETIC]) {
+        const hit = text.match(pattern)
+        assert.equal(hit, null, `${name}: "${hit?.[0]}"`)
+      }
+    }
+  }
+})
+
+test('the outdoor burden is named the way the buyer named it', () => {
+  const pool = compose(briefFor('t3_outdoorPoolConcern')).snapshot.map((e) => e.agent).join(' ')
+  const planting = compose(briefFor('t4_outdoorPlantingConcern')).snapshot.map((e) => e.agent).join(' ')
+  assert.notEqual(pool, planting, 'the two upkeep qualifiers produce identical strategy')
+  assert.match(pool, /pool/i)
+  assert.match(planting, /landscaping/i)
+  // And neither invents a position the buyer never took.
+  for (const [label, text] of [['pool', pool], ['planting', planting]] as const) {
+    for (const pattern of [
+      /dislikes? (a )?pool/i, /no pool/i, /does not want a pool/i,
+      /refuses? (to )?landscap/i, /smaller (yard|lot|garden)/i,
+      /too much (land|property|garden)/i, /bigger is/i,
+    ]) {
+      const hit = text.match(pattern)
+      assert.equal(hit, null, `${label}: invented "${hit?.[0]}"`)
+    }
+  }
+  // The planting fixture must never mention a pool, and the reverse.
+  assert.doesNotMatch(planting, /pool/i)
 })
 
 test('no sentence exists only to sound polished', () => {

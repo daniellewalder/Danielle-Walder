@@ -196,11 +196,34 @@ const IMPLICATIONS: readonly {
       buyer: 'Dated is fine if the plan and the lot are right.',
     },
   },
+  /*
+   * THE OUTDOOR BURDEN, AS THEY NAMED IT.
+   *
+   * We collected which part of the upkeep worries them, so the instruction
+   * should use it. Specific before general, because `.find` takes the first
+   * match. None of these says they dislike pools, refuse landscaping, want a
+   * small yard, or that more property is bad: the evidence is a burden they
+   * identified, not a new hard filter.
+   */
+  {
+    needs: ['inspect.outdoorUsability', 'inspect.upkeep~pool'],
+    phrase: {
+      agent: 'A pool does not automatically count as the outdoor space. The outside still has to be somewhere they would sit.',
+      buyer: 'A pool is not automatically the outdoor space I meant. It still has to be somewhere I would actually sit.',
+    },
+  },
+  {
+    needs: ['inspect.outdoorUsability', 'inspect.upkeep~planting'],
+    phrase: {
+      agent: 'They want the outdoor space, but not if using it comes with a landscaping job.',
+      buyer: 'I want the outdoor space, but not if using it comes with a landscaping job.',
+    },
+  },
   {
     needs: ['inspect.outdoorUsability', 'inspect.upkeep'],
     phrase: {
-      agent: 'Look for the usable version of the outside, not the biggest one.',
-      buyer: 'Look for the usable version of the outside, not the biggest one.',
+      agent: 'They want outdoor space, not another job.',
+      buyer: 'I want outdoor space, not another job.',
     },
   },
   {
@@ -221,11 +244,16 @@ const IMPLICATIONS: readonly {
 
 function snapshotFor(brief: StructuredBrief): Line[] {
   const out: Line[] = []
+  /*
+   * Both the bare id and the qualified one, so an instruction can key on the
+   * part of the upkeep the buyer actually named without losing the general
+   * case for the qualifiers that have no specific line.
+   */
   const ids = new Set<string>([
     ...brief.skipFaster.map((e) => e.id),
     ...brief.doNotFlex.map((e) => e.id),
     ...brief.secondLook.map((e) => e.id),
-    ...brief.showingTests.map((e) => e.id),
+    ...brief.showingTests.flatMap((e) => (e.qualifier ? [e.id, `${e.id}~${e.qualifier}`] : [e.id])),
     ...brief.flexOrder.candidates.filter((c) => c.status === 'available').map((c) => `flex.${c.lever}`),
   ])
 
@@ -292,13 +320,18 @@ function snapshotFor(brief: StructuredBrief): Line[] {
       buyer: "I'd rather see fewer houses than loosen one of these just to have more to look at.",
     })
   } else {
+    /*
+     * Plainly, and without a word about the buyer. The old pair said "not a
+     * buyer digging in", which frames them as resistant in the act of saying
+     * they are not, and apologised for the instrument on the way past.
+     */
     out.push({
-      agent: 'Nothing has come out softer than the hard requirements, so I cannot say yet what they would move on.',
-      buyer: "I haven't worked out yet what I'd move on.",
+      agent: 'We do not know yet what they would trade first.',
+      buyer: "I haven't worked out yet what I'd trade first.",
     })
     out.push({
-      agent: 'That is a question we did not ask, not a buyer digging in. Worth asking before narrowing anything.',
-      buyer: 'Worth asking me before we narrow anything.',
+      agent: 'The test did not establish it, so I would ask before narrowing the search.',
+      buyer: 'Worth asking me before we narrow the search.',
     })
   }
 

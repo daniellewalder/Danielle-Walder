@@ -200,8 +200,17 @@ export const LEAD: Readonly<Record<string, Phrase>> = {
     buyer: "I'm open to doing work, so a house that needs updating is worth seeing.",
   },
   'condition|cosmeticFinish': {
-    agent: 'They are open to doing work. Decorating is not the draw, so a house that needs something structural will land better than one that just needs painting.',
-    buyer: "I'm open to doing work. Decorating isn't the draw, so a house that needs something structural suits me better than one that just needs painting.",
+    /*
+     * PERMISSION IS NOT PREFERENCE.
+     *
+     * This said a structural project "will land better than one that just
+     * needs painting", which claims the buyer would rather do the bigger job.
+     * Nothing establishes that. `structuralWorkOkay` says a real project is
+     * acceptable, and a low personalization reading says decorating is not
+     * itself part of the appeal. Neither says they want the work.
+     */
+    agent: 'They are open to real work, but a blank cosmetic canvas is not the reason to buy the house.',
+    buyer: "I'm open to real work, but a blank cosmetic canvas isn't the reason I'd buy a house.",
   },
   'condition|geography': {
     // Two facts and no instruction was a recap. The useful half is what to put

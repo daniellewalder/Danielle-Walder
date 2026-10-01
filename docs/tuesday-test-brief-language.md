@@ -336,3 +336,86 @@ instruction, and the two buyer-heading names.
 No UI. No mailto. No model change of any kind: the only files that moved are
 `lib/tuesday/v2/render/phrases.ts`, `compose.ts`, `index.ts` and
 `render.test.ts`.
+
+---
+
+# The three corrections, and the freeze
+
+## 1. Permission is not preference
+
+`structuralWorkOkay` and a high renovation reading mean a real project is
+acceptable. They do not mean the buyer wants one, and a low personalization
+reading does not mean they would rather move a wall than paint a room. The
+`condition|cosmeticFinish` opening said a structural project "will land better
+than one that just needs painting", which claimed exactly that.
+
+It now reads: **"They are open to real work, but a blank cosmetic canvas is not
+the reason to buy the house."** Permission, plus what the low personalization
+reading actually says, and no claim about what they would rather do. The
+property-led sentence that follows it is unchanged.
+
+Two regression tests. One fails the build on twelve preference phrasings
+anywhere in the strategic copy (`rather do the work`, `prefers a project`,
+`will land better`, `suits them better`, `looking for a project`, `wants a
+renovation`, `the draw`, `enjoys the work`, `eager`, `keen to`, `excited`, `the
+more work the better`, `ideally`). A second asserts the positive half: where a
+real project is acceptable and it reaches the snapshot, the sentence has to be
+about it being allowed.
+
+## 2. The outdoor burden, as they named it
+
+One shared line discarded the qualifier we deliberately collected. The
+instruction now uses it, with the specific cases taking precedence over the
+general one:
+
+| qualifier | instruction |
+|---|---|
+| `upkeep:pool` | A pool does not automatically count as the outdoor space. The outside still has to be somewhere they would sit. |
+| `upkeep:planting` | They want the outdoor space, but not if using it comes with a landscaping job. |
+| anything else | They want outdoor space, not another job. |
+
+This needed one mechanical change in the renderer: the implication matcher now
+sees both the bare action id and the qualified one, so a rule can key on the
+part of the upkeep the buyer named while the general case still covers the
+qualifiers that have no specific line.
+
+None of the three says they dislike pools, refuse landscaping, want a smaller
+yard, or that more property is worse. A test asserts all four, asserts the two
+fixtures no longer share a strategic line, and asserts the planting fixture
+never mentions a pool.
+
+## 3. Plainly, and without a word about the buyer
+
+The missing-lever opening said "not a buyer digging in", which frames them as
+resistant in the act of denying it, and apologised for the instrument on the
+way past. It now reads: **"We do not know yet what they would trade first. The
+test did not establish it, so I would ask before narrowing the search."**
+
+A test fails the build on fourteen adversarial framings and five apologetic
+ones, across both renderings.
+
+## What else changed
+
+Twenty of fifty-nine rendered rows, every one of them an intended propagation
+and nothing else:
+
+| fix | rows | fixtures |
+|---|---|---|
+| Permission is not preference | 2 | `structuralBuilder`, `t8_sizeAndStructural` |
+| The outdoor qualifier | 9 | `t3_outdoorPoolConcern` and its seven handoff pairings, `t4_outdoorPlantingConcern` |
+| Plain missing-lever wording | 9 | `fixedMap`, `projectUnresolved`, `protectedLoser`, `t5_evQualifier`, `t9_rankOneWinsQ8`, `t10_rankTwoWinsQ8`, `t11_declinedTradeoff`, `t13_leverNotEstablished`, `tradeoffTwoProperties` |
+
+Checked by rendering all thirty fixtures and twenty-one handoff pairings before
+and after, and classifying every difference. Unexplained differences: none.
+
+No phrase-frequency work was done in this pass, and no correct repeated
+sentence was varied to make outputs look more distinct.
+
+## Frozen
+
+The renderer is frozen as of this change, alongside the V2 instrument, V2
+scoring and evidence, provenance, the adaptive tradeoff, the strategy layer and
+the structured brief contract.
+
+417 tests. Lint, typecheck and build clean. `git diff` against every frozen
+file, against V1, and against `components/` and `app/`, is empty.
