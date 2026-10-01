@@ -1,5 +1,8 @@
 import type { StructuredBrief } from '../brief.ts'
-import { compose, MAX_SHOWING_BUYER, type Composed, type SectionId } from './compose.ts'
+import {
+  compose, MAX_SHOWING_BUYER,
+  type Composed, type Line, type Section, type SectionId,
+} from './compose.ts'
 
 /**
  * The two things a person reads.
@@ -83,4 +86,4 @@ export function renderBuyerCopy(brief: StructuredBrief, options: RenderOptions =
 }
 
 export { compose }
-export type { Composed, SectionId }
+export type { Composed, Line, Section, SectionId }

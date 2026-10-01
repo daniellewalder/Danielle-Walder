@@ -1,19 +1,23 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { TuesdayTest } from '@/components/tuesday/TuesdayTest'
+import { TuesdayTestV2 } from '@/components/tuesday/v2/TuesdayTestV2'
+import { VersionGate } from '@/components/tuesday/v2/VersionGate'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { tuesdayTestPage } from '@/lib/content/pages'
 
 export const metadata: Metadata = {
   title: 'The Tuesday Test · Danielle Walder',
   description:
-    'Seven decisions about what you would actually regret compromising on, and what that means for the search.',
+    'A few decisions about what you would actually regret compromising on, and what that means for the search.',
 }
 
 /**
- * The real thing, replacing the static preview that said "the full version is
- * coming". Answers live in the URL, so this page reads them from the query —
- * which is why the interaction sits behind Suspense.
+ * Answers live in the URL, so this page reads them from the query, which is
+ * why the interaction sits behind Suspense.
+ *
+ * A visit with no payload starts V2. A V1 payload keeps running V1, so anyone
+ * part way through an old link is not dropped into a different instrument.
  */
 export default function TuesdayTestPage() {
   return (
@@ -26,7 +30,7 @@ export default function TuesdayTestPage() {
       />
 
       <Suspense fallback={<div className="wrap pt-12 mobile:pt-8" aria-hidden="true" />}>
-        <TuesdayTest />
+        <VersionGate v1={<TuesdayTest />} v2={<TuesdayTestV2 />} />
       </Suspense>
     </>
   )
