@@ -57,16 +57,111 @@ export const tuesdayV2 = {
     eyebrow: 'the tuesday test',
     /** The link back, for a buyer who wants to start over. */
     retake: 'Take it again',
-    /** The two agent-facing actions land in the next phase, not this one. */
-    pending: {
-      heading: 'Sending this to Danielle',
-      body: 'The version of this that goes to Danielle is being built now. For the moment, the link in your address bar is the whole result, and it will still work later.',
+    /** The handoff, which is where the result turns into something she can use. */
+    cta: {
+      heading: 'Want me to use this?',
+      body: 'Send it over and I will search against it. You can add what the test could not ask about, or send it as it is.',
+      send: 'Send Danielle my brief',
+      copy: 'Copy my brief',
+      copied: 'Copied',
+      copyFailed: 'Copying did not work here. Select the brief below and copy it.',
+      copyLink: 'Copy the link to this result',
+      linkCopied: 'Link copied',
     },
     empty: {
       heading: 'There is nothing to read yet.',
       body: 'This link does not carry a finished test. Take it and it will.',
       cta: 'Take the Tuesday Test',
     },
+    /**
+     * The optional search details.
+     *
+     * RECORD THE CONSTRAINT, NEVER THE REASON. Not one of these asks why. No
+     * field asks about schools beyond the boundary the buyer names, none asks
+     * who the bedrooms are for, and none asks why a destination matters or why
+     * stairs are a problem. The frozen handoff rule governs every word here.
+     */
+    handoff: {
+      heading: 'A few search details',
+      body: 'All optional. The test already did the hard part, so add only what is useful and leave the rest.',
+      back: 'Back to the result',
+      open: 'Open email to Danielle',
+      openNote: 'This opens your email app with the brief ready to send. Nothing is sent until you press send there.',
+      tooLong: 'That is too long for an email link to carry safely. The whole brief has been copied instead, so you can paste it into a new email.',
+      trimmedNote: 'Your closing note was too long to carry in the email link, so the brief went without it. It is in the copied version if you would rather paste that.',
+      preview: 'What Danielle will get',
+      clarify: 'One thing to clarify with Danielle',
+
+      price: {
+        legend: 'Price',
+        min: 'Target minimum',
+        max: 'Target maximum',
+        ceiling: 'Hard ceiling',
+        help: 'Any one of these is useful. You do not need all three.',
+      },
+      timing: {
+        legend: 'Timing',
+        options: [
+          { id: 'casual', label: 'Just looking' },
+          { id: 'thisYear', label: 'Sometime this year' },
+          { id: 'active', label: 'Actively looking' },
+          { id: 'specific', label: 'Specific timing' },
+        ],
+        note: 'What is driving the timing',
+      },
+      where: {
+        legend: 'Where',
+        considering: "Areas I'm considering",
+        ruledOut: "Areas I've ruled out",
+        note: 'Anything I should know about the map',
+        help: 'One per line, or however you like to write them.',
+      },
+      school: {
+        legend: 'School or district boundary',
+        field: 'A specific school or district boundary I need respected',
+        help: 'Written down exactly as you put it, and used as a boundary. Nothing is rated or ranked.',
+      },
+      destinations: {
+        legend: 'Regular destinations',
+        field: 'Places I regularly need to get to',
+        help: 'One per line.',
+      },
+      property: {
+        legend: 'Property basics',
+        types: 'Property type',
+        beds: 'Minimum bedrooms',
+        baths: 'Minimum bathrooms',
+        sqft: 'Minimum square footage',
+      },
+      physical: {
+        legend: 'Physical requirements',
+        parking: 'Parking or garage',
+        stairs: 'Stairs',
+        pool: 'Pool',
+        ev: 'EV charging',
+        other: 'Anything else the house has to have',
+        requirement: [
+          { id: 'required', label: 'Required' },
+          { id: 'preferred', label: 'Preferred' },
+          { id: 'noPreference', label: 'No preference' },
+        ],
+        stairsOptions: [
+          { id: 'stepFreeNeeded', label: 'Needs to be step free' },
+          { id: 'preferMinimal', label: 'Prefer minimal' },
+          { id: 'noPreference', label: 'No preference' },
+        ],
+        poolOptions: [
+          { id: 'required', label: 'Required' },
+          { id: 'no', label: 'Would rather not' },
+          { id: 'noPreference', label: 'No preference' },
+        ],
+      },
+      anythingElse: {
+        legend: 'Anything else',
+        field: 'Anything else I should know',
+      },
+    },
+
     unfinished: {
       heading: 'This one is not finished.',
       body: 'The link carries some answers but not all of them. Pick up where it stops.',

@@ -210,7 +210,7 @@ test('an incomplete V2 payload routes back to the question it stops at', () => {
 test('an empty or unreadable payload shows nothing rather than inventing a result', () => {
   assert.equal(score(decode('').answers).answered, 0)
   assert.equal(score(decode('v.2_zz.rubbish').answers).answered, 0)
-  assert.match(RESULT_V2, /score\(answers\)\.answered === 0/)
+  assert.match(RESULT_V2, /result\.answered === 0/)
   assert.match(RESULT_V2, /tuesdayV2\.result\.empty/)
 })
 

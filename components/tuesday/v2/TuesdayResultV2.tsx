@@ -10,6 +10,7 @@ import { strategyFor } from '@/lib/tuesday/v2/strategy'
 import { assembleBrief } from '@/lib/tuesday/v2/brief'
 import { compose, type Line, type SectionId } from '@/lib/tuesday/v2/render'
 import { isComplete, nextStep, stepKey } from '@/lib/tuesday/v2/flow'
+import { HandoffFlow } from './HandoffFlow'
 
 /**
  * The buyer's result.
@@ -87,12 +88,19 @@ export function TuesdayResultV2() {
   const encoded = params.get('a')
   const answers = useMemo(() => decode(encoded).answers, [encoded])
 
-  const composed = useMemo(() => {
-    const result = score(answers)
-    return compose(assembleBrief(result, strategyFor(result)))
-  }, [answers])
+  /*
+   * The page shows the Tuesday Test result, which is the quiz and nothing
+   * else. The handoff enriches the brief that goes to Danielle, and that
+   * enriched version is previewed inside the form rather than quietly
+   * rewriting the result above it.
+   */
+  const result = useMemo(() => score(answers), [answers])
+  const composed = useMemo(
+    () => compose(assembleBrief(result, strategyFor(result))),
+    [result],
+  )
 
-  if (!encoded || score(answers).answered === 0) {
+  if (!encoded || result.answered === 0) {
     return <Dead copy={tuesdayV2.result.empty} href="/tuesday-test" />
   }
 
@@ -172,25 +180,7 @@ export function TuesdayResultV2() {
         })}
       </div>
 
-      <section className="wrap mt-16 border-t border-hairline pt-11 mobile:mt-12">
-        {/*
-          The two agent-facing actions are the next phase. Saying so is better
-          than a button that quietly sends the wrong thing, and better than a
-          dead control with no explanation.
-        */}
-        <h2 className="font-display text-[23px] leading-[1.2] text-espresso">
-          {tuesdayV2.result.pending.heading}
-        </h2>
-        <p className="mt-4 max-w-measure font-sans text-[17px] leading-[1.5] text-warmgray">
-          {tuesdayV2.result.pending.body}
-        </p>
-        <Link
-          href="/tuesday-test"
-          className="mt-8 inline-flex rounded-button bg-brown px-6 py-[13px] font-sans text-[15px] font-semibold text-cream hover:bg-wine focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wine mobile:min-h-[44px] mobile:w-full mobile:items-center mobile:justify-center"
-        >
-          {tuesdayV2.result.retake}
-        </Link>
-      </section>
+      <HandoffFlow result={result} />
     </>
   )
 }
