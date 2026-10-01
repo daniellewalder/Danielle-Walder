@@ -460,7 +460,7 @@ test('a discrepancy is flagged and never resolved', () => {
   const brief = briefFor('t3_outdoorPoolConcern', 'D_poolDiscrepancy')
   const agent = renderAgentBrief(brief)
   assert.ok(agent.includes('NEEDS CLARIFICATION'))
-  assert.ok(/Worth one question/.test(agent))
+  assert.ok(/Worth clarifying/.test(agent))
   // The renderer must not pick a side.
   assert.ok(!/so (we|I) should|ignore the|the test is right|the handoff is right/i.test(agent))
 })

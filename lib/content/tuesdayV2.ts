@@ -86,9 +86,8 @@ export const tuesdayV2 = {
       body: 'All optional. The test already did the hard part, so add only what is useful and leave the rest.',
       back: 'Back to the result',
       open: 'Open email to Danielle',
-      openNote: 'This opens your email app with the brief ready to send. Nothing is sent until you press send there.',
-      tooLong: 'That is too long for an email link to carry safely. The whole brief has been copied instead, so you can paste it into a new email.',
-      trimmedNote: 'Your closing note was too long to carry in the email link, so the brief went without it. It is in the copied version if you would rather paste that.',
+      openNote: "You'll review the email before anything sends.",
+      tooLong: 'Your brief is too detailed for a reliable email draft, so I copied the full version instead. Paste it into an email to Danielle.',
       preview: 'What Danielle will get',
       clarify: 'One thing to clarify with Danielle',
 

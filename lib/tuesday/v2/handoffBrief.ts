@@ -29,12 +29,7 @@ export const BRIEF_SUBJECT = 'My Tuesday Test search brief'
 export const MAILTO_LIMIT = 1900
 
 /**
- * What travels, most useful first.
- *
- * This is also the drop order, read backwards: when the url will not fit, the
- * least load-bearing block goes first. The buyer's own words are dropped
- * before the brief is, because a brief with a hole in it is worse than one
- * without the postscript, but they are dropped before nothing else.
+ * The reading order. NOT the drop order: see `DROPPABLE` below.
  */
 const ORDER: readonly SectionId[] = [
   'facts',
@@ -69,13 +64,38 @@ export interface BriefBlock {
   lines: readonly string[]
 }
 
+/**
+ * WHAT MAY NEVER BE DROPPED TO FIT A MAILTO.
+ *
+ * The result link reconstructs everything the quiz derived. It reconstructs
+ * none of what the buyer typed: not the budget, not the boundary they asked
+ * for, not the destinations, not the note they sat and wrote. So compaction
+ * takes the derived analysis and leaves the buyer's own inputs alone, and a
+ * discrepancy counts as theirs because it only exists when their search facts
+ * disagree with their answers.
+ *
+ * Someone who carefully fills in "anything else Danielle should know" and then
+ * finds it missing from the draft has been failed by this code, and saying so
+ * in a notice underneath does not fix it.
+ */
+const PROTECTED: readonly SectionId[] = ['facts', 'clarify']
+
+/** Derived analysis, in the order it is given up. */
+const DROPPABLE: readonly SectionId[] = [
+  'secondLook',
+  'unresolved',
+  'showing',
+  'flex',
+  'noLever',
+  'leverUnknown',
+  'filter',
+]
+
 export interface BriefOptions {
   resultUrl?: string
   /** How many showing checks to carry. Reduced only to fit a mailto. */
   showingLimit?: number
-  /** False drops the buyer's own closing note. Only to fit a mailto. */
-  includeNote?: boolean
-  /** Sections to leave out. Only to fit a mailto. */
+  /** Derived sections to leave out. Only to fit a mailto, never buyer input. */
   omit?: readonly SectionId[]
 }
 
@@ -120,7 +140,9 @@ export function briefBlocks(
   if (options.resultUrl) {
     blocks.push({ heading: 'My full result:', lines: [options.resultUrl] })
   }
-  if (closing && options.includeNote !== false) {
+  // The buyer's own closing words. Never conditional: there is no length that
+  // makes it acceptable to drop what someone wrote for Danielle to read.
+  if (closing) {
     blocks.push({ heading: 'A few other things:', lines: [brief.searchFacts!.buyerNote!] })
   }
   return blocks
@@ -157,59 +179,48 @@ export function mailtoHref(to: string, subject: string, body: string): string {
 }
 
 export type MailtoResult =
-  | { kind: 'ready'; href: string; body: string; trimmed: readonly SectionId[]; keptNote: boolean }
-  /** Nothing safe could be built. The caller copies instead and says so. */
+  | { kind: 'ready'; href: string; body: string; trimmed: readonly SectionId[] }
+  /**
+   * The buyer's own inputs will not fit a safe mailto, so no draft is opened.
+   * The caller copies the whole brief and says that is what happened.
+   */
   | { kind: 'tooLong'; body: string }
 
 /**
  * A mailto that will survive the trip, or an honest refusal.
  *
- * Trimming walks the drop order and never silently removes a block: what came
- * out is reported, so the page can tell the buyer their note went to the
- * clipboard instead of quietly vanishing between here and Danielle's inbox.
+ * Compaction gives up derived analysis and nothing else. When even the minimum
+ * (the greeting, every search fact they entered, their note, a clarification
+ * if there is one, the snapshot and the link) will not fit, no draft opens:
+ * a partial draft would quietly lose something they typed, and the link cannot
+ * put it back.
  */
 export function buildMailto(
   brief: StructuredBrief,
   resultUrl: string,
   to: string = contactEmail,
 ): MailtoResult {
-  /*
-   * The drop order, least load-bearing first.
-   *
-   * The buyer's own words go before any of the brief does, because the brief
-   * is the part that cannot be reconstructed from the link. Then the open
-   * question, then the second look, then the showing checks thinned and
-   * finally dropped, and the discrepancy last of all because it is a live
-   * conflict rather than an observation.
-   *
-   * The result link is never dropped. It is the one line that can rebuild
-   * everything else, so trading it away to keep a sentence would be the wrong
-   * way round.
-   */
-  const attempts: BriefOptions[] = [
-    { resultUrl },
-    { resultUrl, includeNote: false },
-    { resultUrl, includeNote: false, omit: ['unresolved'] },
-    { resultUrl, includeNote: false, omit: ['unresolved', 'secondLook'] },
-    { resultUrl, includeNote: false, omit: ['unresolved', 'secondLook'], showingLimit: MIN_SHOWING },
-    { resultUrl, includeNote: false, omit: ['unresolved', 'secondLook'], showingLimit: 0 },
-    { resultUrl, includeNote: false, omit: ['unresolved', 'secondLook', 'clarify'], showingLimit: 0 },
-  ]
+  const attempts: BriefOptions[] = [{ resultUrl }]
+  // Each step gives up one more piece of the generated analysis, in order.
+  const omit: SectionId[] = []
+  for (const section of DROPPABLE) {
+    if (section === 'showing') {
+      attempts.push({ resultUrl, omit: [...omit], showingLimit: MIN_SHOWING })
+      attempts.push({ resultUrl, omit: [...omit], showingLimit: 0 })
+      continue
+    }
+    omit.push(section)
+    attempts.push({ resultUrl, omit: [...omit], showingLimit: 0 })
+  }
 
   for (const options of attempts) {
     const body = emailBody(brief, options)
     const href = mailtoHref(to, BRIEF_SUBJECT, body)
     if (href.length <= MAILTO_LIMIT) {
-      return {
-        kind: 'ready',
-        href,
-        body,
-        trimmed: options.omit ?? [],
-        keptNote: options.includeNote !== false,
-      }
+      return { kind: 'ready', href, body, trimmed: options.omit ?? [] }
     }
   }
-  // Even the shortest safe version will not fit, so nothing is opened and the
-  // full brief goes to the clipboard instead.
+  // Not even the minimum fits, so nothing is opened and the whole brief goes
+  // to the clipboard with its buyer-entered content intact.
   return { kind: 'tooLong', body: emailBody(brief, { resultUrl }) }
 }

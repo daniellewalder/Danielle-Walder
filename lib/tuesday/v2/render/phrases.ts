@@ -633,8 +633,8 @@ export const REQUIREMENT: Readonly<Record<string, string>> = {
 /** Discrepancies. Stated, never resolved. */
 export const DISCREPANCY: Readonly<Record<string, Phrase>> = {
   'upkeep qualifier = pool|hardFilters.pool = required': {
-    agent: 'The test has pool upkeep down as a burden. The search facts say a pool is required. Worth one question.',
-    buyer: 'I flagged pool upkeep as a burden but also asked for a pool. Worth sorting out.',
+    agent: 'They want a pool and also flagged pool upkeep as a burden. Worth clarifying.',
+    buyer: "I want a pool, but I also said the upkeep would bother me. That's one to talk through.",
   },
   'renovationTolerance = no|buyer note mentions major work': {
     agent: 'The test has renovation ruled out. The note mentions major work. Worth one question before you search on either.',

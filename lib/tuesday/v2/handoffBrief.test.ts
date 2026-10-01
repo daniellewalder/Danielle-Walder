@@ -275,45 +275,175 @@ test('the limit is measured on the encoded url, not the raw body', () => {
   assert.ok(href.includes('%20'))
 })
 
-test('a very long note is dropped before the brief is, and the drop is reported', () => {
-  const brief = briefFor(
-    't1_strongMapLowRenoCosmetic',
-    { ...HANDOFFS.A_fullySpecified.handoff, buyerNote: 'x '.repeat(600).trim() },
-  )
-  const built = buildMailto(brief, URL_FOR('t1_strongMapLowRenoCosmetic'))
+/*
+ * BUYER-ENTERED CONTENT IS NEVER GIVEN UP TO FIT A MAILTO.
+ *
+ * The result link rebuilds everything the quiz derived and none of what they
+ * typed, so compaction takes the analysis and leaves their inputs alone.
+ */
+const EVERYTHING: Handoff = {
+  price: { targetMin: 1_600_000, targetMax: 2_100_000, hardCeiling: 2_250_000 },
+  timing: { posture: 'specific', note: 'Our lease is up at the end of March.' },
+  geography: {
+    considering: ['Mar Vista', 'Culver City', 'Playa del Rey'],
+    ruledOut: ['anything east of La Brea'],
+  },
+  schoolBoundary: 'Needs to stay inside the Westwood Charter boundary.',
+  destinations: ['my office in El Segundo', 'my mother in Sherman Oaks'],
+  propertyBasics: { types: ['single family'], minBeds: 4, minBaths: 3, minSqft: 2200 },
+  hardFilters: {
+    parking: 'required', stairs: 'stepFreeNeeded', pool: 'no', ev: 'required',
+    other: ['somewhere to put a desk'],
+  },
+  buyerNote:
+    'We have seen about fifteen houses already and keep hitting the same problem. '
+    + 'I would rather see fewer and better.',
+}
+
+/** Every buyer-entered value, as it appears once rendered. */
+const BUYER_VALUES = [
+  '$1.6m to $2.1m', '$2.25m', 'Our lease is up at the end of March.',
+  'Mar Vista, Culver City, Playa del Rey', 'anything east of La Brea',
+  'Needs to stay inside the Westwood Charter boundary.',
+  'my office in El Segundo, my mother in Sherman Oaks',
+  'single family', 'Minimum bedrooms: 4', 'Minimum bathrooms: 3', '2,200 sq ft',
+  'Parking: required', 'needs to be step-free', 'Pool: not wanted', 'EV charging: required',
+  'somewhere to put a desk',
+  'We have seen about fifteen houses already',
+  'I would rather see fewer and better.',
+]
+
+test('a long full handoff keeps every buyer-entered field in the draft', () => {
+  const brief = briefFor('architectureAndPersonalization', EVERYTHING)
+  const built = buildMailto(brief, URL_FOR('architectureAndPersonalization'))
+  assert.equal(built.kind, 'ready', 'no draft could be built at all')
+  if (built.kind !== 'ready') return
+  assert.ok(built.href.length <= MAILTO_LIMIT, `${built.href.length} over the limit`)
+  for (const value of BUYER_VALUES) {
+    assert.ok(built.body.includes(value), `compaction dropped a buyer-entered value: "${value}"`)
+  }
+  // And it paid for that by giving up generated analysis.
+  assert.ok(built.trimmed.length > 0, 'nothing was compacted, so this proves nothing')
+})
+
+test('each buyer-entered field survives compaction on its own', () => {
+  const fields: [string, Handoff, string][] = [
+    ['budget', { price: { targetMin: 1_600_000, targetMax: 2_100_000 } }, '$1.6m to $2.1m'],
+    ['hard ceiling', { price: { hardCeiling: 2_250_000 } }, 'Hard ceiling: $2.25m'],
+    ['timing', { timing: { posture: 'active' } }, 'actively looking now'],
+    ['timing note', { timing: { posture: 'specific', note: 'Lease up in March.' } }, 'Lease up in March.'],
+    ['areas', { geography: { considering: ['Mar Vista', 'Culver City'] } }, 'Mar Vista, Culver City'],
+    ['ruled out', { geography: { ruledOut: ['east of La Brea'] } }, 'east of La Brea'],
+    ['map note', { geography: { note: 'Not across the 405.' } }, 'Not across the 405.'],
+    ['boundary', { schoolBoundary: 'Inside the Westwood Charter line.' }, 'Inside the Westwood Charter line.'],
+    ['destinations', { destinations: ['my office in El Segundo'] }, 'my office in El Segundo'],
+    ['property type', { propertyBasics: { types: ['single family'] } }, 'single family'],
+    ['bedrooms', { propertyBasics: { minBeds: 4 } }, 'Minimum bedrooms: 4'],
+    ['bathrooms', { propertyBasics: { minBaths: 3 } }, 'Minimum bathrooms: 3'],
+    ['square footage', { propertyBasics: { minSqft: 2200 } }, '2,200 sq ft'],
+    ['parking', { hardFilters: { parking: 'required' } }, 'Parking: required'],
+    ['stairs', { hardFilters: { stairs: 'stepFreeNeeded' } }, 'needs to be step-free'],
+    ['pool', { hardFilters: { pool: 'required' } }, 'Pool: required'],
+    ['EV', { hardFilters: { ev: 'required' } }, 'EV charging: required'],
+    ['other requirement', { hardFilters: { other: ['a real pantry'] } }, 'a real pantry'],
+    ['free text', { buyerNote: 'We have seen fifteen already.' }, 'We have seen fifteen already.'],
+  ]
+  // Against the fixture with the longest generated analysis, so compaction is
+  // doing real work in every one of these.
+  for (const [name, handoff, expected] of fields) {
+    const padded: Handoff = { ...EVERYTHING, ...handoff }
+    const built = buildMailto(briefFor('architectureAndPersonalization', padded), URL_FOR('architectureAndPersonalization'))
+    assert.equal(built.kind, 'ready', `${name}: no draft`)
+    if (built.kind === 'ready') {
+      assert.ok(built.body.includes(expected), `${name} was dropped to fit the mailto`)
+    }
+  }
+})
+
+test('a discrepancy is never dropped, because it only exists from their own inputs', () => {
+  const brief = briefFor('t3_outdoorPoolConcern', { ...EVERYTHING, hardFilters: { pool: 'required' } })
+  assert.equal(brief.discrepancies.length, 1)
+  const built = buildMailto(brief, URL_FOR('t3_outdoorPoolConcern'))
+  assert.equal(built.kind, 'ready')
+  if (built.kind === 'ready') {
+    assert.ok(built.body.includes('One thing to clarify:'), 'the clarification was compacted away')
+    assert.ok(/pool/i.test(built.body))
+    assert.ok(!built.trimmed.includes('clarify'))
+  }
+})
+
+test('generated analysis is what gets given up, in order', () => {
+  const brief = briefFor('architectureAndPersonalization', EVERYTHING)
+  const built = buildMailto(brief, URL_FOR('architectureAndPersonalization'))
   assert.equal(built.kind, 'ready')
   if (built.kind !== 'ready') return
-  assert.equal(built.keptNote, false, 'the note was kept and the url is unsafe')
-  assert.ok(built.href.length <= MAILTO_LIMIT)
-  // The brief itself survived intact.
-  assert.ok(built.body.includes('Has to have:'))
-  assert.ok(built.body.includes('My full result:'))
-  // And the full version, note and all, is still what the clipboard gets.
-  assert.ok(clipboardBrief(brief, URL_FOR('t1_strongMapLowRenoCosmetic')).includes('A few other things:'))
+  // Second look goes before unresolved, which goes before the rest.
+  const dropped = built.trimmed
+  if (dropped.length > 0) assert.equal(dropped[0], 'secondLook')
+  if (dropped.length > 1) assert.equal(dropped[1], 'unresolved')
+  for (const section of dropped) {
+    assert.ok(!['facts', 'clarify'].includes(section), `${section} is buyer input and was dropped`)
+  }
 })
 
-test('a note long enough to break any mailto falls back rather than truncating', () => {
-  const brief = briefFor('t1_strongMapLowRenoCosmetic', { buyerNote: 'y '.repeat(3000).trim() })
-  const built = buildMailto(brief, URL_FOR('t1_strongMapLowRenoCosmetic'))
-  // The note alone cannot be carried, so the brief goes without it rather than
-  // the whole thing failing.
+test('showing checks are reduced before they are removed', () => {
+  const brief = briefFor('structuralBuilder', EVERYTHING)
+  const built = buildMailto(brief, URL_FOR('structuralBuilder'))
   assert.equal(built.kind, 'ready')
-  if (built.kind === 'ready') assert.equal(built.keptNote, false)
+  if (built.kind === 'ready') {
+    const showing = built.body.split('Worth checking when we see something:')[1]
+    if (showing) {
+      const count = showing.split('\n\n')[0].trim().split('\n').length
+      assert.ok(count <= 4, `${count} showing checks survived`)
+    }
+  }
 })
 
-test('when nothing safe can be built the caller is told, not left guessing', () => {
-  // A result url long enough that even the shortest brief will not fit.
-  const brief = briefFor('turnkey')
-  const built = buildMailto(brief, `https://x.test/r?a=${'z'.repeat(2200)}`)
-  assert.equal(built.kind, 'tooLong')
-  if (built.kind === 'tooLong') assert.ok(built.body.length > 0, 'nothing to fall back to')
+test('the result link stays whenever a safe draft can be built', () => {
+  for (const fixture of Object.keys(FIXTURES) as (keyof typeof FIXTURES)[]) {
+    const built = buildMailto(briefFor(fixture, EVERYTHING), URL_FOR(fixture))
+    if (built.kind === 'ready') {
+      assert.ok(built.body.includes('My full result:'), `${fixture}: the link was dropped`)
+      assert.ok(built.body.includes(URL_FOR(fixture)), fixture)
+    }
+  }
+})
+
+test('a note too long for any safe draft falls back to the clipboard, note intact', () => {
+  /*
+   * The case the old policy got wrong. It used to drop the note and open a
+   * draft without it; now no draft opens, and the whole thing including every
+   * word they wrote goes to the clipboard.
+   */
+  const brief = briefFor('architectureAndPersonalization', {
+    ...EVERYTHING,
+    buyerNote: 'I have quite a lot to say about this and here is the next part of it. '.repeat(30).trim(),
+  })
+  const built = buildMailto(brief, URL_FOR('architectureAndPersonalization'))
+  assert.equal(built.kind, 'tooLong', 'a partial draft was opened instead')
+  if (built.kind !== 'tooLong') return
+  assert.ok(built.body.includes('I have quite a lot to say about this'), 'the note was discarded')
+  for (const value of BUYER_VALUES.slice(0, 16)) {
+    assert.ok(built.body.includes(value), `the fallback lost "${value}"`)
+  }
+  // And the clipboard gets the same complete thing.
+  assert.ok(clipboardBrief(brief, URL_FOR('architectureAndPersonalization')).includes('I have quite a lot to say'))
+})
+
+test('the fallback is explained, not reported as an error', () => {
+  const message = tuesdayV2.result.handoff.tooLong
+  assert.match(message, /copied the full version/)
+  assert.match(message, /Paste it into an email/)
+  for (const wrong of ['error', 'failed', 'sorry', 'could not', 'unable']) {
+    assert.ok(!message.toLowerCase().includes(wrong), `the fallback reads as a failure: ${wrong}`)
+  }
 })
 
 test('the page copies and says so when a mailto cannot be built', () => {
   assert.match(FLOW, /built\.kind === 'tooLong'/)
   assert.match(FLOW, /setTooLong\(true\)/)
   assert.match(FLOW, /void copyText\(built\.body/)
-  assert.match(JSON.stringify(tuesdayV2.result.handoff.tooLong), /copied instead/)
+  assert.match(tuesdayV2.result.handoff.tooLong, /copied the full version instead/)
 })
 
 // ---------------------------------------------------------------------------
@@ -327,8 +457,8 @@ test('no wording claims a submission that did not happen', () => {
   }
   // And it says what the button actually does.
   assert.equal(tuesdayV2.result.handoff.open, 'Open email to Danielle')
-  assert.match(tuesdayV2.result.handoff.openNote, /opens your email app/)
-  assert.match(tuesdayV2.result.handoff.openNote, /Nothing is sent until you press send/)
+  // The helper has to make clear the buyer still has to send it themselves.
+  assert.match(tuesdayV2.result.handoff.openNote, /review the email before anything sends/)
 })
 
 test('the development placeholder is gone', () => {

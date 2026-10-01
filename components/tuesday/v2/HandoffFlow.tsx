@@ -184,7 +184,6 @@ export function HandoffFlow({ result }: { result: Result }) {
     window.location.href = built.href
   }, [brief, copyText])
 
-  const mailto = useMemo(() => buildMailto(brief, RESULT_URL()), [brief])
   const discrepancies = brief.discrepancies
   const h = tuesdayV2.result.handoff
   const cta = tuesdayV2.result.cta
@@ -322,7 +321,7 @@ export function HandoffFlow({ result }: { result: Result }) {
             </button>
           </div>
           <p className="mt-4 max-w-measure font-sans text-[14.5px] leading-[1.5] text-taupe">
-            {tooLong ? h.tooLong : mailto.kind === 'ready' && !mailto.keptNote ? h.trimmedNote : h.openNote}
+            {tooLong ? h.tooLong : h.openNote}
           </p>
           {copied === 'failed' ? (
             <p className="mt-3 max-w-measure font-sans text-[14.5px] leading-[1.5] text-wine">
