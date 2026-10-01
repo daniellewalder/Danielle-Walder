@@ -183,7 +183,7 @@ test('destinations are recorded as written, uncategorised and unexplained', () =
 
 test('no handoff field is ever read as a reason for anything', () => {
   // Every trace source must be a real question id or the literal `handoff`.
-  const QUESTIONS = new Set(['tuesday', 'dealbreaker', 'daily', 'architecture', 'personalization', 'project', 'location', 'tradeoff', 'depends', 'handoff'])
+  const QUESTIONS = new Set(['tuesday', 'dealbreaker', 'daily', 'architecture', 'personalization', 'project', 'location', 'tradeoff', 'depends', 'sizeRoute', 'handoff'])
   for (const handoff of Object.keys(HANDOFFS) as (keyof typeof HANDOFFS)[]) {
     for (const fixture of Object.keys(FIXTURES) as (keyof typeof FIXTURES)[]) {
       const brief = withHandoff(fixture, handoff)
@@ -280,6 +280,71 @@ test('every concept in the brief has exactly one factual home', () => {
         entry.referencedIn.length,
         `${name}: ${concept} is referenced twice in one section`,
       )
+    }
+  }
+})
+
+/*
+ * ONE SIGNAL, DESCRIBED TWICE.
+ *
+ * A functional requirement legitimately lives in both `nonNegotiables` and
+ * `practicalProgram`, because those sections answer different questions. What
+ * must never happen is the two reading as two independent things the buyer
+ * said: that is how one click became "you kept coming back to it".
+ */
+test('a concept in two sections never implies two independent signals', () => {
+  for (const { name, brief, result } of briefs) {
+    for (const [concept, indexed] of Object.entries(brief.conceptIndex)) {
+      if (!indexed.attribute || indexed.referencedIn.length === 0) continue
+      const evidence = result.attributes.find((entry) => entry.attribute.id === concept)
+      if (!evidence) continue
+
+      /*
+       * The EVIDENCE layer may cite only questions that actually touched this
+       * attribute. A derived action is different and may cite either side of a
+       * combination: a conclusion about outdoor space drawn from the upkeep
+       * answer legitimately names `daily`, because the combination is the
+       * evidence. That is layer B working, not a second signal.
+       */
+      const nonNegotiable = brief.nonNegotiables.find((entry) => entry.attribute === concept)
+      for (const id of nonNegotiable?.trace.sources ?? []) {
+        assert.ok(
+          evidence.evidence.directSources.includes(id),
+          `${name}: ${concept} is described as evidence from ${id}, which never touched it`,
+        )
+      }
+
+      // The repetition claim stays gated on distinct questions, never on how
+      // many sections the concept reached.
+      if (nonNegotiable?.repeated) {
+        assert.ok(
+          new Set(nonNegotiable.corroboration).size >= 2,
+          `${name}: ${concept} claims repetition from one question`,
+        )
+      }
+      // Appearing in several sections never upgrades a single signal.
+      if (!nonNegotiable?.repeated && nonNegotiable) {
+        assert.equal(
+          new Set(nonNegotiable.corroboration).size < 2,
+          true,
+          `${name}: ${concept} is not marked repeated but has two distinct sources`,
+        )
+      }
+    }
+  }
+})
+
+test('a shared concept has one id across every section that mentions it', () => {
+  for (const { name, brief } of briefs) {
+    // Any subject anywhere must resolve in the index, attribute or not.
+    const subjects = new Set<string>([
+      ...brief.nonNegotiables.map((entry) => entry.attribute),
+      ...derivedSections(brief).map((entry) => entry.subject),
+      ...brief.doNotSubstitute.map((entry) => entry.wanted),
+      ...brief.flexOrder.candidates.map((entry) => entry.lever),
+    ])
+    for (const subject of subjects) {
+      assert.ok(brief.conceptIndex[subject], `${name}: ${subject} has no shared concept id`)
     }
   }
 })

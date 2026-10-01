@@ -1,14 +1,23 @@
 # The Tuesday Test: V2 instrument specification
 
-**No code changed.** Final architecture for sign-off.
+**Built and frozen.** This is the instrument as implemented in
+`lib/tuesday/v2/`, not a proposal.
 
 8 core questions · 2 conditional follow-ups · qualifier taps on four bundled
 answers · an optional agent handoff after the result.
 
-**This revision applies:** `expansion` removed entirely and Q6's major-project
-answer no longer establishes it; Q8 adds no direct importance at all; the
-same-cluster prohibition is replaced by an explicit allowed-pair matrix; the
-main-rooms qualifier is cut; `site` wording settled.
+**Earlier revision applied:** `expansion` removed entirely and Q6's
+major-project answer no longer establishes it; Q8 adds no direct importance at
+all; the same-cluster prohibition is replaced by an explicit allowed-pair
+matrix; the main-rooms qualifier is cut; `site` wording settled.
+
+**This revision applies three corrections found while building the structured
+brief contract.** Q5's "some" moves from +1 to 0, because at +1 it normalised
+above the high threshold and the middle band could never occur, so "some" and
+"all of it" scored as one answer. C2 is replaced: the artificial contradiction
+conditional is gone, and the slot now carries the size route, which settles how
+a protected size may be satisfied. `site` gains an in-person check. Full
+reasoning and measurements: `docs/tuesday-test-brief-contract.md`.
 
 ---
 
@@ -36,7 +45,7 @@ main-rooms qualifier is cut; `site` wording settled.
 | `separation` | Somewhere to close a door | Q1, Q3 | — |
 | `publicRooms` | Living space that works for how you cook and host | Q3 | **no** (cut) |
 | `kitchen` | A kitchen you don't have to redo | Q6 | — |
-| `condition` | Move-in condition | Q5, Q6, C2 | — |
+| `condition` | Move-in condition | Q5, Q6 | — |
 
 ## verifyPerProperty — depends on the actual site, structure or rules (4)
 
@@ -76,14 +85,20 @@ becomes a **search parameter Danielle checks**, never a scored buyer priority.
 
 | Scale | Range | Sources |
 |---|---|---|
-| `personalizationAppetite` | −3 … +3 | Q5, C2 |
-| `renovationTolerance` | −3 … +3 | Q6, C1, C2 |
-| `dayOneReadiness` | −2 … +4 | Q5, Q6, C1, C2 |
+| `personalizationAppetite` | −3 … +3 | Q5 only |
+| `renovationTolerance` | −3 … +3 | Q6, C1 |
+| `dayOneReadiness` | −2 … +4 | Q5, Q6, C1 |
 
-## Stances — explicit positions, no score (9)
+C2 moves no scale and scores no attribute. It records a position only.
+
+## Stances — explicit positions, no score (13)
 
 `wantsFinished` · `willBuild` · **`structuralWorkOkay`** · `wantsNeutral` ·
 `budgetLed` · `timeLed` · `scaleLimited` · `propertyGated` · `narrowCriteria`
+
+Plus the four from C2, which say how a protected size may be satisfied and
+nothing about how much it matters: `sizeExistingOnly` · `sizeAdditionOkay` ·
+`sizeReconfigureOkay` · `sizePropertySpecific`
 
 ## Removed from the scored model
 
@@ -185,12 +200,25 @@ No negative score. "Plain is actively preferred" is a stance.
 
 | Option | Scale | Also |
 |---|---|---|
-| All of it. Paint, paper, lighting, the lot. | personalization **+3** | |
-| Some. I'd change what bothers me and live with the rest. | **+1** | |
-| Not much. If it's done well I'd rather leave it alone. | **−2** | |
-| I'd rather buy it finished and not think about it. | **−3** | condition **1**, dayOne **+1** |
+| All of it. Paint, paper, lighting, the lot. | personalization **+3** | band `yes` |
+| Some. I'd change what bothers me and live with the rest. | **0** | band `conditional` |
+| Not much. If it's done well I'd rather leave it alone. | **−2** | band `no` |
+| I'd rather buy it finished and not think about it. | **−3** | condition **1**, dayOne **+1**, band `no` |
 
 Independent of Q4 by construction.
+
+**Why "some" is 0 and not +1.** Normalised against the scale's own range of
+[−3, +3], +1 reads as 0.667, which is above the 0.62 high threshold. The middle
+band was arithmetically unreachable and "some" scored identically to "all of
+it", so every rule that fires on high personalization treated the two buyers as
+one person. At 0 it reads as 0.500.
+
+`conditional` means willing to change things, with decorating not itself a
+goal. On its own it does **not** license the cosmetic-finish lever, a second
+look on a plain house, or any do-not-flex on finish. The lever is vetoed with
+`limitedCosmeticAppetite`, which is kept separate from `noCosmeticAppetite`
+because this is a position, not a refusal. The low band establishes nothing
+about renovation tolerance: neither low answer touches that scale.
 
 ---
 
@@ -283,7 +311,7 @@ materially changes what gets searched or inspected.
 | Q7 | **none** | — | — |
 | **Q8** | **none, ever** | — | `narrowCriteria` (escape only) |
 | C1 | none | reno +, dayOne + | four gating stances |
-| C2 | condition 2 | pers ±, reno ±, dayOne ± | `propertyGated` |
+| C2 | **none** | **none** | one size-route stance |
 
 ## Provenance rules
 
@@ -519,18 +547,47 @@ a requirement was not.
 | The scale. Rooms, yes. Moving walls, no. | reno **+1** | `scaleLimited` |
 | The house. For the right property I'd do a lot more. | reno **+2** | `propertyGated` |
 
-## C2 · contradiction · fires on `wantsFinished` + `willBuild`
+## C2 · the size route · fires on `size` protect **AND** `structuralWorkOkay`
 
-| Option | Scales | Also |
-|---|---|---|
-| I enjoy cosmetic changes, not construction. | pers **+3**, reno **−3** | |
-| I'd renovate, but only for an exceptional property. | reno **+1** | `propertyGated` |
-| I'm genuinely open to a major project if the economics work. | reno **+3**, dayOne **−2** | `structuralWorkOkay` |
-| I mostly want the house finished when I buy it. | dayOne **+3**, reno **−2** | condition **2** |
+> If the right house is smaller than you want today, what happens?
 
-At most one clarification per result; C1 takes precedence. A clarification may
-not raise a new attribute above `scrutinize`. Unanswered is recorded as
-unresolved, never defaulted.
+| Option | Route | Scales | Attributes |
+|---|---|---|---|
+| It needs to be big enough already. | `existingOnly` | **none** | **none** |
+| I'd consider adding on if the property made sense. | `additionOkay` | **none** | **none** |
+| I'd rework the space that's already there, but I don't want an addition. | `reconfigureOkay` | **none** | **none** |
+| I'd have to see the actual house before I knew. | `propertySpecific` | **none** | **none** |
+
+**Both trigger conditions, not either.** A high renovation tolerance alone is
+not enough: plenty of buyers take on work without size being what is at stake,
+and asking someone how they would reach a size they never protected is a
+question that makes the instrument feel like it is guessing. `project: fixable`
+gives a high renovation band without accepting structural work and does not
+fire this.
+
+**It changes the route, never the requirement.** No option carries an attribute
+weight or a scale delta. Each sets one stance and nothing else, so `size` stays
+protected at exactly the same strength, from the same sources, at the same
+stated rank, on all four routes. No option creates an `expansion` attribute,
+and `expansion` remains absent from the taxonomy.
+
+Strategy consequences, which differ on every route:
+
+| route | search behaviour |
+|---|---|
+| `existingOnly` | undersized is eliminated; never kept on the assumption it can be enlarged later; the route itself is no longer a lever |
+| `additionOkay` | undersized may stay a candidate; whether **this** property can take an addition is a property fact and is verified in person, never assumed |
+| `reconfigureOkay` | the existing area may work when the problem is the arrangement; this never implies that genuinely insufficient area is acceptable |
+| `propertySpecific` | nothing is decided from the listing; the house and the site settle it |
+
+While the route is unanswered, the brief reports `mustSpaceExistAlready` as its
+unresolved item and offers no second look on an undersized house, because
+keeping one in play would assume the answer.
+
+At most one clarification per result; C1 takes precedence, though in practice
+the two cannot both be live since `depends` and `further` are different answers
+to Q6. A clarification may not raise a new attribute above `scrutinize`.
+Unanswered is recorded as unresolved, never defaulted.
 
 ---
 

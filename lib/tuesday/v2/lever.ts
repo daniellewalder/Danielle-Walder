@@ -36,8 +36,16 @@ export type VetoReason =
   | 'lowRenovation'
   /** Appetite is unsettled, so calling condition a lever would be guesswork. */
   | 'unresolvedProject'
-  /** Personalization appetite does not support giving on finish. */
+  /** They would rather the visual layer already worked. */
   | 'noCosmeticAppetite'
+  /**
+   * They will change some things, but decorating is not the goal.
+   *
+   * SEPARATE FROM `noCosmeticAppetite`. "I'd change what bothers me and live
+   * with the rest" is a real position and not a refusal, and it is not strong
+   * enough on its own to make an unstyled house the thing we lead with.
+   */
+  | 'limitedCosmeticAppetite'
   /**
    * The renovation question was never answered, so we have no reading at all.
    *
@@ -49,6 +57,13 @@ export type VetoReason =
   | 'personalizationNotEstablished'
   /** Size is not protected, or structural work was never accepted. */
   | 'noStructuralRoute'
+  /**
+   * They answered the size route and said the space has to be there already.
+   *
+   * An explicit position, so it counts as the buyer closing this route. It can
+   * only come from an answered question and never from silence.
+   */
+  | 'sizeMustExistAlready'
 
 export type ClosedReason =
   /** Candidates existed and the buyer's own answers closed every one. */
@@ -82,11 +97,12 @@ export interface LeverDiagnosis {
  * fixtures were being reported as buyers who had closed every route when they
  * had simply not been asked about renovation or personalization.
  */
-const BUYER_CLOSED: readonly VetoReason[] = [
+export const BUYER_CLOSED: readonly VetoReason[] = [
   'isDealbreaker',
   'hardFiltered',
   'fixedGeography',
   'lowRenovation',
+  'sizeMustExistAlready',
 ]
 
 /**
@@ -134,6 +150,7 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
    */
   if (s.pers === 'yes') add('cosmeticFinish', null)
   else if (s.pers === 'unset') add('cosmeticFinish', 'personalizationNotEstablished')
+  else if (s.pers === 'conditional') add('cosmeticFinish', 'limitedCosmeticAppetite')
   else add('cosmeticFinish', 'noCosmeticAppetite')
 
   /*
@@ -142,8 +159,9 @@ export function diagnoseLever(s: Signals): LeverDiagnosis {
    * Size stays protected. What is flexible is whether it already exists, and
    * only when the buyer accepted structural work.
    */
-  if (s.protectedIds.has('size') && s.stances.has('structuralWorkOkay')) add('sizeRoute', null)
-  else add('sizeRoute', 'noStructuralRoute')
+  if (s.protectedIds.has('size') && s.stances.has('structuralWorkOkay')) {
+    add('sizeRoute', s.sizeRoute === 'existingOnly' ? 'sizeMustExistAlready' : null)
+  } else add('sizeRoute', 'noStructuralRoute')
 
   // --- the protected attributes themselves --------------------------------
   for (const id of [...s.protectedIds].sort()) {

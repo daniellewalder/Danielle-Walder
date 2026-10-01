@@ -10,9 +10,11 @@ import {
   type Evidence,
   type MapConstraint,
   type ScaleId,
+  type SizeRoute,
   type StanceId,
+  sizeRouteOf,
 } from './model.ts'
-import { QUESTIONS, questionById } from './questions.ts'
+import { QUESTIONS, questionById, type FollowUp } from './questions.ts'
 import { picksFor, type V2Answers } from './answers.ts'
 
 export type Scales = Record<ScaleId, number>
@@ -39,8 +41,17 @@ export interface Result {
   declinedTradeoff: boolean
   answered: number
   answeredQuestionIds: readonly string[]
-  /** Which follow-up, if any, should be put on screen. Only one exists. */
-  needs: 'depends' | null
+  /** Which follow-up, if any, should be put on screen. At most one. */
+  needs: FollowUp | null
+  /**
+   * HOW the protected size may be satisfied, once the follow-up settles it.
+   *
+   * Null means the question was never put, or never answered. It is never a
+   * default: assuming `existingOnly` from silence would eliminate listings the
+   * buyer never ruled out, and assuming `additionOkay` would keep candidates
+   * they would reject on sight.
+   */
+  sizeRoute: SizeRoute | null
   /** The tradeoff exactly as presented, echoed so the brief never re-derives it. */
   tradeoff: { pair: readonly [string, string]; winner: string | null; family: string } | null
 }
@@ -162,6 +173,7 @@ export function score(answers: V2Answers): Result {
   if (answers.project) applyOption('project', answers.project, null)
   if (answers.location) applyOption('location', answers.location, null)
   if (answers.depends) applyOption('depends', answers.depends, null)
+  if (answers.sizeRoute) applyOption('sizeRoute', answers.sizeRoute, null)
 
   /*
    * The tradeoff. Ordering and corroboration only.
@@ -225,6 +237,10 @@ export function score(answers: V2Answers): Result {
       a.attribute.id.localeCompare(b.attribute.id),
   )
 
+  const protectedIds = new Set(
+    read.filter((entry) => entry.state === 'protect').map((entry) => entry.attribute.id),
+  )
+
   return {
     version: 2,
     scales,
@@ -235,9 +251,25 @@ export function score(answers: V2Answers): Result {
     declinedTradeoff,
     answered,
     answeredQuestionIds: [...answeredIds],
-    needs: nextFollowUp(answers),
+    needs: nextFollowUp(answers, protectedIds, stances),
+    sizeRoute: sizeRouteOf(stances),
     tradeoff: answers.tradeoff ?? null,
   }
+}
+
+/**
+ * Whether the size route is a live question for this buyer.
+ *
+ * BOTH CONDITIONS, NOT EITHER. A high renovation tolerance on its own is not
+ * enough: plenty of buyers will take on work without size being the thing at
+ * stake, and asking them how they would reach a size they never protected is
+ * the kind of question that makes an instrument feel like it is guessing.
+ */
+export function sizeRouteApplies(
+  protectedIds: ReadonlySet<string>,
+  stances: ReadonlySet<StanceId>,
+): boolean {
+  return protectedIds.has('size') && stances.has('structuralWorkOkay')
 }
 
 /**
@@ -246,9 +278,14 @@ export function score(answers: V2Answers): Result {
  * A buyer who has already answered one is not asked the other: the point is to
  * resolve the single biggest uncertainty, not to interrogate.
  */
-function nextFollowUp(answers: V2Answers): 'depends' | null {
-  if (answers.depends) return null
-  return answers.project === 'depends' ? 'depends' : null
+function nextFollowUp(
+  answers: V2Answers,
+  protectedIds: ReadonlySet<string>,
+  stances: ReadonlySet<StanceId>,
+): FollowUp | null {
+  if (!answers.depends && answers.project === 'depends') return 'depends'
+  if (!answers.sizeRoute && sizeRouteApplies(protectedIds, stances)) return 'sizeRoute'
+  return null
 }
 
 export function byState(result: Result): Record<AttributeState, ReadAttribute[]> {

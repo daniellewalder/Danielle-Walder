@@ -1,4 +1,4 @@
-import { attributeById, type Changeability } from './model.ts'
+import { attributeById, type Changeability, type SizeRoute } from './model.ts'
 import type { Result } from './score.ts'
 import type { AgentAction, Strategy } from './strategy.ts'
 import { isMeasurementGap, type LeverDiagnosis, type VetoReason } from './lever.ts'
@@ -153,8 +153,14 @@ export interface SearchPattern {
   project: 'turnkey' | 'cosmeticOnly' | 'contained' | 'major' | 'undecided' | 'notEstablished'
   personalization: 'wantsToMakeItTheirs' | 'someChanges' | 'prefersItLeftAlone' | 'notEstablished'
   leverState: LeverDiagnosis['state']
+  /**
+   * HOW the protected size may be satisfied. Null when the question was never
+   * put, or is still open. Never defaulted: assuming it either way would
+   * change which listings are candidates on evidence nobody gave.
+   */
+  sizeRoute: SizeRoute | null
   /** Each posture names the evidence behind it. No posture is asserted bare. */
-  trace: Readonly<Record<'map' | 'project' | 'personalization', Trace>>
+  trace: Readonly<Record<'map' | 'project' | 'personalization' | 'sizeRoute', Trace>>
 }
 
 export interface StructuredBrief {
@@ -173,8 +179,17 @@ export interface StructuredBrief {
   /** Verbatim handoff, or null when nothing was supplied. */
   searchFacts: Handoff | null
   discrepancies: readonly Discrepancy[]
-  /** Where each concept is described, and where it is merely referenced. */
-  conceptIndex: Readonly<Record<string, { home: string; referencedIn: readonly string[] }>>
+  /**
+   * The shared concept id for every fact in the brief.
+   *
+   * One home, and every other section is a reference to it. This is what tells
+   * the renderer that a functional requirement in `nonNegotiables` and the
+   * same requirement in `practicalProgram` are ONE signal described twice for
+   * two different purposes, not two independent things the buyer said.
+   */
+  conceptIndex: Readonly<
+    Record<string, { home: string; referencedIn: readonly string[]; attribute: boolean }>
+  >
 }
 
 // ---------------------------------------------------------------------------
@@ -200,8 +215,19 @@ const DOES_NOT_IMPLY: Readonly<Record<string, readonly string[]>> = {
   'secondLook.cosmeticallyPlain': ['renovationTolerance', 'structuralWork'],
   'secondLook.datedButSound': ['acceptingABadPlan', 'acceptingACompromisedSite'],
   'secondLook.architecturalButUnstyled': ['renovationTolerance'],
-  'secondLook.smallerWithPotential': ['sizeIsNegotiable'],
+  // Appetite for an addition, never a claim that this property can take one.
+  'secondLook.smallerWithPotential': ['sizeIsNegotiable', 'expansionIsFeasibleHere'],
+  // Reworking a plan is not accepting less area than they need.
+  'secondLook.badlyArrangedNotSmall': ['sizeIsNegotiable', 'insufficientAreaIsAcceptable'],
 }
+
+/**
+ * Rules whose showing test verifies a need the buyer stated outright.
+ *
+ * Everything else reaches a showing test by combining signals, and the
+ * distinction is what stops a conclusion of ours being read back as theirs.
+ */
+const STATED_NEED_RULES: readonly string[] = ['operationalNeedsInspection', 'siteNeedsInspection']
 
 function projectPosture(result: Result, strategy: Strategy): SearchPattern['project'] {
   const { renovation, dayOne, cosmetic } = strategy.buyerEvidence.bands
@@ -427,6 +453,7 @@ export function assembleBrief(
       project: projectPosture(result, strategy),
       personalization: personalizationPosture(strategy),
       leverState: strategy.derived.lever.state,
+      sizeRoute: result.sizeRoute,
       trace: {
         map: {
           layer: 'buyerEvidence',
@@ -449,6 +476,11 @@ export function assembleBrief(
           sources: result.answeredQuestionIds.filter((id) => id === 'personalization'),
           rules: ['personalizationPosture'],
         },
+        // Stated outright by the follow-up, so it is evidence, not a reading.
+        sizeRoute: {
+          layer: 'buyerEvidence',
+          sources: result.answeredQuestionIds.filter((id) => id === 'sizeRoute'),
+        },
       },
     },
     nonNegotiables,
@@ -463,7 +495,7 @@ export function assembleBrief(
       ...item(action),
       // Verifying something the buyer named is evidence-led; verifying
       // something a combination produced is strategy-led.
-      origin: action.rules.includes('operationalNeedsInspection') ? 'buyerEvidence' : 'derived',
+      origin: action.rules.some((rule) => STATED_NEED_RULES.includes(rule)) ? 'buyerEvidence' : 'derived',
     })),
     doNotSubstitute: strategy.derived.doNotSubstitute.map((action) => ({
       wanted: action.subject,
@@ -572,8 +604,14 @@ const SECTION_PRIORITY = [
 
 function indexConcepts(brief: StructuredBrief): StructuredBrief['conceptIndex'] {
   const appearances = new Map<string, Set<string>>()
+  /*
+   * EVERY concept, not only taxonomy attributes.
+   *
+   * `sizeRoute`, `geography`, `condition` and `cosmeticFinish` can each appear
+   * in two sections, and the renderer needs the same record for them that it
+   * has for an attribute: this is one fact with one home, not two signals.
+   */
   const put = (subject: string, section: string) => {
-    if (!attributeById(subject)) return
     const sections = appearances.get(subject) ?? new Set<string>()
     sections.add(section)
     appearances.set(subject, sections)
@@ -588,10 +626,16 @@ function indexConcepts(brief: StructuredBrief): StructuredBrief['conceptIndex'] 
   for (const entry of brief.secondLook) put(entry.subject, 'secondLook')
   for (const entry of brief.doNotSubstitute) put(entry.wanted, 'doNotSubstitute')
 
-  const index: Record<string, { home: string; referencedIn: readonly string[] }> = {}
+  const index: Record<string, { home: string; referencedIn: readonly string[]; attribute: boolean }> = {}
   for (const [subject, sections] of appearances) {
     const ordered = SECTION_PRIORITY.filter((section) => sections.has(section))
-    index[subject] = { home: ordered[0], referencedIn: ordered.slice(1) }
+    index[subject] = {
+      home: ordered[0],
+      referencedIn: ordered.slice(1),
+      // False for a derived concept, which has no entry in the taxonomy and so
+      // can never carry buyer evidence of its own.
+      attribute: Boolean(attributeById(subject)),
+    }
   }
   return index
 }

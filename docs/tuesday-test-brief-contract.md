@@ -35,7 +35,8 @@ interface StructuredBrief {
     project: 'turnkey' | 'cosmeticOnly' | 'contained' | 'major' | 'undecided' | 'notEstablished'
     personalization: 'wantsToMakeItTheirs' | 'someChanges' | 'prefersItLeftAlone' | 'notEstablished'
     leverState: 'identified' | 'closed' | 'notEstablished'
-    trace: Record<'map' | 'project' | 'personalization', Trace>
+    sizeRoute: 'existingOnly' | 'additionOkay' | 'reconfigureOkay' | 'propertySpecific' | null
+    trace: Record<'map' | 'project' | 'personalization' | 'sizeRoute', Trace>
   }
   nonNegotiables: NonNegotiable[]
   flexOrder: {
@@ -54,7 +55,7 @@ interface StructuredBrief {
   practicalProgram: BriefItem[]
   searchFacts: Handoff | null
   discrepancies: Discrepancy[]
-  conceptIndex: Record<string, { home: string; referencedIn: string[] }>
+  conceptIndex: Record<string, { home: string; referencedIn: string[]; attribute: boolean }>
 }
 
 interface Trace {
@@ -105,7 +106,7 @@ interface Discrepancy {
 }
 ```
 
-Three changes to the shape you proposed, each for a reason:
+Four changes to the shape you proposed, each for a reason:
 
 **`LeverEntry` has three statuses, not two.** `vetoed` is a finding about the
 buyer. `notSelected` is a fact about us: it could move, better levers existed,
@@ -118,6 +119,14 @@ something already protected. The entry is dropped and its trace folded into the
 attribute, so the reasoning survives without a second heading.
 
 **`searchPattern.trace`.** A posture is a conclusion, so it names its evidence.
+
+**`searchPattern.sizeRoute` and `conceptIndex[].attribute`.** The route is part
+of the operational description of the search, so it sits beside the other three
+postures rather than being reassembled from the sections. `attribute` marks
+whether a concept has an entry in the taxonomy: a derived concept such as
+`sizeRoute` or `cosmeticFinish` can appear in two sections and needs the same
+one-home record an attribute gets, but it can never carry buyer evidence of its
+own and the renderer has to be able to tell.
 
 ## 3. Assembler rules
 
@@ -137,7 +146,12 @@ attribute, so the reasoning survives without a second heading.
    never licenses renovation tolerance.
 7. `practicalProgram` is every established functional or qualified need, at
    `protect` or `scrutinize`.
-8. `conceptIndex` is computed last, over the finished brief.
+8. `searchPattern.sizeRoute` is the answer to the size-route follow-up, or
+   null. Never defaulted either way: assuming the space must already exist
+   would eliminate listings the buyer never ruled out, and assuming it need not
+   would keep candidates they would reject on sight.
+9. `conceptIndex` is computed last, over the finished brief, and covers every
+   concept the brief mentions rather than only taxonomy attributes.
 
 ## 4. Deduplication rules
 
@@ -157,7 +171,13 @@ cannot, because every concept has one home.
 - A concept may legitimately appear in several sections when each says
   something different: a non-negotiable means do not compromise it, a program
   item means the house has to have it. What is forbidden is two findings with
-  no record of which one describes it.
+  no record of which one describes it, which is what `conceptIndex` prevents.
+- **One signal, described twice, is never two signals.** The evidence layer may
+  cite only questions that actually touched the attribute, and the repetition
+  claim stays gated on two distinct question ids. A derived action is different
+  and may cite either side of a combination: a conclusion about outdoor space
+  drawn partly from the upkeep answer legitimately names `daily`, because the
+  combination is the evidence.
 
 ## 5. Discrepancy rules
 
@@ -196,15 +216,27 @@ the assembled brief contains no school-quality vocabulary at all.
 
 ## 7. The seven questions
 
+Each column is one fixture. An empty cell is an empty section, not a gap.
+
 | | `twoDealbreakers` | `turnkey` | `structuralBuilder` | `t1_strongMapLowRenoCosmetic` | `t3_outdoorPoolConcern` | `t9_rankOneWinsQ8` | `t13_leverNotEstablished` |
 |---|---|---|---|---|---|---|---|
 | **filter in the search tool** | _empty_ | condition, layout, publicRooms | _empty_ | kitchen, publicRooms | upkeep | kitchen | _empty_ |
-| **use as a lever** | 1. geography | _empty_ | 1. cosmeticFinish, 2. condition, 3. sizeRoute | 1. cosmeticFinish, 2. geography | 1. geography | _empty_ | _empty_ |
+| **use as a lever** | 1. geography | _empty_ | 1. condition, 2. sizeRoute | 1. cosmeticFinish, 2. geography | 1. geography | _empty_ | _empty_ |
 | **not compromise** | privacy, light | condition, layout, publicRooms, geography | separation, size, site | light, publicRooms, kitchen, condition | outdoor, upkeep | light, outdoor, kitchen, condition, geography | geography |
-| **cannot screen, needs a showing** | _empty_ | _empty_ | size, separation | _empty_ | outdoor, upkeep:pool | _empty_ | exposure |
-| **deserves a second look** | _empty_ | _empty_ | datedButSound, smallerWithPotential | cosmeticallyPlain | _empty_ | _empty_ | _empty_ |
+| **cannot screen, needs a showing** | _empty_ | _empty_ | size, separation, site:land | _empty_ | outdoor, upkeep:pool | _empty_ | exposure |
+| **deserves a second look** | _empty_ | _empty_ | _empty_ | cosmeticallyPlain | _empty_ | _empty_ | _empty_ |
 | **still unresolved** | _empty_ | whatWouldGive | mustSpaceExistAlready | whatWouldGive | renovationAppetite | the personalization question was never answered, so finish could not be weighed | firstFilter, they said it depends how much work, and the follow-up is still open |
 | **needs clarification** | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ |
+
+| | `r5_someChangesOnly` | `r1_sizeExistingOnly` | `r2_sizeAdditionOkay` | `r3_sizeReconfigureOkay` | `r4_sizePropertySpecific` | `r6_siteQualifiers` |
+|---|---|---|---|---|---|---|
+| **filter in the search tool** | kitchen, publicRooms | size | _empty_ | _empty_ | _empty_ | kitchen |
+| **use as a lever** | 1. geography | 1. condition, 2. geography | 1. condition, 2. geography, 3. sizeRoute | 1. condition, 2. geography, 3. sizeRoute | 1. condition, 2. geography, 3. sizeRoute | 1. geography |
+| **not compromise** | light, publicRooms, kitchen, condition | size, sizeRoute | size | size | size | site, kitchen, condition |
+| **cannot screen, needs a showing** | _empty_ | _empty_ | size | size | size | site:land |
+| **deserves a second look** | _empty_ | _empty_ | smallerWithPotential | badlyArrangedNotSmall | _empty_ | _empty_ |
+| **still unresolved** | whatWouldGive | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ |
+| **needs clarification** | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ | _empty_ |
 
 ## 8. One full brief per family
 
@@ -219,6 +251,7 @@ _two full-strength dealbreakers, ranked, from one provenance source_
     "project": "notEstablished",
     "personalization": "notEstablished",
     "leverState": "identified",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -246,6 +279,10 @@ _two full-strength dealbreakers, ranked, from one provenance source_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -404,17 +441,35 @@ _two full-strength dealbreakers, ranked, from one provenance source_
       "home": "nonNegotiables",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "light": {
       "home": "nonNegotiables",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     },
     "condition": {
       "home": "flexOrder",
-      "referencedIn": []
+      "referencedIn": [],
+      "attribute": true
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -431,6 +486,7 @@ _turnkey, low renovation tolerance_
     "project": "turnkey",
     "personalization": "prefersItLeftAlone",
     "leverState": "closed",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -462,6 +518,10 @@ _turnkey, low renovation tolerance_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -744,21 +804,41 @@ _turnkey, low renovation tolerance_
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "layout": {
       "home": "nonNegotiables",
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "publicRooms": {
       "home": "nonNegotiables",
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "doNotFlex",
+      "referencedIn": [
+        "flexOrder"
+      ],
+      "attribute": false
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -773,8 +853,9 @@ _major structural work, and no expansion attribute is created by it_
   "searchPattern": {
     "map": "propertyLed",
     "project": "major",
-    "personalization": "wantsToMakeItTheirs",
+    "personalization": "someChanges",
     "leverState": "identified",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -799,7 +880,7 @@ _major structural work, and no expansion attribute is created by it_
       "personalization": {
         "layer": "derived",
         "because": [
-          "personalizationAppetite = yes"
+          "personalizationAppetite = conditional"
         ],
         "sources": [
           "personalization"
@@ -807,6 +888,10 @@ _major structural work, and no expansion attribute is created by it_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -952,7 +1037,7 @@ _major structural work, and no expansion attribute is created by it_
       {
         "lever": "condition",
         "status": "available",
-        "rank": 2,
+        "rank": 1,
         "trace": {
           "layer": "derived",
           "because": [
@@ -969,33 +1054,29 @@ _major structural work, and no expansion attribute is created by it_
       },
       {
         "lever": "cosmeticFinish",
-        "status": "available",
-        "rank": 1,
+        "status": "vetoed",
+        "veto": "limitedCosmeticAppetite",
         "trace": {
           "layer": "derived",
           "because": [
-            "cosmetic = yes",
-            "an unstyled house is acceptable",
-            "implies nothing about renovation"
-          ],
-          "sources": [
-            "personalization"
+            "vetoed: limitedCosmeticAppetite"
           ],
           "rules": [
-            "cosmeticFinishLever"
+            "leverDiagnosis"
           ]
         }
       },
       {
         "lever": "sizeRoute",
         "status": "available",
-        "rank": 3,
+        "rank": 2,
         "trace": {
           "layer": "derived",
           "because": [
             "size = protect",
             "structuralWorkOkay",
-            "the size may be created rather than found"
+            "the route is not settled yet",
+            "whether the size must already exist is not yet established"
           ],
           "sources": [
             "tuesday",
@@ -1053,52 +1134,7 @@ _major structural work, and no expansion attribute is created by it_
   },
   "doNotFlex": [],
   "skipFaster": [],
-  "secondLook": [
-    {
-      "id": "secondLook.datedButSound",
-      "subject": "condition",
-      "trace": {
-        "layer": "derived",
-        "because": [
-          "cosmetic = yes",
-          "renovation = yes"
-        ],
-        "sources": [
-          "personalization",
-          "project"
-        ],
-        "rules": [
-          "persHighRenoHigh"
-        ]
-      },
-      "doesNotImply": [
-        "acceptingABadPlan",
-        "acceptingACompromisedSite"
-      ]
-    },
-    {
-      "id": "secondLook.smallerWithPotential",
-      "subject": "size",
-      "trace": {
-        "layer": "derived",
-        "because": [
-          "size = protect",
-          "structuralWorkOkay"
-        ],
-        "sources": [
-          "tuesday",
-          "dealbreaker",
-          "project"
-        ],
-        "rules": [
-          "sizeStructural"
-        ]
-      },
-      "doesNotImply": [
-        "sizeIsNegotiable"
-      ]
-    }
-  ],
+  "secondLook": [],
   "showingTests": [
     {
       "id": "inspect.expansionFeasibility",
@@ -1116,7 +1152,7 @@ _major structural work, and no expansion attribute is created by it_
           "project"
         ],
         "rules": [
-          "sizeStructural"
+          "sizeRouteUnsettled"
         ]
       },
       "origin": "derived"
@@ -1141,6 +1177,27 @@ _major structural work, and no expansion attribute is created by it_
         ]
       },
       "origin": "derived"
+    },
+    {
+      "id": "inspect.siteFit",
+      "subject": "site",
+      "qualifier": "land",
+      "trace": {
+        "layer": "derived",
+        "because": [
+          "site = protect",
+          "qualifier = land",
+          "inspect the slope, the shape and which parts of the land are usable",
+          "this needs evaluating in person, and nothing here says a problem exists"
+        ],
+        "sources": [
+          "dealbreaker"
+        ],
+        "rules": [
+          "siteNeedsInspection"
+        ]
+      },
+      "origin": "buyerEvidence"
     }
   ],
   "doNotSubstitute": [],
@@ -1153,7 +1210,8 @@ _major structural work, and no expansion attribute is created by it_
         "layer": "derived",
         "because": [
           "size = protect",
-          "structuralWorkOkay"
+          "structuralWorkOkay",
+          "the size route has not been answered"
         ],
         "sources": [
           "dealbreaker",
@@ -1190,28 +1248,45 @@ _major structural work, and no expansion attribute is created by it_
       "referencedIn": [
         "showingTests",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "size": {
       "home": "nonNegotiables",
       "referencedIn": [
         "showingTests",
-        "flexOrder",
-        "secondLook"
-      ]
+        "flexOrder"
+      ],
+      "attribute": true
     },
     "site": {
       "home": "nonNegotiables",
       "referencedIn": [
         "practicalProgram",
+        "showingTests",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     },
     "condition": {
       "home": "flexOrder",
-      "referencedIn": [
-        "secondLook"
-      ]
+      "referencedIn": [],
+      "attribute": true
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -1228,6 +1303,7 @@ _strong map + low renovation + cosmetic flexibility_
     "project": "cosmeticOnly",
     "personalization": "wantsToMakeItTheirs",
     "leverState": "identified",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -1259,6 +1335,10 @@ _strong map + low renovation + cosmetic flexibility_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -1550,27 +1630,51 @@ _strong map + low renovation + cosmetic flexibility_
       "home": "nonNegotiables",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "publicRooms": {
       "home": "nonNegotiables",
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "kitchen": {
       "home": "nonNegotiables",
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "condition": {
       "home": "doNotFlex",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "finishes": {
+      "home": "secondLook",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -1587,6 +1691,7 @@ _outdoor protected + pool-specific upkeep concern_
     "project": "undecided",
     "personalization": "notEstablished",
     "leverState": "identified",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -1617,6 +1722,10 @@ _outdoor protected + pool-specific upkeep concern_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -1908,7 +2017,8 @@ _outdoor protected + pool-specific upkeep concern_
         "showingTests",
         "flexOrder",
         "doNotSubstitute"
-      ]
+      ],
+      "attribute": true
     },
     "upkeep": {
       "home": "nonNegotiables",
@@ -1917,11 +2027,28 @@ _outdoor protected + pool-specific upkeep concern_
         "showingTests",
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     },
     "condition": {
       "home": "flexOrder",
-      "referencedIn": []
+      "referencedIn": [],
+      "attribute": true
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -1938,6 +2065,7 @@ _two protected dealbreakers, the FIRST-ranked one wins Q8_
     "project": "turnkey",
     "personalization": "notEstablished",
     "leverState": "notEstablished",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -1967,6 +2095,10 @@ _two protected dealbreakers, the FIRST-ranked one wins Q8_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -2253,26 +2385,47 @@ _two protected dealbreakers, the FIRST-ranked one wins Q8_
       "home": "nonNegotiables",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "outdoor": {
       "home": "nonNegotiables",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "kitchen": {
       "home": "nonNegotiables",
       "referencedIn": [
         "skipFaster",
         "flexOrder"
-      ]
+      ],
+      "attribute": true
     },
     "condition": {
       "home": "doNotFlex",
       "referencedIn": [
         "flexOrder"
-      ]
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "doNotFlex",
+      "referencedIn": [
+        "flexOrder"
+      ],
+      "attribute": false
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -2289,6 +2442,7 @@ _fixed map and nothing else established: we never found what could move_
     "project": "undecided",
     "personalization": "prefersItLeftAlone",
     "leverState": "notEstablished",
+    "sizeRoute": null,
     "trace": {
       "map": {
         "layer": "buyerEvidence",
@@ -2321,6 +2475,10 @@ _fixed map and nothing else established: we never found what could move_
         "rules": [
           "personalizationPosture"
         ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": []
       }
     }
   },
@@ -2453,9 +2611,293 @@ _fixed map and nothing else established: we never found what could move_
   "searchFacts": null,
   "discrepancies": [],
   "conceptIndex": {
+    "exposure": {
+      "home": "showingTests",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "geography": {
+      "home": "doNotFlex",
+      "referencedIn": [
+        "flexOrder"
+      ],
+      "attribute": false
+    },
     "condition": {
       "home": "flexOrder",
-      "referencedIn": []
+      "referencedIn": [],
+      "attribute": true
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    }
+  }
+}
+```
+
+### `r2_sizeAdditionOkay`
+_the same buyer, willing to add on if the property makes sense_
+
+```json
+{
+  "version": 2,
+  "searchPattern": {
+    "map": "fewAreas",
+    "project": "major",
+    "personalization": "someChanges",
+    "leverState": "identified",
+    "sizeRoute": "additionOkay",
+    "trace": {
+      "map": {
+        "layer": "buyerEvidence",
+        "sources": [
+          "location"
+        ]
+      },
+      "project": {
+        "layer": "derived",
+        "because": [
+          "renovationTolerance = yes",
+          "dayOneReadiness = no",
+          "structuralWorkOkay"
+        ],
+        "sources": [
+          "project"
+        ],
+        "rules": [
+          "projectPosture"
+        ]
+      },
+      "personalization": {
+        "layer": "derived",
+        "because": [
+          "personalizationAppetite = conditional"
+        ],
+        "sources": [
+          "personalization"
+        ],
+        "rules": [
+          "personalizationPosture"
+        ]
+      },
+      "sizeRoute": {
+        "layer": "buyerEvidence",
+        "sources": [
+          "sizeRoute"
+        ]
+      }
+    }
+  },
+  "nonNegotiables": [
+    {
+      "attribute": "size",
+      "qualifier": null,
+      "changeability": "realProject",
+      "direct": 4,
+      "directSources": [
+        "tuesday",
+        "dealbreaker"
+      ],
+      "statedRank": 1,
+      "corroboration": [
+        "tuesday",
+        "dealbreaker"
+      ],
+      "repeated": true,
+      "ordering": null,
+      "trace": {
+        "layer": "buyerEvidence",
+        "sources": [
+          "tuesday",
+          "dealbreaker"
+        ]
+      }
+    }
+  ],
+  "flexOrder": {
+    "state": "identified",
+    "reason": null,
+    "candidates": [
+      {
+        "lever": "geography",
+        "status": "available",
+        "rank": 2,
+        "trace": {
+          "layer": "derived",
+          "because": [
+            "map = fewAreas"
+          ],
+          "sources": [
+            "location"
+          ],
+          "rules": [
+            "geographyLever"
+          ]
+        }
+      },
+      {
+        "lever": "condition",
+        "status": "available",
+        "rank": 1,
+        "trace": {
+          "layer": "derived",
+          "because": [
+            "renovation = yes",
+            "work is on the table"
+          ],
+          "sources": [
+            "project"
+          ],
+          "rules": [
+            "conditionLever"
+          ]
+        }
+      },
+      {
+        "lever": "cosmeticFinish",
+        "status": "vetoed",
+        "veto": "limitedCosmeticAppetite",
+        "trace": {
+          "layer": "derived",
+          "because": [
+            "vetoed: limitedCosmeticAppetite"
+          ],
+          "rules": [
+            "leverDiagnosis"
+          ]
+        }
+      },
+      {
+        "lever": "sizeRoute",
+        "status": "available",
+        "rank": 3,
+        "trace": {
+          "layer": "derived",
+          "because": [
+            "size = protect",
+            "structuralWorkOkay",
+            "sizeRoute = additionOkay",
+            "the size may be created by adding on, subject to the property"
+          ],
+          "sources": [
+            "tuesday",
+            "dealbreaker",
+            "project",
+            "sizeRoute"
+          ],
+          "rules": [
+            "sizeRouteLever"
+          ]
+        }
+      },
+      {
+        "lever": "size",
+        "status": "vetoed",
+        "veto": "isDealbreaker",
+        "trace": {
+          "layer": "derived",
+          "because": [
+            "vetoed: isDealbreaker"
+          ],
+          "rules": [
+            "leverDiagnosis"
+          ]
+        }
+      }
+    ]
+  },
+  "doNotFlex": [],
+  "skipFaster": [],
+  "secondLook": [
+    {
+      "id": "secondLook.smallerWithPotential",
+      "subject": "size",
+      "trace": {
+        "layer": "derived",
+        "because": [
+          "size = protect",
+          "sizeRoute = additionOkay",
+          "undersized may still be a candidate"
+        ],
+        "sources": [
+          "tuesday",
+          "dealbreaker",
+          "sizeRoute"
+        ],
+        "rules": [
+          "sizeAdditionOkay"
+        ]
+      },
+      "doesNotImply": [
+        "sizeIsNegotiable",
+        "expansionIsFeasibleHere"
+      ]
+    }
+  ],
+  "showingTests": [
+    {
+      "id": "inspect.expansionFeasibility",
+      "subject": "size",
+      "trace": {
+        "layer": "derived",
+        "because": [
+          "sizeRoute = additionOkay",
+          "feasibility is a property fact, not an appetite"
+        ],
+        "sources": [
+          "tuesday",
+          "dealbreaker",
+          "sizeRoute"
+        ],
+        "rules": [
+          "sizeAdditionOkay"
+        ]
+      },
+      "origin": "derived"
+    }
+  ],
+  "doNotSubstitute": [],
+  "expectedTradeoff": null,
+  "unresolved": [],
+  "practicalProgram": [],
+  "searchFacts": null,
+  "discrepancies": [],
+  "conceptIndex": {
+    "size": {
+      "home": "nonNegotiables",
+      "referencedIn": [
+        "showingTests",
+        "flexOrder",
+        "secondLook"
+      ],
+      "attribute": true
+    },
+    "geography": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "condition": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": true
+    },
+    "cosmeticFinish": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
+    },
+    "sizeRoute": {
+      "home": "flexOrder",
+      "referencedIn": [],
+      "attribute": false
     }
   }
 }
@@ -2654,152 +3096,187 @@ _a settled no-renovation posture and a note that explicitly mentions gutting it_
 }
 ```
 
-## 10. What this phase found
 
-Building the brief exposed four defects in layers that were otherwise frozen.
-All four are fixed and covered by regression tests. The first is the serious
-one.
+## 10. The three approved corrections
 
-### A gap in our questioning was being reported as the buyer refusing
+### Q5 personalization: the middle band
 
-`closed` is supposed to mean the buyer's own answers shut every route.
-`diagnoseLever` reached it whenever ANY route was closed by an answer, even
-with other routes never measured at all. Two things fed it:
+The deltas are now +3 / 0 / -2 / -3. Against the scale's own range of [-3, +3]:
 
-- an unanswered renovation question produced the veto `lowRenovation`
-- an unanswered personalization question produced `noCosmeticAppetite`
+| answer | delta | normalised | band | posture |
+|---|---|---|---|---|
+| All of it. Paint, paper, lighting, the lot. | +3 | 1.000 | `yes` | `wantsToMakeItTheirs` |
+| Some. I'd change what bothers me and live with the rest. | 0 | 0.500 | `conditional` | `someChanges` |
+| Not much. If it's done well I'd rather leave it alone. | -2 | 0.167 | `no` | `prefersItLeftAlone` |
+| I'd rather buy it finished and not think about it. | -3 | 0.000 | `no` | `prefersItLeftAlone` |
 
-Both are claims about a buyer who was never asked. Both counted towards
-`closed`. So a buyer who named two dealbreakers and a fixed map, and then
-stopped, was reported as having closed the search.
+Thresholds are 0.62 and 0.38, so all three bands are now reachable and "some"
+sits in the middle rather than reading as the maximum.
 
-Fixed three ways: two new veto reasons, `renovationNotEstablished` and
-`personalizationNotEstablished`, that say what is true; a `NOT_MEASURED` list
-that can never contribute to `closed`; and `closed` now requiring that every
-route was actually measured.
+What `conditional` does NOT produce, enforced by test: the cosmetic-finish
+lever, a second look on a cosmetically plain house, or any do-not-flex on
+finish. The lever is vetoed with a new reason, `limitedCosmeticAppetite`, kept
+separate from `noCosmeticAppetite` because "I'd change what bothers me" is a
+real position and not a refusal.
 
-Measured over 33,000 paths that include partial completions, **13.19% of all
-paths carried a no-lever result mislabelled as `closed`**. It lands wherever
-the project or personalization question is unanswered. The fully answered space
-is unchanged: 87.92% `identified`, 10.00% `closed`, 2.08% `notEstablished` over
-844,800 paths, and `turnkey` remains the one fixture legitimately `closed`.
+`low` still establishes nothing about renovation: neither low answer touches
+the renovation scale, and a test asserts the band stays `unset` when the
+project question was not answered.
 
-This is the exact conflation the three-state model was built to end. The
-earlier lever audit missed it because it measured whether a lever was *found*,
-never whether a veto was *earned*.
+Across 844,800 fully answered paths the posture now splits 25% / 25% / 50%,
+where before "some" and "all of it" were one bucket of 50%.
 
-### A strategy rule contradicted the diagnosis it is checked against
+### The size-route conditional
 
-`geographyLever` offered geography as a lever for a `propertyLed` buyer.
-`diagnoseLever` vetoes that same case as `geographyAlreadyOpen`. The two
-disagreed silently because the only test was that an `identified` diagnosis
-produced *some* lever.
+Asked only when `size` is protect-level AND `structuralWorkOkay` is true. Not
+on general renovation tolerance: `project: fixable` gives a high renovation
+band without accepting structural work, and a buyer who never protected size
+is never asked how they would reach a size they did not ask for. Live on 3.64%
+of fully answered paths. The `depends` follow-up keeps precedence, though the
+two cannot both be live since `further` and `depends` are different answers to
+one question.
 
-The diagnosis is right: a property-led buyer already told us the area is open,
-so "give on geography first" is their own answer read back, with no constraint
-left to trade. The rule now excludes `propertyLed`, and a new test asserts that
-no rule ever offers a lever the diagnosis vetoed.
+The four options carry **no attribute weight and no scale delta**. They set one
+stance each and nothing else, so `size` stays protected at exactly the same
+strength, from the same sources, at the same stated rank, on every route. No
+option creates an `expansion` attribute, and `expansion` is still absent from
+the taxonomy. Tests assert all of this per route.
 
-### `practicalProgram` dropped the signals it exists to carry
+| route | filter | lever | second look | showing test |
+|---|---|---|---|---|
+| unanswered | none | `sizeRoute` available, route unsettled | none | `inspect.expansionFeasibility` |
+| `existingOnly` | `reject.undersized` on `size` | vetoed: `sizeMustExistAlready` | none | none |
+| `additionOkay` | none | available | `secondLook.smallerWithPotential` | `inspect.expansionFeasibility` |
+| `reconfigureOkay` | none | available | `secondLook.badlyArrangedNotSmall` | `inspect.areaCanBeRearranged` |
+| `propertySpecific` | none | available | none | `inspect.sizeSolvableHere` |
 
-It was sourced from protect-level attributes only, so in
-`twoBundledQualifiers` it printed protected `utility` while dropping
-`upkeep:pool` at scrutinize level, which is precisely the one-off practical
-signal the section is for. Now sourced from every established functional or
-qualified need.
+The guardrails are carried in `doesNotImply`, not in prose:
+`smallerWithPotential` does not imply `expansionIsFeasibleHere` (appetite is
+established, feasibility is a property fact), and `badlyArrangedNotSmall` does
+not imply `insufficientAreaIsAcceptable`. Neither implies `sizeIsNegotiable`.
+`existingOnly` additionally carries `hold.sizeRoute`: never kept as a candidate
+on the assumption it can be enlarged later.
 
-### Levers we simply did not lead with were reported as vetoed
+One behaviour change worth noting. Before the conditional existed,
+`secondLook.smallerWithPotential` fired for every size-plus-structural buyer.
+It no longer does while the route is unsettled, because keeping an undersized
+house in play assumes they would add on, which is the thing the follow-up
+establishes rather than guesses. `structuralBuilder` lost that second look as a
+result, and `mustSpaceExistAlready` remains its unresolved item until it is
+answered.
 
-`separation` was eligible in two fixtures and never offered, because three
-better levers existed. The brief called it `vetoed`, which reads as the buyer
-ruling it out. Hence the third status.
+`sizeMustExistAlready` is the one new veto that counts towards `closed`,
+because it can only ever come from an answered question.
 
-## 11. One defect left open, for your decision
+### Site showing tests
 
-I have not touched this, because fixing it means re-tuning a scale you
-approved.
+`site` is protect-at-purchase and had no in-person check at all, which was the
+gap reported last round. Now `inspect.siteFit`, exactly one finding per result,
+on every qualifier and with none.
 
-**The personalization band's middle value is arithmetically unreachable.**
-`personalizationAppetite` is moved by one question with four options:
+The repo's qualifier ids differ slightly from the ones in your note. The
+meanings are identical and the ids are kept because they are already in the
+serialization:
 
-| answer | delta | normalised | band |
-|---|---|---|---|
-| All of it. Paint, paper, lighting, the lot. | +3 | 1.000 | `yes` |
-| Some. I'd change what bothers me and live with the rest. | +1 | 0.667 | `yes` |
-| Not much. If it's done well I'd rather leave it alone. | -2 | 0.167 | `no` |
-| I'd rather buy it finished and not think about it. | -3 | 0.000 | `no` |
+| your note | repo id | what to inspect |
+|---|---|---|
+| `site:land` | `site:land` | the slope, the shape and which parts of the land are usable |
+| `site:siting` | `site:sits` | how the house actually sits on the property |
+| `site:neighbors` | `site:neighbours` | the physical relationship to the neighbouring structures |
+| `site:access` | `site:access` | the arrival, the driveway and how the property is entered |
+| `site:all` | `site:whole` | the site as one thing, not as four separate checks |
+| no qualifier | none | the overall site fit |
 
-The thresholds are 0.62 and 0.38, so nothing can land between them.
-`conditional` never occurs, and "some" is scored identically to "all of it".
-Every rule that fires on personalization high, including offering cosmetic
-finish as the first lever, treats those two buyers as the same person.
+`whole` stays one finding. A test asserts it never names any of the four
+specifics, because the buyer gave one answer and splitting it would turn one
+signal into four separate concerns.
 
-Verified by brute force over the whole answer space. `renovationTolerance`
-reaches `conditional` legitimately; `personalizationAppetite` cannot.
+What the evidence licenses is "this has to be looked at", and the action says so
+outright: every one carries the fact "this needs evaluating in person, and
+nothing here says a problem exists". A test scans every string the brief
+produces for assertive language (bad, poor, steep, difficult, too close, wrong,
+unusable, compromised and the rest) and fails on any of it. The origin is
+`buyerEvidence`, because the buyer named the site themselves.
 
-Three ways out, in order of how much they disturb what you approved:
+## 11. Partial completions still cannot generate a veto
 
-1. **Re-space the deltas** to +3 / 0 / -2 / -3, which puts "some" at 0.5 and
-   inside `conditional`. One line, no wording change, no new question.
-2. **Leave the scale and stop the overclaim downstream** by treating band `yes`
-   as "will change things" without letting it alone select cosmetic finish as
-   the first lever.
-3. **Leave it.** Defensible if you think "I'd change what bothers me" really
-   does mean finish is the first thing to give.
+Kept and extended. Four veto reasons assert a position, and each is now mapped
+to the question that must have been answered for it to exist:
 
-I would take 1.
+| veto | requires an answer to |
+|---|---|
+| `lowRenovation` | `project` |
+| `noCosmeticAppetite` | `personalization` |
+| `limitedCosmeticAppetite` | `personalization` |
+| `sizeMustExistAlready` | `sizeRoute` |
 
-The brief already refuses to overclaim on its own account: the posture is named
-`wantsToMakeItTheirs`, not `high`, and its trace records the band and the
-question, so nothing downstream can quietly upgrade "some" into a magnitude the
-evidence cannot support.
+The test brute-forces 1,200 partial-completion paths and fails if any of those
+reasons appears without its question. A second test asserts that `BUYER_CLOSED`
+and the measurement-gap list stay disjoint, so a reason can never both mean the
+buyer closed a route and be reachable by never asking.
 
-## 12. What the Tuesday Test cannot supply, and the brief clearly needs
+`unset` still produces `renovationNotEstablished` and
+`personalizationNotEstablished`, neither of which can contribute to `closed`,
+and `closed` still requires every route to have been measured.
 
-Ranked by how much each one changes the search. None of these is guessable, and
-none should be inferred.
+## 12. Distribution after the changes
 
-1. **Price, and the difference between a target and a ceiling.** Nothing else
-   determines what is worth showing. Handoff field, already in the schema.
-2. **Actual geography.** `fewAreas` and `strongPreference` are postures. The
-   areas themselves are only ever the buyer's own words. Handoff field.
-3. **Timing.** "Active" and "casual" run completely different searches and the
-   test never asks. Handoff field.
-4. **Minimum bedrooms, baths, square footage, property type.** The test
-   measures what matters about a house, not its specification. Handoff field.
-5. **Whether the protected size has to exist now.** `mustSpaceExistAlready`
-   surfaces in `unresolved` for the structural buyers; nothing in the test
-   settles it, and the answer changes which listings are even candidates.
-   Not a handoff field. Would need either a question or Danielle asking.
-6. **Market facts of any kind.** Layer C is empty and must stay empty until a
-   real data source exists. The brief asserts nothing about rarity, value,
-   inventory or what a kind of house "tends" to have, and a test enforces that
-   against the whole assembled JSON.
-7. **Anything a photograph cannot carry.** `showingTests` names these but
-   cannot resolve them. That is the section working correctly.
+844,800 fully answered paths:
 
-Two gaps in what the *instrument* establishes, distinct from the above:
+| lever state | before | after |
+|---|---|---|
+| `identified` | 87.92% | 81.88% |
+| `closed` | 10.00% | 15.00% |
+| `notEstablished` | 2.08% | 3.13% |
 
-- **The renovation and personalization questions are skippable**, and skipping
-  them is what produced the mislabelling in section 10. The brief now reports
-  the gap honestly. Whether those two questions should be required is a
-  product decision, not a code one.
-- **`site` has no showing test.** It is protected in two fixtures, described
-  only as a non-negotiable, and how a house sits on its lot is close to the
-  definition of something you cannot screen from a listing.
+The shift is the personalization fix. Buyers who said "some" were previously
+handed the cosmetic-finish lever they had not licensed; those results now fall
+through to whatever else is eligible. The closure is still attributed only to
+earned vetoes, since `limitedCosmeticAppetite` is deliberately not in
+`BUYER_CLOSED`.
 
 ## 13. Test count
 
-342, up from 298. All passing, with lint, typecheck and build clean.
+383, up from 342 at the start of this round and 298 before the brief contract.
+All passing, with lint, typecheck and build clean.
 
-| file | tests | new |
+| file | tests | new this round |
 |---|---|---|
-| `lib/tuesday/v2/brief.test.ts` | 40 | 40: layers, traces, dedup, fair housing, discrepancies, the flex order |
-| `lib/tuesday/v2/strategy.test.ts` | 41 | 4: rule/diagnosis agreement, silence never blames the buyer, `closed` requires measurement |
+| `lib/tuesday/v2/sizeroute.test.ts` | 21 | 21 |
+| `lib/tuesday/v2/site.test.ts` | 10 | 10 |
+| `lib/tuesday/v2/bands.test.ts` | 7 | 7 |
+| `lib/tuesday/v2/brief.test.ts` | 42 | 2 |
+| `lib/tuesday/v2/strategy.test.ts` | 42 | 1 |
 | rest of `lib/tuesday/v2/` | 100 | unchanged |
 | `lib/tuesday/` (V1) | 75 | unchanged |
 | rest of `lib/` | 86 | unchanged |
-| **total** | **342** | **+44** |
+| **total** | **383** | **+41** |
 
-V1 is untouched. `git diff` against every V1 file, `components/` and `app/` is
-empty, so every shared V1 link still reads through the V1 interpreter.
+Eight fixtures were added: the four size routes, the personalization middle
+band, and three site cases (a specific qualifier, the bundled whole, and the
+qualifier skipped).
+
+## 14. V1 is untouched
+
+`git diff` against `lib/tuesday/model.ts`, `score.ts`, `questions.ts`,
+`interpret.ts`, `read.ts`, `showing.ts`, `brief.ts`, `encode.ts`, `hero.ts`,
+and against `components/`, `app/`, `lib/essays/`, `lib/config.ts` and
+`lib/content/`, is empty for the whole of the V2 work. Every shared V1 link
+still reads through the V1 interpreter.
+
+**One thing to be aware of for the future.** The personalization change alters
+what an existing V2 payload means: a link carrying `p.some` now scores
+differently than it would have yesterday. That is safe only because V2 has
+never been on screen, so no V2 link exists anywhere. Once the V2 instrument
+ships, a scoring change of this kind requires a version bump rather than an
+edit, for exactly the reason the versioning exists.
+
+## 15. Frozen
+
+As of this change, frozen: the V2 instrument, V2 scoring and evidence,
+provenance, the adaptive tradeoff, the strategy layer, and this brief contract.
+
+Changes to these layers from here need a genuine correctness bug, not a copy
+preference. If the reader-facing brief wants something the structure does not
+carry, the answer is a renderer that composes what is here, or a documented
+defect, not a quiet re-tune.

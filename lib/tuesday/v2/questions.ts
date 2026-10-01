@@ -55,8 +55,11 @@ export interface Question {
   /** True when the second pick is explicitly optional and explicitly weaker. */
   ordered?: boolean
   options: readonly QuestionOption[]
-  showWhen?: 'depends'
+  showWhen?: FollowUp
 }
+
+/** The conditional follow-ups. At most one is ever shown. */
+export type FollowUp = 'depends' | 'sizeRoute'
 
 export const QUESTIONS: readonly Question[] = [
   {
@@ -210,9 +213,21 @@ export const QUESTIONS: readonly Question[] = [
         scales: { personalizationAppetite: 3 },
       },
       {
+        /*
+         * ZERO, NOT +1.
+         *
+         * At +1 this normalised to 0.667 against the scale's own range, which
+         * is above the 0.62 threshold, so "some" scored identically to "all of
+         * it" and the middle band could never occur at all. Every rule that
+         * fires on high personalization treated the two buyers as one person.
+         *
+         * At the midpoint it reads as what it says: willing to change things,
+         * but decorating is not the goal. That is `conditional`, and it must
+         * never on its own make cosmetic plainness a lever or a second look.
+         */
         id: 'some',
         label: "Some. I'd change what bothers me and live with the rest.",
-        scales: { personalizationAppetite: 1 },
+        scales: { personalizationAppetite: 0 },
       },
       {
         id: 'notmuch',
@@ -332,6 +347,50 @@ export const QUESTIONS: readonly Question[] = [
         label: "The house. For the right property I'd do a lot more.",
         scales: { renovationTolerance: 2 },
         stances: ['propertyGated'],
+      },
+    ],
+  },
+
+  /*
+   * The size route.
+   *
+   * Asked only of a buyer who protected size AND accepted structural work,
+   * because only then is there a genuine open question: the space they need
+   * might have to exist already, or might be something they would create. That
+   * changes which listings are candidates at all, which is why it is worth a
+   * question rather than a guess.
+   *
+   * IT DOES NOT TOUCH THE IMPORTANCE OF SIZE. No option carries an attribute
+   * weight or a scale delta, so size stays exactly as protected as it was and
+   * no option can create an `expansion` requirement nobody stated. All four
+   * record a position and nothing else.
+   */
+  {
+    id: 'sizeRoute',
+    kicker: 'the smaller house',
+    prompt: 'If the right house is smaller than you want today, what happens?',
+    weight: 1,
+    showWhen: 'sizeRoute',
+    options: [
+      {
+        id: 'existing',
+        label: 'It needs to be big enough already.',
+        stances: ['sizeExistingOnly'],
+      },
+      {
+        id: 'addition',
+        label: "I'd consider adding on if the property made sense.",
+        stances: ['sizeAdditionOkay'],
+      },
+      {
+        id: 'reconfigure',
+        label: "I'd rework the space that's already there, but I don't want an addition.",
+        stances: ['sizeReconfigureOkay'],
+      },
+      {
+        id: 'seeit',
+        label: "I'd have to see the actual house before I knew.",
+        stances: ['sizePropertySpecific'],
       },
     ],
   },

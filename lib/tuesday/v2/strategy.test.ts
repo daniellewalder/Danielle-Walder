@@ -5,6 +5,7 @@ import { score } from './score.ts'
 import { QUESTIONS } from './questions.ts'
 import type { V2Answers } from './answers.ts'
 import { RULE_IDS, strategyFor, type AgentAction, type Strategy } from './strategy.ts'
+import { BUYER_CLOSED, isMeasurementGap } from './lever.ts'
 
 const all = Object.entries(FIXTURES).map(([name, { answers }]) => {
   const result = score(answers)
@@ -35,32 +36,53 @@ const derivedActions = (s: Strategy): AgentAction[] => [
  * reported as the buyer's decision, and must never count towards `closed`.
  */
 test('an unanswered question never produces a veto that blames the buyer', () => {
-  const BLAMES_BUYER = ['lowRenovation', 'noCosmeticAppetite', 'isDealbreaker', 'fixedGeography', 'hardFiltered']
+  /*
+   * Each of these reasons asserts a position, so each must be traceable to the
+   * question that established it. The map is the key: a veto reached by not
+   * asking is a measurement gap wearing a finding's clothes.
+   */
+  const NEEDS_AN_ANSWER: Readonly<Record<string, string>> = {
+    lowRenovation: 'project',
+    noCosmeticAppetite: 'personalization',
+    limitedCosmeticAppetite: 'personalization',
+    sizeMustExistAlready: 'sizeRoute',
+  }
   const paths: V2Answers[] = []
-  for (const project of [undefined, 'never', 'done', 'depends', 'fixable', 'further']) {
-    for (const personalization of [undefined, 'all', 'some', 'notmuch', 'finished']) {
-      for (const location of ['fixed', 'strong', 'few', 'property']) {
-        const answers: V2Answers = { version: 2, dealbreaker: [{ option: 'dark' }], location }
-        if (project) answers.project = project
-        if (personalization) answers.personalization = personalization
-        paths.push(answers)
+  for (const dealbreaker of [[{ option: 'dark' }], [{ option: 'outgrow' }]]) {
+    for (const project of [undefined, 'never', 'done', 'depends', 'fixable', 'further']) {
+      for (const personalization of [undefined, 'all', 'some', 'notmuch', 'finished']) {
+        for (const sizeRoute of [undefined, 'existing', 'addition', 'reconfigure', 'seeit']) {
+          for (const location of ['fixed', 'strong', 'few', 'property']) {
+            const answers: V2Answers = { version: 2, dealbreaker, location }
+            if (project) answers.project = project
+            if (personalization) answers.personalization = personalization
+            if (sizeRoute) answers.sizeRoute = sizeRoute
+            paths.push(answers)
+          }
+        }
       }
     }
   }
   for (const answers of paths) {
     const result = score(answers)
     const strategy = strategyFor(result)
-    const askedProject = result.answeredQuestionIds.includes('project')
-    const askedPers = result.answeredQuestionIds.includes('personalization')
+    const answered = new Set(result.answeredQuestionIds)
     for (const candidate of strategy.derived.lever.candidates) {
-      if (!candidate.vetoedBy || !BLAMES_BUYER.includes(candidate.vetoedBy)) continue
-      if (candidate.concept === 'condition' && candidate.vetoedBy === 'lowRenovation') {
-        assert.ok(askedProject, `lowRenovation from silence: ${JSON.stringify(answers)}`)
-      }
-      if (candidate.concept === 'cosmeticFinish' && candidate.vetoedBy === 'noCosmeticAppetite') {
-        assert.ok(askedPers, `noCosmeticAppetite from silence: ${JSON.stringify(answers)}`)
-      }
+      const needs = candidate.vetoedBy && NEEDS_AN_ANSWER[candidate.vetoedBy]
+      if (!needs) continue
+      assert.ok(
+        answered.has(needs),
+        `${candidate.vetoedBy} on ${candidate.concept} without an answer to ${needs}: ${JSON.stringify(answers)}`,
+      )
     }
+  }
+})
+
+test('every veto that counts towards closed comes from an answered question', () => {
+  // The two lists have to stay disjoint: a reason cannot both mean the buyer
+  // closed a route and be reachable by never asking.
+  for (const reason of BUYER_CLOSED) {
+    assert.ok(!isMeasurementGap(reason), `${reason} is both a buyer decision and a measurement gap`)
   }
 })
 
@@ -337,8 +359,13 @@ test('t7 character plus personalization filters on bones and rehabilitates plain
 test('t8 size plus structural work raises the right unresolved lever', () => {
   const s = one('t8_sizeAndStructural')
   assert.equal(s.derived.unresolvedLever?.id, 'mustSpaceExistAlready')
-  assert.ok(s.derived.secondLook.some((a) => a.id === 'secondLook.smallerWithPotential'))
   assert.ok(s.derived.showingTests.some((a) => a.id === 'inspect.expansionFeasibility'))
+  /*
+   * And NOT a second look on an undersized house. Keeping a smaller property
+   * in play assumes they would add on, which is precisely what the size-route
+   * follow-up is there to establish rather than guess.
+   */
+  assert.ok(!s.derived.secondLook.some((a) => a.id === 'secondLook.smallerWithPotential'))
 })
 
 test('t9 and t10: Q8 changes ordering without changing either protect state', () => {

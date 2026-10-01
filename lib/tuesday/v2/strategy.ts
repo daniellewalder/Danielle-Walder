@@ -1,4 +1,4 @@
-import { type MapConstraint, type StanceId } from './model.ts'
+import { type MapConstraint, type SizeRoute, type StanceId } from './model.ts'
 import { bandOf, type Band, type ReadAttribute, type Result } from './score.ts'
 import { MAP } from './tradeoff.ts'
 import { diagnoseLever, type LeverDiagnosis } from './lever.ts'
@@ -117,6 +117,40 @@ export interface Strategy {
 // Signals
 // ---------------------------------------------------------------------------
 
+/**
+ * What the size lever actually means, per route.
+ *
+ * Never more than the answer supports. "I'd have to see the house" is not a
+ * statement that the size can be created, so that route says only that the
+ * question is open at the property.
+ */
+const SIZE_LEVER: Readonly<Record<string, string>> = {
+  unsettled: 'whether the size must already exist is not yet established',
+  additionOkay: 'the size may be created by adding on, subject to the property',
+  reconfigureOkay: 'the existing area may be made to work by reworking the plan',
+  propertySpecific: 'whether the size can be solved is a question for the actual house',
+}
+
+/**
+ * What to look at on the site, by qualifier.
+ *
+ * Each is an instruction to inspect, never a finding. `whole` is deliberately
+ * one line: the buyer said the whole thing, which is one answer, and splitting
+ * it into four would turn a single signal into four separate concerns.
+ */
+const SITE_FOCUS: Readonly<Record<string, string>> = {
+  land: 'inspect the slope, the shape and which parts of the land are usable',
+  sits: 'inspect how the house actually sits on the property',
+  neighbours: 'inspect the physical relationship to the neighbouring structures',
+  access: 'inspect the arrival, the driveway and how the property is entered',
+  whole: 'inspect the site as one thing, not as four separate checks',
+  none: 'inspect the overall site fit',
+}
+
+/** Where the size evidence came from. Used by every size-route rule. */
+const sizeSources = (s: Signals): readonly string[] =>
+  s.byId.get('size')?.evidence.directSources ?? []
+
 /** Clusters used for filtering decisions. Organizational only. */
 const SPATIAL = ['size', 'separation', 'publicRooms', 'layout']
 const SITE_QUALITIES = ['light', 'privacy', 'outdoor', 'street', 'site']
@@ -139,6 +173,8 @@ export interface Signals {
   tradeoffLoserProtected: boolean
   declinedTradeoff: boolean
   projectUnresolved: boolean
+  /** HOW the protected size may be satisfied, once settled. Null until then. */
+  sizeRoute: SizeRoute | null
   answered: number
   /**
    * Subjects that a filter rule will eliminate on.
@@ -189,6 +225,7 @@ export function signalsOf(result: Result): Signals {
     tradeoffLoserProtected: Boolean(loser && protectedIds.has(loser)),
     declinedTradeoff: result.declinedTradeoff,
     projectUnresolved: result.needs === 'depends',
+    sizeRoute: result.sizeRoute,
     answered: result.answered,
   }
 }
@@ -396,14 +433,25 @@ const RULES: readonly Rule[] = [
   {
     id: 'sizeRouteLever',
     tier: 2,
-    when: (s) => s.protectedIds.has('size') && s.stances.has('structuralWorkOkay'),
+    /*
+     * NOT when the buyer said it has to be big enough already. That answer
+     * closes this route explicitly, and offering it afterwards would be
+     * flexing on something they just ruled out.
+     */
+    when: (s) =>
+      s.protectedIds.has('size') &&
+      s.stances.has('structuralWorkOkay') &&
+      s.sizeRoute !== 'existingOnly',
     emit: (s) => ({
       actions: [
         // The ROUTE to the required size, not the size. Size stays protected;
         // what can move is whether it already exists.
         act('flexFirst', 'flex.sizeRoute', 'sizeRoute',
-          ['size = protect', 'structuralWorkOkay', 'the size may be created rather than found'],
-          [...(s.byId.get('size')?.evidence.directSources ?? []), 'project'], 'sizeRouteLever', { order: 25 }),
+          ['size = protect', 'structuralWorkOkay',
+            ...(s.sizeRoute ? [`sizeRoute = ${s.sizeRoute}`] : ['the route is not settled yet']),
+            SIZE_LEVER[s.sizeRoute ?? 'unsettled']],
+          [...(s.byId.get('size')?.evidence.directSources ?? []),
+            'project', ...(s.sizeRoute ? ['sizeRoute'] : [])], 'sizeRouteLever', { order: 25 }),
       ],
     }),
   },
@@ -502,8 +550,9 @@ const RULES: readonly Rule[] = [
     when: (s) => s.protectedIn(SPATIAL).length > 0 && s.reno === 'yes',
     emit: (s) => ({
       actions: s.protectedIn(SPATIAL)
-        // `sizeStructural` asks the same question about size, and asks it more
-        // precisely, so the general check stands aside rather than duplicating.
+        // The size-route rules ask the same question about size, and ask it
+        // more precisely, so the general check stands aside rather than
+        // duplicating it under a vaguer heading.
         .filter((entry) => !(entry.attribute.id === 'size' && s.stances.has('structuralWorkOkay')))
         .map((entry) =>
         act('showingTest', `inspect.${entry.attribute.id}.correctable`, entry.attribute.id,
@@ -512,24 +561,97 @@ const RULES: readonly Rule[] = [
       ),
     }),
   },
+  /*
+   * THE SIZE ROUTE.
+   *
+   * Size stays protected throughout. What differs is how the requirement may
+   * be met, and each route produces different search behaviour:
+   *
+   *   unanswered        the question is open, so it is the unresolved item
+   *   existingOnly      undersized is out; never kept on an enlargement guess
+   *   additionOkay      undersized may stay in, subject to verification
+   *   reconfigureOkay   badly arranged may stay in; genuinely too small is out
+   *   propertySpecific  nothing is decided from the listing at all
+   */
   {
-    id: 'sizeStructural',
+    id: 'sizeRouteUnsettled',
     tier: 4,
-    when: (s) => s.protectedIds.has('size') && s.stances.has('structuralWorkOkay'),
+    when: (s) =>
+      s.protectedIds.has('size') && s.stances.has('structuralWorkOkay') && s.sizeRoute === null,
     emit: (s) => ({
       actions: [
-        act('secondLook', 'secondLook.smallerWithPotential', 'size',
-          ['size = protect', 'structuralWorkOkay'], [...(s.byId.get('size')?.evidence.directSources ?? []), 'project'], 'sizeStructural'),
         act('showingTest', 'inspect.expansionFeasibility', 'size',
           ['size = protect', 'structuralWorkOkay', 'expansion potential is a property fact, not a buyer priority'],
-          [...(s.byId.get('size')?.evidence.directSources ?? []), 'project'], 'sizeStructural'),
+          [...sizeSources(s), 'project'], 'sizeRouteUnsettled'),
       ],
       unresolved: {
         id: 'mustSpaceExistAlready',
-        because: ['size = protect', 'structuralWorkOkay'],
+        because: ['size = protect', 'structuralWorkOkay', 'the size route has not been answered'],
         sources: ['dealbreaker', 'project'],
         priority: 2,
       },
+    }),
+  },
+  {
+    id: 'sizeExistingOnly',
+    tier: 4,
+    when: (s) => s.sizeRoute === 'existingOnly',
+    emit: (s) => ({
+      actions: [
+        act('filterHard', 'reject.undersized', 'size',
+          ['size = protect', 'sizeRoute = existingOnly', 'the space has to be there already'],
+          [...sizeSources(s), 'sizeRoute'], 'sizeExistingOnly'),
+        act('doNotFlex', 'hold.sizeRoute', 'sizeRoute',
+          ['sizeRoute = existingOnly',
+            'never kept as a candidate on the assumption it can be enlarged later'],
+          ['sizeRoute'], 'sizeExistingOnly'),
+      ],
+    }),
+  },
+  {
+    id: 'sizeAdditionOkay',
+    tier: 4,
+    when: (s) => s.sizeRoute === 'additionOkay',
+    emit: (s) => ({
+      actions: [
+        act('secondLook', 'secondLook.smallerWithPotential', 'size',
+          ['size = protect', 'sizeRoute = additionOkay', 'undersized may still be a candidate'],
+          [...sizeSources(s), 'sizeRoute'], 'sizeAdditionOkay'),
+        // The appetite is established. Whether THIS property can take an
+        // addition is a fact about the property, and nothing here assumes it.
+        act('showingTest', 'inspect.expansionFeasibility', 'size',
+          ['sizeRoute = additionOkay', 'feasibility is a property fact, not an appetite'],
+          [...sizeSources(s), 'sizeRoute'], 'sizeAdditionOkay'),
+      ],
+    }),
+  },
+  {
+    id: 'sizeReconfigureOkay',
+    tier: 4,
+    when: (s) => s.sizeRoute === 'reconfigureOkay',
+    emit: (s) => ({
+      actions: [
+        act('secondLook', 'secondLook.badlyArrangedNotSmall', 'size',
+          ['size = protect', 'sizeRoute = reconfigureOkay',
+            'the existing area may work when the problem is the arrangement'],
+          [...sizeSources(s), 'sizeRoute'], 'sizeReconfigureOkay'),
+        act('showingTest', 'inspect.areaCanBeRearranged', 'size',
+          ['sizeRoute = reconfigureOkay', 'no addition wanted, so the question is the plan'],
+          [...sizeSources(s), 'sizeRoute'], 'sizeReconfigureOkay'),
+      ],
+    }),
+  },
+  {
+    id: 'sizePropertySpecific',
+    tier: 4,
+    when: (s) => s.sizeRoute === 'propertySpecific',
+    emit: (s) => ({
+      actions: [
+        act('showingTest', 'inspect.sizeSolvableHere', 'size',
+          ['size = protect', 'sizeRoute = propertySpecific',
+            'not decidable from the listing, so the house and the site settle it'],
+          [...sizeSources(s), 'sizeRoute'], 'sizePropertySpecific'),
+      ],
     }),
   },
   {
@@ -692,6 +814,42 @@ const RULES: readonly Rule[] = [
           entry.qualifier ? { qualifier: entry.qualifier } : {}),
       ),
     }),
+  },
+
+  /*
+   * THE SITE, IN PERSON.
+   *
+   * `site` is protect-at-purchase and had no showing test at all, which is odd
+   * for the one attribute that is almost the definition of something a
+   * photograph cannot carry.
+   *
+   * WHAT THE EVIDENCE LICENSES: this has to be looked at. Nothing more. It
+   * does not license a claim that the slope is bad, that the neighbours are
+   * too close, that the driveway is difficult or that the orientation is
+   * wrong. Those are property facts and we have none. The qualifier only
+   * narrows WHAT to look at, and `whole` stays one finding rather than
+   * becoming four, because the buyer gave one answer.
+   */
+  {
+    id: 'siteNeedsInspection',
+    tier: 6,
+    when: (s) => s.protectedIds.has('site'),
+    emit: (s) => {
+      const qualifier = s.qualifiers.site
+      return {
+        actions: [
+          act('showingTest', 'inspect.siteFit', 'site',
+            [
+              'site = protect',
+              ...(qualifier ? [`qualifier = ${qualifier}`] : ['no qualifier given']),
+              SITE_FOCUS[qualifier ?? 'none'] ?? SITE_FOCUS.none,
+              'this needs evaluating in person, and nothing here says a problem exists',
+            ],
+            [...(s.byId.get('site')?.evidence.directSources ?? [])], 'siteNeedsInspection',
+            qualifier ? { qualifier } : {}),
+        ],
+      }
+    },
   },
 
   // --- tier 7: nothing established -----------------------------------------

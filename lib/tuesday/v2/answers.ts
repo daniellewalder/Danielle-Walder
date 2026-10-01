@@ -47,8 +47,16 @@ export interface V2Answers {
   project?: string
   location?: string
   tradeoff?: TradeoffAnswer
-  /** The "depends on what" follow-up. The only conditional in V2. */
+  /** The "depends on what" follow-up. */
   depends?: string
+  /**
+   * The size-route follow-up.
+   *
+   * Records HOW the protected size may be satisfied. It never changes how much
+   * size matters, and it is only ever asked when size is protected and
+   * structural work was accepted.
+   */
+  sizeRoute?: string
 }
 
 export const EMPTY: V2Answers = { version: INSTRUMENT_VERSION }
@@ -88,5 +96,6 @@ export function answeredCount(answers: V2Answers): number {
   if (answers.location) total += 1
   if (answers.tradeoff) total += 1
   if (answers.depends) total += 1
+  if (answers.sizeRoute) total += 1
   return total
 }

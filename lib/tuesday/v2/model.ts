@@ -245,6 +245,37 @@ export type StanceId =
   | 'scaleLimited'
   | 'propertyGated'
   | 'narrowCriteria'
+  /*
+   * HOW the protected size may be satisfied. Never whether it matters.
+   *
+   * These come from the size-route follow-up, which is asked only of a buyer
+   * who protected size AND accepted structural work. They carry no importance
+   * and no scale movement, because the question is not how much size matters.
+   * It is whether the size has to already exist, and that changes which
+   * listings are candidates without changing what the buyer wants.
+   */
+  | 'sizeExistingOnly'
+  | 'sizeAdditionOkay'
+  | 'sizeReconfigureOkay'
+  | 'sizePropertySpecific'
+
+/** The four answers to the size-route follow-up, as one value. */
+export type SizeRoute = 'existingOnly' | 'additionOkay' | 'reconfigureOkay' | 'propertySpecific'
+
+/** Stance → route. The one place the mapping lives. */
+export const SIZE_ROUTE_STANCES: Readonly<Record<StanceId & string, SizeRoute>> = {
+  sizeExistingOnly: 'existingOnly',
+  sizeAdditionOkay: 'additionOkay',
+  sizeReconfigureOkay: 'reconfigureOkay',
+  sizePropertySpecific: 'propertySpecific',
+} as Readonly<Record<string, SizeRoute>>
+
+export function sizeRouteOf(stances: ReadonlySet<StanceId>): SizeRoute | null {
+  for (const [stance, route] of Object.entries(SIZE_ROUTE_STANCES)) {
+    if (stances.has(stance as StanceId)) return route
+  }
+  return null
+}
 
 /** Four levels, strongest first. Never derived from the buyer's reasons. */
 export type MapConstraint = 'fixed' | 'strongPreference' | 'fewAreas' | 'propertyLed'

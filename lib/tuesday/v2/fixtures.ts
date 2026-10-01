@@ -3,7 +3,7 @@ import { candidatesFrom, selectPair, type Preconditions } from './tradeoff.ts'
 import { bandOf, score } from './score.ts'
 
 /**
- * Sixteen answer paths that between them exercise every mechanism in the V2
+ * Answer paths that between them exercise every mechanism in the V2
  * engine. They exist to be read, not just to pass: the dump alongside them
  * prints evidence, provenance, ordering and state so the model can be audited
  * without reading a line of result copy.
@@ -272,6 +272,91 @@ export const FIXTURES: Readonly<Record<string, { why: string; answers: V2Answers
       location: 'few',
     }),
   },
+  // --- the size route: the four answers to the second conditional ---------
+  r1_sizeExistingOnly: {
+    why: 'size protected, structural work accepted, but the space has to exist already',
+    answers: V({
+      tuesday: 'room',
+      dealbreaker: [{ option: 'outgrow' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'few',
+      sizeRoute: 'existing',
+    }),
+  },
+  r2_sizeAdditionOkay: {
+    why: 'the same buyer, willing to add on if the property makes sense',
+    answers: V({
+      tuesday: 'room',
+      dealbreaker: [{ option: 'outgrow' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'few',
+      sizeRoute: 'addition',
+    }),
+  },
+  r3_sizeReconfigureOkay: {
+    why: 'the same buyer, reworking the existing space but not adding on',
+    answers: V({
+      tuesday: 'room',
+      dealbreaker: [{ option: 'outgrow' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'few',
+      sizeRoute: 'reconfigure',
+    }),
+  },
+  r4_sizePropertySpecific: {
+    why: 'the same buyer, who would have to see the actual house first',
+    answers: V({
+      tuesday: 'room',
+      dealbreaker: [{ option: 'outgrow' }],
+      architecture: 'some',
+      personalization: 'some',
+      project: 'further',
+      location: 'few',
+      sizeRoute: 'seeit',
+    }),
+  },
+  r5_someChangesOnly: {
+    why: 'personalization "some": the middle band, which must not read as high',
+    answers: V({
+      dealbreaker: [{ option: 'dark' }],
+      daily: [{ option: 'public' }],
+      architecture: 'notreally',
+      personalization: 'some',
+      project: 'never',
+      location: 'strong',
+    }),
+  },
+  r6_siteQualifiers: {
+    why: 'site protected with a specific qualifier, for the in-person check',
+    answers: V({
+      dealbreaker: [{ option: 'site', qualifier: 'land' }],
+      project: 'never',
+      location: 'few',
+    }),
+  },
+  r7_siteWhole: {
+    why: 'site protected with the bundled "whole thing": one finding, never four',
+    answers: V({
+      dealbreaker: [{ option: 'site', qualifier: 'whole' }],
+      project: 'never',
+      location: 'few',
+    }),
+  },
+  r8_siteNoQualifier: {
+    why: 'site protected with the qualifier skipped: overall site fit, no problem implied',
+    answers: V({
+      dealbreaker: [{ option: 'site' }],
+      project: 'never',
+      location: 'few',
+    }),
+  },
+
   t13_leverNotEstablished: {
     why: 'fixed map and nothing else established: we never found what could move',
     answers: V({
