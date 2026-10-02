@@ -178,7 +178,7 @@ export const QUESTIONS: readonly Question[] = [
     id: 'architecture',
     kicker: 'the house itself',
     prompt:
-      'Some houses have something of their own. Others are just well built. Which matters to you?',
+      'Some houses have something of their own. Others are just well built. How much does that matter to you?',
     weight: 1,
     options: [
       {

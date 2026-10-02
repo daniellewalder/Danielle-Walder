@@ -138,12 +138,12 @@ export const LEVER_BY_SITUATION: Readonly<Record<string, Phrase>> = {
     buyer: 'Area. If nothing else opens it up, a few streets past my preferred line.',
   },
   'geography|fewAreas|1': {
-    agent: 'Area. More than one neighbourhood already works, so stretch inside that set before anything else.',
-    buyer: 'Area. More than one neighbourhood already works for me, so stretch that set first.',
+    agent: 'Area. More than one neighborhood already works, so stretch inside that set before anything else.',
+    buyer: 'Area. More than one neighborhood already works for me, so stretch that set first.',
   },
   'geography|fewAreas|2': {
-    agent: 'Area. If nothing else opens it up, the neighbourhoods that already work can stretch.',
-    buyer: 'Area. If nothing else opens it up, the neighbourhoods that already work can stretch.',
+    agent: 'Area. If nothing else opens it up, the neighborhoods that already work can stretch.',
+    buyer: 'Area. If nothing else opens it up, the neighborhoods that already work can stretch.',
   },
   'condition|2': {
     agent: 'Condition. If the finishes alone are not enough, real work is on the table too.',
@@ -229,6 +229,34 @@ export const LEAD: Readonly<Record<string, Phrase>> = {
   'cosmeticFinish|geography': {
     agent: 'I would not rule out a house because the finishes are boring. The area itself stays where it is.',
     buyer: "I wouldn't rule out a house because the finishes are boring. The area stays where it is.",
+  },
+}
+
+/**
+ * WHAT THE WORK DEPENDS ON, when condition is the lever and the buyer said it
+ * depends.
+ *
+ * Four follow-up answers land on the same renovation band, so without these
+ * the brief told a buyer who said "rooms, yes, moving walls, no" that they
+ * were open to real work. Each of these says what they actually limited, and
+ * none of them claims they want the project: permission is not preference.
+ */
+export const PROJECT_LIMIT_LEAD: Readonly<Record<string, Phrase>> = {
+  scale: {
+    agent: 'They are open to some work, but not the kind that means moving walls. I would show them houses that need finishing rather than houses that need rearranging.',
+    buyer: "I'm open to some work, but not the kind that means moving walls. Show me houses that need finishing rather than houses that need rearranging.",
+  },
+  time: {
+    agent: 'They would take on work, but not the kind they would have to live through. I would keep the scope to what can be done before they move in.',
+    buyer: "I'd take on work, but not the kind I'd have to live in while it happens. Keep the scope to what can be done before I move in.",
+  },
+  budget: {
+    agent: 'What they would take on is a question about the numbers. I would put the cost of the work in front of them with the house.',
+    buyer: "What I'd take on is a question about the numbers. Put the cost of the work in front of me with the house.",
+  },
+  property: {
+    agent: 'They would take on more work for the right house. I would lead with the property and let the work follow it.',
+    buyer: "I'd take on more work for the right house. Lead with the property and let the work follow it.",
   },
 }
 
@@ -335,6 +363,19 @@ export const BUYER_DECISION_VETOES: readonly string[] = [
   'limitedCosmeticAppetite',
 ]
 
+/**
+ * The same veto when it is the only thing in the sentence.
+ *
+ * "The rest are my dealbreakers" works as the tail of a list and is circular
+ * on its own, sitting directly under the list of dealbreakers it refers to.
+ */
+export const VETO_ALONE: Readonly<Record<string, Phrase>> = {
+  isDealbreaker: {
+    agent: 'every one of those is a dealbreaker',
+    buyer: 'every one of those is a dealbreaker for me',
+  },
+}
+
 // ---------------------------------------------------------------------------
 // Actions
 // ---------------------------------------------------------------------------
@@ -433,7 +474,10 @@ export const SHOWING: Readonly<Record<string, Phrase>> = {
   'inspect.upkeep~amount': { agent: 'Walk the whole property and count what has to be maintained.' },
   'inspect.upkeep~general': { agent: 'Ask what has been deferred and what is coming up.' },
   'inspect.utility': { agent: 'Find out where everyday life actually goes in this house.' },
-  'inspect.utility~laundry': { agent: 'Find the laundry. Is it somewhere they would use it?' },
+  'inspect.utility~laundry': {
+    agent: 'Find the laundry. Is it somewhere they would actually use it?',
+    buyer: 'Find the laundry. Is it somewhere I would actually use it?',
+  },
   'inspect.utility~storage': { agent: 'Open the cupboards. Where does everything actually go?' },
   'inspect.utility~pantry': {
     agent: 'Where does the pantry overflow go? Look for the second place to put things.',
@@ -468,7 +512,10 @@ export const SHOWING: Readonly<Record<string, Phrase>> = {
     agent: "Look at what's built next door, from inside the house.",
     buyer: "Look at what's next door, from inside the house.",
   },
-  'inspect.siteFit~access': { agent: 'Arrive the way they would. Driveway, gate, the last fifty feet.' },
+  'inspect.siteFit~access': {
+    agent: 'Arrive the way they would. Driveway, gate, the last fifty feet.',
+    buyer: 'Arrive the way I would. Driveway, gate, the last fifty feet.',
+  },
   'inspect.siteFit~whole': { agent: 'Walk the whole site before you form a view of the house.' },
   'inspect.characterIsStructural': {
     agent: 'Check the character is in the building, not in the furniture.',
@@ -564,33 +611,33 @@ export const UNRESOLVED: Readonly<Record<string, Phrase>> = {
 }
 
 /** Functional requirements. Factual, never analysis. */
-export const PROGRAM: Readonly<Record<string, string>> = {
-  circulation: 'stairs and circulation that work',
-  utility: 'somewhere for laundry, storage and the everyday',
-  parking: 'parking that works',
-  upkeep: 'upkeep they can live with',
+export const PROGRAM: Readonly<Record<string, Phrase>> = {
+  circulation: { agent: 'stairs and circulation that work' },
+  utility: { agent: 'somewhere for laundry, storage and the everyday' },
+  parking: { agent: 'parking that works' },
+  upkeep: { agent: 'upkeep they can live with', buyer: 'upkeep I can live with' },
 }
 
-export const PROGRAM_QUALIFIED: Readonly<Record<string, string>> = {
-  'utility:laundry': 'laundry',
-  'utility:storage': 'storage',
-  'utility:pantry': 'a pantry that works',
-  'utility:all': 'laundry, storage and pantry',
-  'parking:offstreet': 'off-street parking',
-  'parking:garage': 'a garage',
-  'parking:access': 'a driveway they can use',
-  'parking:charging': 'EV charging',
+export const PROGRAM_QUALIFIED: Readonly<Record<string, Phrase>> = {
+  'utility:laundry': { agent: 'laundry' },
+  'utility:storage': { agent: 'storage' },
+  'utility:pantry': { agent: 'a pantry that works' },
+  'utility:all': { agent: 'laundry, storage and pantry' },
+  'parking:offstreet': { agent: 'off-street parking' },
+  'parking:garage': { agent: 'a garage' },
+  'parking:access': { agent: 'a driveway they can use', buyer: 'a driveway I can use' },
+  'parking:charging': { agent: 'EV charging' },
   // Factual. "A pool is a maintenance question, not a feature" was analysis
   // wearing a checklist's clothes, and this section is not for analysis.
-  'upkeep:pool': 'pool upkeep',
-  'upkeep:planting': 'planting and landscape upkeep',
-  'upkeep:amount': 'how much property there is to look after',
-  'upkeep:general': 'general maintenance',
-  'site:land': 'the land itself',
-  'site:sits': 'how the house sits on the lot',
-  'site:neighbours': 'what is built next door',
-  'site:access': 'access they can live with',
-  'site:whole': 'the site as a whole',
+  'upkeep:pool': { agent: 'pool upkeep' },
+  'upkeep:planting': { agent: 'planting and landscape upkeep' },
+  'upkeep:amount': { agent: 'how much property there is to look after' },
+  'upkeep:general': { agent: 'general maintenance' },
+  'site:land': { agent: 'the land itself' },
+  'site:sits': { agent: 'how the house sits on the lot' },
+  'site:neighbours': { agent: 'what is built next door' },
+  'site:access': { agent: 'access they can live with', buyer: 'access I can live with' },
+  'site:whole': { agent: 'the site as a whole' },
 }
 
 /** Handoff field labels. No interpretation anywhere in this section. */
@@ -639,5 +686,33 @@ export const DISCREPANCY: Readonly<Record<string, Phrase>> = {
   'renovationTolerance = no|buyer note mentions major work': {
     agent: 'The test has renovation ruled out. The note mentions major work. Worth one question before you search on either.',
     buyer: 'I said no renovation but my note mentions major work. Worth sorting out.',
+  },
+}
+
+/**
+ * `flexOrder.missing`, in both registers.
+ *
+ * The contract records these gaps as prose because they are statements about
+ * our own instrument, and that prose is written for Danielle. Keyed by the
+ * exact sentence the contract supplies; `render.test.ts` asserts every entry
+ * of `GAP_TEXT` has a register here, so a new gap cannot reach a buyer in the
+ * third person.
+ */
+export const GAP: Readonly<Record<string, Phrase>> = {
+  'the renovation question was never answered, so condition could not be weighed': {
+    agent: 'the renovation question was never answered, so condition could not be weighed',
+    buyer: "I never answered the renovation question, so there is no reading on what I'd do to a house",
+  },
+  'the personalization question was never answered, so finish could not be weighed': {
+    agent: 'the personalization question was never answered, so finish could not be weighed',
+    buyer: 'I never answered the question about finish, so there is no reading on that either',
+  },
+  'they said it depends how much work, and the follow-up is still open': {
+    agent: 'they said it depends how much work, and the follow-up is still open',
+    buyer: 'I said it depends how much work, and I never pinned down what it depends on',
+  },
+  'nothing softer than their hard constraints was ever gathered': {
+    agent: 'nothing softer than their hard constraints was ever gathered',
+    buyer: 'nothing softer than my hard constraints ever came up',
   },
 }

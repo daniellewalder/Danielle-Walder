@@ -17,7 +17,7 @@ export const tuesdayV2 = {
    */
   tradeoff: {
     kicker: 'the one that survives',
-    prompt: 'Two of these came up. If you had to pick one, which survives?',
+    prompt: 'If you had to pick one, which survives?',
     decline: "I'd keep looking.",
     /** Said once, because the answer is a real one and not a cop-out. */
     note: 'Both still matter. This only records which one survives a forced choice.',
@@ -28,6 +28,11 @@ export const tuesdayV2 = {
     kicker: 'which part',
     one: 'Which part of that did you mean?',
     many: 'Which part of each of those did you mean?',
+    /*
+     * Two answers, two groups, one Continue. Without this the button simply
+     * stayed inert after the first group, with nothing on screen saying why.
+     */
+    manyHelp: 'Choose one for each answer above.',
   },
 
   /**
@@ -39,17 +44,32 @@ export const tuesdayV2 = {
    */
   mapSide: 'Staying inside the area you want',
 
+  /**
+   * The two questions that take two answers.
+   *
+   * THEY ARE NOT THE SAME MECHANIC, AND THEY MUST NOT LOOK ALIKE. On the
+   * dealbreaker question both answers count the same; on the daily question
+   * the first is weighted higher. Both used to print an identical numbered
+   * badge, so the only thing telling them apart was a sentence that reads
+   * almost the same two screens apart. The marks now say which rule is in
+   * force, and `weighted` is what makes the first one louder.
+   */
   ordered: {
     dealbreaker: {
       help: 'Choose up to two. Both count the same.',
-      rank: ['First', 'Second'],
+      /** Equal weight, equal emphasis: neither of these outranks the other. */
+      marks: ['first pick', 'second pick'],
+      weighted: false,
       /** Read out to assistive tech, so the order is not carried by a badge. */
       announce: ['chosen first', 'chosen second'],
+      full: 'Two selected. Remove one to choose something else.',
     },
     daily: {
       help: 'Choose up to two. The first one counts for more.',
-      rank: ['First', 'Second'],
+      marks: ['most', 'second'],
+      weighted: true,
       announce: ['chosen first, and weighted higher', 'chosen second'],
+      full: 'Two selected. Remove one to choose something else.',
     },
   },
 
@@ -89,7 +109,26 @@ export const tuesdayV2 = {
       openNote: "You'll review the email before anything sends.",
       tooLong: 'Your brief is too detailed for a reliable email draft, so I copied the full version instead. Paste it into an email to Danielle.',
       preview: 'What Danielle will get',
+      /*
+       * The preview was a 320px scroll box inside a page thousands of pixels
+       * long, showing under half of what it was previewing. Now it opens in
+       * the page, like anything else you are asked to read before sending.
+       */
+      previewMore: 'Read the whole brief',
+      previewLess: 'Hide the whole brief',
       clarify: 'One thing to clarify with Danielle',
+
+      /*
+       * ONE DISCLOSURE, NOT A FORM FULL OF THEM.
+       *
+       * "All optional" was true in the copy and contradicted by the layout:
+       * eight groups and fourteen fields, equally weighted, with the send
+       * action five screens down. The basics are the ones most people have,
+       * and everything else is one tap away with whatever was typed intact.
+       */
+      more: 'Add more search details',
+      less: 'Hide the extra details',
+      moreHelp: 'Boundaries, places you need to get to, stairs, a pool, anything else.',
 
       price: {
         legend: 'Price',
@@ -131,6 +170,8 @@ export const tuesdayV2 = {
         beds: 'Minimum bedrooms',
         baths: 'Minimum bathrooms',
         sqft: 'Minimum square footage',
+        /* Asked with the basics, because most buyers have an answer to it. */
+        parking: 'Parking or garage',
       },
       physical: {
         legend: 'Physical requirements',

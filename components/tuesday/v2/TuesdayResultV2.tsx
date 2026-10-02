@@ -64,24 +64,32 @@ const HEADING: Record<SectionId, string> = {
   clarify: 'Worth sorting out',
 }
 
-/** After the hero: the operational pieces first, then everything else. */
+/**
+ * WHAT WAS WORKED OUT, BEFORE WHAT WAS CLICKED.
+ *
+ * The tradeoff is the one thing on this page the buyer did not type: it is the
+ * forced choice resolved. It used to sit ninth, under five sections of
+ * read-back, so the first thing a decisive buyer met was their own answers
+ * played back to them. Order now runs: the strategic read, the tension, what
+ * moves, then the filter list. Nothing is forced; an absent section is absent.
+ */
 const ORDER: readonly SectionId[] = [
-  'filter',
+  'tradeoff',
   'flex',
   'noLever',
   'leverUnknown',
+  'filter',
   'secondLook',
   'skip',
   'showing',
   'noSubstitute',
-  'tradeoff',
   'unresolved',
   'program',
   'clarify',
 ]
 
-/** The lever, in whichever of its three forms applies. */
-const LEAD_SECTIONS: readonly SectionId[] = ['flex', 'noLever', 'leverUnknown']
+/** The tension, and the lever in whichever of its three forms applies. */
+const LEAD_SECTIONS: readonly SectionId[] = ['tradeoff', 'flex', 'noLever', 'leverUnknown']
 
 export function TuesdayResultV2() {
   const params = useSearchParams()

@@ -80,6 +80,14 @@ type Copied = 'idle' | 'brief' | 'link' | 'failed'
 
 export function HandoffFlow({ result }: { result: Result }) {
   const [open, setOpen] = useState(false)
+  /*
+   * One disclosure for the fields most people will not need, and one for the
+   * full brief. Both are plain state: everything typed inside either of them
+   * stays in state whether it is on screen or not, so closing one never loses
+   * a word of it.
+   */
+  const [more, setMore] = useState(false)
+  const [wholeBrief, setWholeBrief] = useState(false)
   const [copied, setCopied] = useState<Copied>('idle')
   const [tooLong, setTooLong] = useState(false)
 
@@ -188,6 +196,14 @@ export function HandoffFlow({ result }: { result: Result }) {
   const h = tuesdayV2.result.handoff
   const cta = tuesdayV2.result.cta
 
+  /*
+   * ONE SOURCE, TWO LENGTHS. Both come from the same blocks the email is built
+   * from; the short one is the opening of that text, never a summary of it.
+   */
+  const previewText = asText(briefBlocks(brief, { resultUrl: RESULT_URL() }))
+  const previewOpening = previewText.split('\n\n').slice(0, 2).join('\n\n')
+  const previewHasMore = previewOpening.length < previewText.length
+
   return (
     <section className="wrap mt-16 border-t border-hairline pt-11 mobile:mt-12">
       <h2 className="font-display text-[26px] leading-[1.2] text-espresso mobile:text-[22px]">
@@ -233,23 +249,7 @@ export function HandoffFlow({ result }: { result: Result }) {
               <div className="flex flex-col gap-5">
                 <Text id="considering" label={h.where.considering} rows={3} value={considering} onChange={setConsidering} />
                 <Text id="ruled-out" label={h.where.ruledOut} rows={2} value={ruledOut} onChange={setRuledOut} />
-                <Text id="map-note" label={h.where.note} rows={2} value={mapNote} onChange={setMapNote} />
               </div>
-            </Group>
-
-            {/*
-              The boundary only. Nothing here asks whether schools matter, what
-              they are rated, or who they are for, and what is typed is carried
-              through to the brief word for word.
-            */}
-            <Group legend={h.school.legend}>
-              <Text id="school" label={h.school.field} help={h.school.help} value={school} onChange={setSchool} />
-            </Group>
-
-            {/* Recorded as written. The brief never asks or guesses why. */}
-            <Group legend={h.destinations.legend}>
-              <Text id="destinations" label={h.destinations.field} help={h.destinations.help}
-                rows={3} value={destinations} onChange={setDestinations} />
             </Group>
 
             <Group legend={h.property.legend}>
@@ -263,27 +263,70 @@ export function HandoffFlow({ result }: { result: Result }) {
                   <Text id="sqft" label={h.property.sqft} inputMode="numeric"
                     value={asMoney(toNumber(sqft))} onChange={(next) => setSqft(digits(next))} />
                 </div>
+                {/*
+                  Buyer-entered requirements, recorded as requirements. No
+                  field asks why, and nothing downstream infers a household, a
+                  health reason, an age or anything else from any of them.
+                */}
+                <Chips name="parking" legend={h.property.parking} options={h.physical.requirement} value={parking} onChange={setParking} />
               </div>
             </Group>
+          </div>
 
+          <div className="mt-8 max-w-[760px] border-t border-hairline pt-7">
+            <button
+              type="button"
+              onClick={() => setMore((value) => !value)}
+              aria-expanded={more}
+              aria-controls="handoff-more"
+              className={DISCLOSE}
+            >
+              {more ? h.less : h.more}
+            </button>
+            {more ? null : (
+              <p className="mt-3 font-sans text-[14.5px] leading-[1.5] text-taupe">{h.moreHelp}</p>
+            )}
             {/*
-              Buyer-entered requirements, recorded as requirements. No field
-              asks why, and nothing downstream infers a household, a health
-              reason, an age or anything else from any of them.
+              Rendered only when open, and every value lives in this
+              component's state, so closing it hides the fields and keeps
+              whatever was typed in them.
             */}
-            <Group legend={h.physical.legend}>
-              <div className="flex flex-col gap-6">
-                <Chips name="parking" legend={h.physical.parking} options={h.physical.requirement} value={parking} onChange={setParking} />
-                <Chips name="stairs" legend={h.physical.stairs} options={h.physical.stairsOptions} value={stairs} onChange={setStairs} />
-                <Chips name="pool" legend={h.physical.pool} options={h.physical.poolOptions} value={pool} onChange={setPool} />
-                <Chips name="ev" legend={h.physical.ev} options={h.physical.requirement} value={ev} onChange={setEv} />
-                <Text id="other" label={h.physical.other} rows={2} value={other} onChange={setOther} />
-              </div>
-            </Group>
+            <div id="handoff-more" hidden={!more}>
+              <div className="mt-8 flex max-w-[760px] flex-col gap-9">
+                {/* The rest of Where. The legend is the group's, not the field's. */}
+                <Group legend={h.where.legend}>
+                  <Text id="map-note" label={h.where.note} rows={2} value={mapNote} onChange={setMapNote} />
+                </Group>
 
-            <Group legend={h.anythingElse.legend}>
-              <Text id="note" label={h.anythingElse.field} rows={3} value={note} onChange={setNote} />
-            </Group>
+                {/*
+                  The boundary only. Nothing here asks whether schools matter,
+                  what they are rated, or who they are for, and what is typed is
+                  carried through to the brief word for word.
+                */}
+                <Group legend={h.school.legend}>
+                  <Text id="school" label={h.school.field} help={h.school.help} value={school} onChange={setSchool} />
+                </Group>
+
+                {/* Recorded as written. The brief never asks or guesses why. */}
+                <Group legend={h.destinations.legend}>
+                  <Text id="destinations" label={h.destinations.field} help={h.destinations.help}
+                    rows={3} value={destinations} onChange={setDestinations} />
+                </Group>
+
+                <Group legend={h.physical.legend}>
+                  <div className="flex flex-col gap-6">
+                    <Chips name="stairs" legend={h.physical.stairs} options={h.physical.stairsOptions} value={stairs} onChange={setStairs} />
+                    <Chips name="pool" legend={h.physical.pool} options={h.physical.poolOptions} value={pool} onChange={setPool} />
+                    <Chips name="ev" legend={h.physical.ev} options={h.physical.requirement} value={ev} onChange={setEv} />
+                    <Text id="other" label={h.physical.other} rows={2} value={other} onChange={setOther} />
+                  </div>
+                </Group>
+
+                <Group legend={h.anythingElse.legend}>
+                  <Text id="note" label={h.anythingElse.field} rows={3} value={note} onChange={setNote} />
+                </Group>
+              </div>
+            </div>
           </div>
 
           {discrepancies.length > 0 ? (
@@ -301,12 +344,27 @@ export function HandoffFlow({ result }: { result: Result }) {
             </div>
           ) : null}
 
-          {/* A short preview, not the whole brief again. */}
+          {/*
+            NOT A WINDOW ONTO THE BRIEF. A scroll box inside a page this long
+            showed under half of what someone is about to send, and the only
+            way to read the rest was to find and fight a second scrollbar. The
+            opening lines sit here; the whole thing opens in the page.
+          */}
           <div className="mt-10 max-w-[760px] border-t border-hairline pt-7">
             <h3 className="text-[11.5px] font-bold uppercase tracking-label text-taupe">{h.preview}</h3>
-            <pre className="mt-5 max-h-[320px] overflow-auto whitespace-pre-wrap break-words font-sans text-[15.5px] leading-[1.55] text-warmgray">
-              {asText(briefBlocks(brief, { resultUrl: RESULT_URL() }))}
-            </pre>
+            <div className="mt-5 whitespace-pre-wrap break-words font-sans text-[15.5px] leading-[1.55] text-warmgray">
+              {wholeBrief ? previewText : previewOpening}
+            </div>
+            {previewHasMore ? (
+              <button
+                type="button"
+                onClick={() => setWholeBrief((value) => !value)}
+                aria-expanded={wholeBrief}
+                className={`${LINKY} mt-5 block`}
+              >
+                {wholeBrief ? h.previewLess : h.previewMore}
+              </button>
+            ) : null}
           </div>
 
           <div className="mt-9 flex flex-wrap items-center gap-6">
@@ -366,5 +424,7 @@ const PRIMARY =
   'inline-flex items-center justify-center rounded-button bg-brown px-7 py-[15px] font-sans text-[16px] font-semibold text-cream hover:bg-wine focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wine mobile:min-h-[48px] mobile:w-full'
 const SECONDARY =
   'inline-flex items-center justify-center rounded-button border-[1.5px] border-brown px-7 py-[13.5px] font-sans text-[16px] font-semibold text-brown hover:border-wine hover:text-wine focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wine mobile:min-h-[48px] mobile:w-full'
+const DISCLOSE =
+  'inline-flex items-center gap-2 rounded-button border-[1.5px] border-hairline px-5 py-[11px] font-sans text-[15px] font-semibold text-brown hover:border-brown focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wine mobile:min-h-[46px] mobile:w-full mobile:justify-center'
 const LINKY =
   'rounded-button px-1 py-2 font-sans text-[15px] font-medium text-warmgray underline underline-offset-4 hover:text-brown focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wine mobile:min-h-[44px]'

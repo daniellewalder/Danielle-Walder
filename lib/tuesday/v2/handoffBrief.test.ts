@@ -6,6 +6,7 @@ import { HANDOFFS } from './handoff.fixtures.ts'
 import { score } from './score.ts'
 import { strategyFor } from './strategy.ts'
 import { assembleBrief } from './brief.ts'
+import { compose } from './render/index.ts'
 import { encode, decode } from './encode.ts'
 import { isEmptyHandoff, type Handoff } from './handoff.ts'
 import {
@@ -504,21 +505,36 @@ test('no model vocabulary reaches the brief a person reads', () => {
   }
 })
 
-test('the brief carries the sections that matter and not every section that exists', () => {
+test('the brief carries everything Danielle can act on, not a four-section summary', () => {
   const brief = briefFor('t3_outdoorPoolConcern', HANDOFFS.A_fullySpecified.handoff)
   const blocks = briefBlocks(brief, { resultUrl: 'https://x.test/r' })
   const headings = blocks.map((block) => block.heading).filter(Boolean)
-  // Present: the operational ones.
+  // The operational ones.
   assert.ok(headings.includes('The search details I gave:'))
   assert.ok(headings.includes('Has to have:'))
   assert.ok(headings.includes('My full result:'))
-  // Absent: the agent-only ones.
-  for (const absent of ['Probably not worth the time:', 'Not the same thing:', 'Practical list:', 'The one to watch:']) {
-    assert.ok(!headings.includes(absent), `the buyer brief carries ${absent}`)
+  /*
+   * The judgment, which used to stay on the page. An exclusion list and the
+   * forced choice are the two things she can act on that the buyer could not
+   * have typed, and an email well inside its budget has room for both.
+   */
+  const composed = compose(brief)
+  for (const [id, heading] of [
+    ['skip', 'Probably not worth the time:'],
+    ['tradeoff', 'The one to watch:'],
+    ['program', 'Practical list:'],
+    ['noSubstitute', 'Not the same thing:'],
+  ] as const) {
+    if (!composed.sections.some((section) => section.id === id)) continue
+    assert.ok(headings.includes(heading), `the brief drops ${heading} with room to spare`)
   }
-  // Showing checks are capped.
+  // Caps: one instruction each, four showing checks.
   const showing = blocks.find((block) => block.heading === 'Worth checking when we see something:')
   if (showing) assert.ok(showing.lines.length <= 4)
+  for (const heading of ['Not the same thing:', 'Worth a second look:', 'Still to settle:']) {
+    const block = blocks.find((entry) => entry.heading === heading)
+    if (block) assert.equal(block.lines.length, 1, `${heading} is a catalogue, not an instruction`)
+  }
 })
 
 test('the snapshot leads, and the result link is near the end', () => {

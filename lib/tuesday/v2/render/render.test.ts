@@ -706,3 +706,33 @@ test('no catalogue phrase is dead copy', () => {
   for (const key of Object.keys(VETO)) if (!reachable.VETO.has(key)) dead.push(`VETO:${key}`)
   assert.deepEqual(dead, [], 'catalogue entries nothing can reach')
 })
+
+test('a conditional project appetite never renders as a major one', () => {
+  /*
+   * "Depends how much work" plus "rooms, yes, moving walls, no" scores the
+   * same renovation tolerance as "for the right property I'd do a lot more",
+   * so the band alone cannot tell them apart. The brief used to lead all four
+   * follow-ups with "I'm open to real work", which is the opposite of what the
+   * scale answer says. The limit is carried, so each has to read differently.
+   */
+  const leads = new Map<string, string>()
+  for (const follow of ['money', 'time', 'scale', 'house'] as const) {
+    const answers: V2Answers = {
+      ...FIXTURES.projectResolved.answers,
+      project: 'depends',
+      depends: follow,
+    }
+    const result = score(answers)
+    const brief = assembleBrief(result, strategyFor(result))
+    assert.ok(brief.searchPattern.projectLimit, `${follow}: the limit was not recorded`)
+    const snapshot = compose(brief).snapshot
+    const buyer = snapshot.map((entry) => entry.buyer).join(' ')
+    assert.ok(
+      !/open to real work|take on a lot\b/i.test(buyer),
+      `${follow}: a conditional appetite reads as an unconditional one: "${buyer}"`,
+    )
+    leads.set(follow, snapshot[0].buyer)
+  }
+  assert.equal(new Set(leads.values()).size, 4, 'the four follow-ups produce the same lead')
+  assert.match(leads.get('scale')!, /moving walls/, 'the scale limit is not stated')
+})

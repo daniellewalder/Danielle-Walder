@@ -64,9 +64,16 @@ test('a V2 payload is detected as V2', () => {
 test('both routes gate on the version rather than on anything else', () => {
   for (const route of [ROUTE_TEST, ROUTE_RESULT]) {
     assert.match(route, /VersionGate/)
-    assert.match(route, /v1=\{<Tuesday(Test|Result) \/>\}/)
+    assert.match(route, /<Tuesday(Test|Result) \/>/)
     assert.match(route, /v2=\{<Tuesday(Test|Result)V2 \/>\}/)
   }
+  /*
+   * The page title is V1's, on every one of its screens, exactly as it
+   * shipped. V2 renders its own on the screen you arrive at and drops it once
+   * answering begins, so the route can no longer put one above both.
+   */
+  assert.match(ROUTE_TEST, /v1=\{\s*<>\s*<PageHeader/)
+  assert.ok(!/v2=\{\s*<>\s*<PageHeader/.test(ROUTE_TEST), 'V2 gets the repeated page header back')
   assert.match(GATE, /detectVersion/)
   // It must read the declared version, never guess from the shape.
   assert.ok(!/startsWith|includes\('t\.'\)|length >/.test(GATE), 'the gate sniffs the payload')
@@ -248,7 +255,14 @@ test('the flow copy says nothing the frozen layers already own', () => {
   // The question text, the options and every result sentence come from the
   // engine. What is written here is screen furniture only.
   assert.ok(!JSON.stringify(tuesdayV2).includes('Tuesday Test·'))
-  assert.equal(tuesdayV2.tradeoff.prompt, 'Two of these came up. If you had to pick one, which survives?')
+  assert.equal(tuesdayV2.tradeoff.prompt, 'If you had to pick one, which survives?')
+  // "Two of these came up" narrated the engine at the one moment the question
+  // costs the buyer something. The explanation below it does the work.
+  assert.ok(!tuesdayV2.tradeoff.prompt.includes('came up'))
+  assert.equal(
+    tuesdayV2.tradeoff.note,
+    'Both still matter. This only records which one survives a forced choice.',
+  )
   assert.equal(tuesdayV2.tradeoff.decline, "I'd keep looking.")
 })
 
@@ -257,8 +271,10 @@ test('the flow copy says nothing the frozen layers already own', () => {
 // ---------------------------------------------------------------------------
 
 test('the progress readout carries no denominator', () => {
-  assert.match(TEST_V2, /Question \{String\(position \+ 1\)/)
+  assert.match(TEST_V2, /Question \{position \+ 1\}/)
   assert.ok(!/\{sequence\.length\}|of \{|\/ \{String\(/.test(TEST_V2), 'a denominator reached the screen')
+  // Not zero padded. "Question 01" is a field label, not how anyone counts.
+  assert.ok(!/padStart/.test(TEST_V2), 'the question number is zero padded')
 })
 
 test('the flow component decides no model logic of its own', () => {
@@ -269,4 +285,106 @@ test('the flow component decides no model logic of its own', () => {
   for (const leak of ['sizeRouteApplies', 'bandOf', 'PROTECT_AT', 'selectPair', 'stateOf', 'stances.has']) {
     assert.ok(!TEST_V2.includes(leak), `the component reaches into the model for ${leak}`)
   }
+})
+
+// ---------------------------------------------------------------------------
+// The shape of a question screen
+// ---------------------------------------------------------------------------
+
+const HANDOFF_FLOW = read('components/tuesday/v2/HandoffFlow.tsx')
+
+test('the page title is on the opening screen only', () => {
+  assert.match(TEST_V2, /const opening = position === 0/)
+  assert.match(TEST_V2, /\{opening \? \(\s*<PageHeader/)
+  // And the screen still says where it is, in one line.
+  assert.match(TEST_V2, /\{opening \? null : \(\s*<p[\s\S]{0,200}tuesdayTestPage\.eyebrow/)
+})
+
+test('the question actions are pinned on a phone and clear of the last answer', () => {
+  assert.match(TEST_V2, /mobile:fixed mobile:inset-x-0 mobile:bottom-0/)
+  // The home indicator, and the notch on a landscape phone.
+  assert.match(TEST_V2, /env\(safe-area-inset-bottom\)/)
+  // The card above reserves the bar's height, so nothing sits under it.
+  assert.match(TEST_V2, /mobile:pb-\[104px\]/)
+  // Desktop keeps them in the flow.
+  assert.match(TEST_V2, /'mt-8 flex flex-wrap items-center gap-7 '/)
+})
+
+test('the two-answer questions do not look like the same mechanic', () => {
+  const { dealbreaker, daily } = tuesdayV2.ordered
+  assert.notDeepEqual(dealbreaker.marks, daily.marks, 'both questions carry the same mark')
+  assert.equal(dealbreaker.weighted, false)
+  assert.equal(daily.weighted, true)
+  // Equal weight means equal emphasis: neither mark may outrank the other.
+  assert.equal(dealbreaker.marks[0].length > 0, true)
+  assert.match(TEST_V2, /copy\.weighted && rank === 1/)
+  assert.match(TEST_V2, /copy\.marks\[rank\]/)
+  // The number is gone, so nothing implies a rank where there is none.
+  assert.ok(!/\{isChosen \? rank \+ 1 : ''\}/.test(TEST_V2), 'the numeric rank badge is back')
+  // Assistive tech keeps the same distinction it always had.
+  assert.notDeepEqual(dealbreaker.announce, daily.announce)
+})
+
+test('a full selection explains itself', () => {
+  for (const field of ['dealbreaker', 'daily'] as const) {
+    assert.match(tuesdayV2.ordered[field].full, /Two selected/)
+  }
+  assert.match(TEST_V2, /picks\.length >= 2 \? \(/)
+  assert.match(TEST_V2, /\{copy\.full\}/)
+})
+
+test('a two-group qualifier screen says both groups need an answer', () => {
+  assert.match(tuesdayV2.qualifier.manyHelp, /each/i)
+  assert.match(TEST_V2, /tuesdayV2\.qualifier\.manyHelp/)
+})
+
+// ---------------------------------------------------------------------------
+// The handoff
+// ---------------------------------------------------------------------------
+
+test('the handoff opens on the basics, with one disclosure for the rest', () => {
+  // Exactly one. A form of accordions is not an improvement on a long form.
+  assert.equal(HANDOFF_FLOW.split('aria-controls="handoff-more"').length - 1, 1)
+  assert.equal((HANDOFF_FLOW.match(/aria-controls=/g) ?? []).length, 1)
+  // The basics stay in front.
+  for (const id of ['price-min', 'price-ceiling', 'considering', 'ruled-out', 'types', 'beds', 'baths', 'sqft']) {
+    const at = HANDOFF_FLOW.indexOf(`id="${id}"`)
+    assert.ok(at !== -1 && at < HANDOFF_FLOW.indexOf('id="handoff-more"'), `${id} is behind the disclosure`)
+  }
+  // And the rest goes behind it.
+  for (const id of ['school', 'destinations', 'other', 'note', 'map-note']) {
+    assert.ok(
+      HANDOFF_FLOW.indexOf(`id="${id}"`) > HANDOFF_FLOW.indexOf('id="handoff-more"'),
+      `${id} is still in front`,
+    )
+  }
+  // Values live in component state, so closing the disclosure keeps them.
+  assert.match(HANDOFF_FLOW, /<div id="handoff-more" hidden=\{!more\}>/)
+})
+
+test('the preview is not a scroll box inside a scrolling page', () => {
+  assert.ok(!/overflow-auto/.test(HANDOFF_FLOW), 'the preview scrolls inside itself')
+  assert.ok(!/max-h-\[/.test(HANDOFF_FLOW), 'the preview is clipped')
+  // Short by default, whole on request, one source for both.
+  assert.match(HANDOFF_FLOW, /const previewText = asText\(briefBlocks\(/)
+  assert.match(HANDOFF_FLOW, /previewText\.split\('\\n\\n'\)\.slice\(0, 2\)/)
+  assert.match(HANDOFF_FLOW, /h\.previewMore/)
+})
+
+test('a discrepancy is surfaced before the send action, not inside the preview', () => {
+  const clarify = HANDOFF_FLOW.indexOf('{h.clarify}')
+  const preview = HANDOFF_FLOW.indexOf('{h.preview}')
+  const send = HANDOFF_FLOW.indexOf('onClick={openEmail}')
+  assert.ok(clarify !== -1 && clarify < preview, 'the clarification is inside or after the preview')
+  assert.ok(preview < send, 'the preview is after the send action')
+  // It never blocks sending and never picks a side.
+  assert.ok(!/disabled=\{discrepancies/.test(HANDOFF_FLOW), 'a discrepancy blocks the send')
+})
+
+test('the result leads with what the test worked out', () => {
+  const order = RESULT_V2.slice(RESULT_V2.indexOf('const ORDER'), RESULT_V2.indexOf('LEAD_SECTIONS'))
+  assert.ok(order.indexOf("'tradeoff'") < order.indexOf("'filter'"), 'the read-back still leads')
+  assert.ok(order.indexOf("'flex'") < order.indexOf("'filter'"), 'the lever is below the filter list')
+  // One earned container, still the filter list.
+  assert.match(RESULT_V2, /const FIELD: Partial<Record<SectionId, string>> = \{\s*filter:/)
 })

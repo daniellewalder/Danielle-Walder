@@ -30,6 +30,13 @@ export const MAILTO_LIMIT = 1900
 
 /**
  * The reading order. NOT the drop order: see `DROPPABLE` below.
+ *
+ * WHAT DANIELLE CAN ACT ON, IN THE ORDER SHE CAN ACT ON IT. The brief used to
+ * carry four generated sections and leave the rest on the page, so an email
+ * well inside its budget arrived without the buyer's exclusions, their
+ * operational requirements or the forced choice the test had just resolved.
+ * The budget decides what travels now, not this list: everything here is
+ * included while it fits, least useful given up first.
  */
 const ORDER: readonly SectionId[] = [
   'facts',
@@ -37,9 +44,13 @@ const ORDER: readonly SectionId[] = [
   'flex',
   'noLever',
   'leverUnknown',
-  'secondLook',
+  'tradeoff',
+  'program',
+  'skip',
   'showing',
+  'noSubstitute',
   'unresolved',
+  'secondLook',
   'clarify',
 ]
 
@@ -53,8 +64,12 @@ const HEADING: Partial<Record<SectionId, string>> = {
   flex: 'Where I can move:',
   noLever: 'Where I cannot move:',
   leverUnknown: 'Still working out:',
+  tradeoff: 'The one to watch:',
+  program: 'Practical list:',
+  skip: 'Probably not worth the time:',
   secondLook: 'Worth a second look:',
   showing: 'Worth checking when we see something:',
+  noSubstitute: 'Not the same thing:',
   unresolved: 'Still to settle:',
   clarify: 'One thing to clarify:',
 }
@@ -80,11 +95,15 @@ export interface BriefBlock {
  */
 const PROTECTED: readonly SectionId[] = ['facts', 'clarify']
 
-/** Derived analysis, in the order it is given up. */
+/** Derived analysis, in the order it is given up. Least useful first. */
 const DROPPABLE: readonly SectionId[] = [
   'secondLook',
   'unresolved',
+  'noSubstitute',
   'showing',
+  'skip',
+  'program',
+  'tradeoff',
   'flex',
   'noLever',
   'leverUnknown',
@@ -132,6 +151,8 @@ export function briefBlocks(
     // A second look is one instruction, not a catalogue.
     if (id === 'secondLook') lines = lines.slice(0, 1)
     if (id === 'unresolved') lines = lines.slice(0, 1)
+    // One false equivalence is a warning. Three is a lecture.
+    if (id === 'noSubstitute') lines = lines.slice(0, 1)
     if (lines.length === 0) continue
 
     blocks.push({ heading: HEADING[id] ?? null, lines })

@@ -159,6 +159,16 @@ export interface SearchPattern {
    * change which listings are candidates on evidence nobody gave.
    */
   sizeRoute: SizeRoute | null
+  /**
+   * WHAT THE BUYER SAID THE WORK DEPENDS ON, when they said it depends.
+   *
+   * Four answers to the follow-up produce the same renovation band, so the
+   * band alone cannot tell "rooms, yes, moving walls, no" apart from "for the
+   * right property I'd do a lot more". This records the limit verbatim, so a
+   * contained appetite is never described as an appetite for a major project.
+   * It changes no posture and no rule: `project` is still the band's reading.
+   */
+  projectLimit: 'budget' | 'time' | 'scale' | 'property' | null
   /** Each posture names the evidence behind it. No posture is asserted bare. */
   trace: Readonly<Record<'map' | 'project' | 'personalization' | 'sizeRoute', Trace>>
 }
@@ -238,6 +248,28 @@ function projectPosture(result: Result, strategy: Strategy): SearchPattern['proj
   if (renovation === 'yes') return 'major'
   if (renovation === 'conditional') return 'contained'
   return 'notEstablished'
+}
+
+/**
+ * The limit the buyer put on the work, read straight off the follow-up stance.
+ *
+ * Buyer evidence, not a reading: each of these is one option they chose. The
+ * band arithmetic collapses all four onto the same renovation tolerance, which
+ * is correct for scoring and useless for writing a sentence, so the limit is
+ * carried separately rather than inferred back out of the band.
+ */
+const PROJECT_LIMIT: Readonly<Record<string, SearchPattern['projectLimit']>> = {
+  budgetLed: 'budget',
+  timeLed: 'time',
+  scaleLimited: 'scale',
+  propertyGated: 'property',
+}
+
+function projectLimitOf(result: Result): SearchPattern['projectLimit'] {
+  for (const [stance, limit] of Object.entries(PROJECT_LIMIT)) {
+    if (result.stances.has(stance as never)) return limit
+  }
+  return null
 }
 
 /**
@@ -454,6 +486,7 @@ export function assembleBrief(
       personalization: personalizationPosture(strategy),
       leverState: strategy.derived.lever.state,
       sizeRoute: result.sizeRoute,
+      projectLimit: projectLimitOf(result),
       trace: {
         map: {
           layer: 'buyerEvidence',
@@ -547,10 +580,11 @@ export function assembleBrief(
  * specific enough to act on. A generic "no secondary preference" tells Danielle
  * nothing; "the renovation question was never answered" tells her what to ask.
  */
-const GAP_TEXT: Readonly<Record<string, string>> = {
+export const GAP_TEXT: Readonly<Record<string, string>> = {
   renovationNotEstablished: 'the renovation question was never answered, so condition could not be weighed',
   personalizationNotEstablished: 'the personalization question was never answered, so finish could not be weighed',
   unresolvedProject: 'they said it depends how much work, and the follow-up is still open',
+  noneGathered: 'nothing softer than their hard constraints was ever gathered',
 }
 
 function missingFor(lever: LeverDiagnosis): readonly string[] {
@@ -561,7 +595,7 @@ function missingFor(lever: LeverDiagnosis): readonly string[] {
   const unique = [...new Set(gaps)]
   return unique.length > 0
     ? unique
-    : ['nothing softer than their hard constraints was ever gathered']
+    : [GAP_TEXT.noneGathered]
 }
 
 /** The false equivalence each substitution action guards against. */

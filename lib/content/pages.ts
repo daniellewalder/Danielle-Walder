@@ -135,7 +135,7 @@ export const tuesdayTestPage = {
   eyebrow: 'the tuesday test',
   heading: 'Will you actually like living there?',
   intro:
-    'A short home-and-neighborhood reflection tool about routine, space, location, quiet, and the particular inconveniences you are least willing to call "part of the charm."',
+    'A few questions about routine, space, location, quiet, and the particular inconveniences you are least willing to call "part of the charm."',
   /**
    * A static editorial preview. These options are text — never buttons, links,
    * inputs, or focusable elements — and nothing is scored, saved, or returned.

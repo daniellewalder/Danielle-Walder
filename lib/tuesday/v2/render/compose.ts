@@ -2,11 +2,11 @@ import type { StructuredBrief } from '../brief.ts'
 import { attributeById } from '../model.ts'
 import {
   BUYER_DECISION_VETOES, CRITERION, CRITERION_BUYER, DISCREPANCY, FACT_LABEL,
-  LEAD, LEVER, LEVER_BY_SITUATION, LEVER_FALLBACK, NO_SUBSTITUTE, PROGRAM,
-  PROGRAM_QUALIFIED,
+  GAP, LEAD, LEVER, LEVER_BY_SITUATION, LEVER_FALLBACK, NO_SUBSTITUTE, PROGRAM,
+  PROGRAM_QUALIFIED, PROJECT_LIMIT_LEAD,
   PROPERTY_LED, QUALIFIER_CRITERION, REQUIREMENT, SEARCH_DIMENSIONS, SECOND,
   PUSH_ON, SECOND_LOOK, SHOWING, SIZE_ROUTE_LEAD, SKIP, TIMING, TRADEOFF, UNRESOLVED,
-  VETO,
+  VETO, VETO_ALONE,
   type Phrase,
 } from './phrases.ts'
 
@@ -278,7 +278,18 @@ function snapshotFor(brief: StructuredBrief): Line[] {
     const first = available[0].lever
     const blocked = closed.find((entry) => SEARCH_DIMENSIONS.includes(entry.lever))?.lever
     const hardStops = closed.some((entry) => entry.veto === 'isDealbreaker')
-    const lead = (blocked && LEAD[`${first}|${blocked}`]) || LEAD[first]
+    /*
+     * CONDITIONAL APPETITE IS NOT MAJOR APPETITE.
+     *
+     * Where condition leads and the buyer told us what the work depends on,
+     * that limit is the lead. Without it all four follow-up answers printed
+     * "open to real work", including the one that says moving walls is out.
+     */
+    const limit = brief.searchPattern.projectLimit
+    const lead =
+      (first === 'condition' && limit && PROJECT_LIMIT_LEAD[limit]) ||
+      (blocked && LEAD[`${first}|${blocked}`]) ||
+      LEAD[first]
     /*
      * One thing can move, nothing is blocking it, and the rest are outright
      * dealbreakers. The hard-stop sentence says all of that at once; leading
@@ -472,10 +483,22 @@ export function compose(brief: StructuredBrief): Composed {
     omitted.push({ id: 'noLever', why: 'a lever exists' })
     omitted.push({ id: 'leverUnknown', why: 'a lever exists' })
   } else if (brief.flexOrder.state === 'closed') {
-    const quotable = closedLeversOf(brief).slice(0, MAX_CLOSING_REASONS)
-    const agentReasons = unique(quotable.map((entry) => VETO[entry.veto!]?.agent))
+    /*
+     * "The rest are my dealbreakers" is the tail of a list, and the list of
+     * dealbreakers is the section directly above this one. Where anything else
+     * closed the gives, that clause only restates the filter list, so it is
+     * dropped. Alone it keeps a form that does not need an antecedent.
+     */
+    const closedReasons = closedLeversOf(brief).slice(0, MAX_CLOSING_REASONS)
+    const quotable =
+      closedReasons.length > 1
+        ? closedReasons.filter((entry) => entry.veto !== 'isDealbreaker')
+        : closedReasons
+    const voice = (entry: (typeof quotable)[number]) =>
+      (quotable.length === 1 ? VETO_ALONE[entry.veto!] : undefined) ?? VETO[entry.veto!]
+    const agentReasons = unique(quotable.map((entry) => voice(entry)?.agent))
     const buyerReasons = unique(
-      quotable.map((entry) => VETO[entry.veto!]?.buyer ?? VETO[entry.veto!]?.agent),
+      quotable.map((entry) => voice(entry)?.buyer ?? voice(entry)?.agent),
     )
     add(
       'noLever',
@@ -495,10 +518,13 @@ export function compose(brief: StructuredBrief): Composed {
       // The instruction to ask is in the snapshot. This section is the list of
       // what is actually missing, and repeating the instruction per line was
       // the same sentence three times on a buyer with three gaps.
-      (brief.flexOrder.missing ?? []).map((gap) => ({
-        agent: `${upper(gap)}.`,
-        buyer: `${upper(gap)}.`,
-      })),
+      (brief.flexOrder.missing ?? []).map((gap) => {
+        const phrase = GAP[gap]
+        return {
+          agent: `${upper(phrase?.agent ?? gap)}.`,
+          buyer: `${upper(phrase?.buyer ?? phrase?.agent ?? gap)}.`,
+        }
+      }),
       'nothing was recorded as missing',
     )
     omitted.push({ id: 'flex', why: 'no lever was established' })
@@ -519,6 +545,12 @@ export function compose(brief: StructuredBrief): Composed {
    * would have to come out" as two separate findings.
    */
   const filtered = new Set(filterable.map((entry) => entry.attribute))
+  /*
+   * Qualified concepts that already carry an instruction somewhere a reader
+   * will act on. Collected from the lines actually rendered, never from the
+   * contract, so a suppressed instruction cannot suppress anything.
+   */
+  const instructed = new Set<string>()
   const skipLines: Line[] = []
   const suppressedSkips: string[] = []
   for (const entry of brief.skipFaster) {
@@ -529,6 +561,11 @@ export function compose(brief: StructuredBrief): Composed {
       suppressedSkips.push(entry.id)
       continue
     }
+    // `reject.upkeep.planting` is the concept `upkeep` qualified by `planting`.
+    const tail = entry.id.startsWith(`reject.${entry.subject}.`)
+      ? entry.id.slice(`reject.${entry.subject}.`.length)
+      : null
+    instructed.add(tail ? `${entry.subject}:${tail}` : entry.subject)
     skipLines.push(line(phrase, entry.subject))
   }
   add(
@@ -548,6 +585,10 @@ export function compose(brief: StructuredBrief): Composed {
     .filter((entry): entry is Line => entry !== null)
     .slice(0, MAX_SHOWING)
   add('showing', showingLines, 'nothing needs checking in person that is specific to this buyer')
+  for (const entry of brief.showingTests) {
+    if (!showingLines.some((candidate) => candidate.concept === entry.subject)) continue
+    instructed.add(entry.qualifier ? `${entry.subject}:${entry.qualifier}` : entry.subject)
+  }
 
   add(
     'noSubstitute',
@@ -563,11 +604,18 @@ export function compose(brief: StructuredBrief): Composed {
   const tradeoff = brief.expectedTradeoff
   if (tradeoff) {
     const phrase = TRADEOFF[tradeoff.why]
-    const pair = `${short(tradeoff.sideA)} against ${short(tradeoff.sideB)}`
+    /*
+     * ONE PAIR PER REGISTER. Built once for the agent and once for the buyer:
+     * six concepts read "outdoor space they'd actually use" in Danielle's
+     * notes and "outdoor space I'd actually use" in the buyer's own brief, and
+     * sharing the string put her vocabulary inside their sentence.
+     */
+    const pairAgent = `${short(tradeoff.sideA)} against ${short(tradeoff.sideB)}`
+    const pairBuyer = `${short(tradeoff.sideA, true)} against ${short(tradeoff.sideB, true)}`
     const ordered = tradeoff.ordering === 'sideAWins'
     add('tradeoff', phrase ? [{
-      agent: `${upper(pair)}.${ordered ? ` Forced to choose once, they kept ${short(tradeoff.sideA)}.` : ''} ${phrase.agent}`,
-      buyer: `${upper(pair)}.${ordered ? ` When I had to pick, I kept ${short(tradeoff.sideA, true)}.` : ''} ${phrase.buyer ?? phrase.agent}`,
+      agent: `${upper(pairAgent)}.${ordered ? ` Forced to choose once, they kept ${short(tradeoff.sideA)}.` : ''} ${phrase.agent}`,
+      buyer: `${upper(pairBuyer)}.${ordered ? ` When I had to pick, I kept ${short(tradeoff.sideA, true)}.` : ''} ${phrase.buyer ?? phrase.agent}`,
       concept: tradeoff.sideA,
     }] : [], 'the tension has no phrasing in the catalogue')
   } else {
@@ -590,22 +638,35 @@ export function compose(brief: StructuredBrief): Composed {
    */
   const programLines: Line[] = []
   const seen = new Set<string>()
-  for (const entry of operational) {
-    const key = entry.qualifier ? `${entry.attribute}:${entry.qualifier}` : entry.attribute
-    const text = PROGRAM_QUALIFIED[key] ?? PROGRAM[entry.attribute]
-    if (!text || seen.has(entry.attribute)) continue
-    seen.add(entry.attribute)
-    programLines.push({ agent: upper(text), buyer: upper(text), concept: entry.attribute })
+  const addProgram = (subject: string, qualifier: string | null | undefined) => {
+    const key = qualifier ? `${subject}:${qualifier}` : subject
+    const phrase = PROGRAM_QUALIFIED[key] ?? PROGRAM[subject]
+    if (!phrase || seen.has(subject)) return
+    /*
+     * TARGETED DEDUP, ONE DIRECTION ONLY.
+     *
+     * A program item is a noun on a checklist. Where the same qualified
+     * concept already has an instruction somewhere that says what to do about
+     * it, the noun adds nothing: "ask what the planting needs, and who cuts
+     * it" and "planting and landscape upkeep" are the same fact, and only one
+     * of them is useful. Nothing else is suppressed, because a requirement, a
+     * showing check and a false-substitute warning are three different jobs.
+     */
+    if (instructed.has(key)) return
+    seen.add(subject)
+    programLines.push({
+      agent: upper(phrase.agent),
+      buyer: upper(phrase.buyer ?? phrase.agent),
+      concept: subject,
+    })
   }
+  for (const entry of operational) addProgram(entry.attribute, entry.qualifier)
   for (const entry of brief.practicalProgram) {
-    const key = entry.qualifier ? `${entry.subject}:${entry.qualifier}` : entry.subject
-    const text = PROGRAM_QUALIFIED[key] ?? PROGRAM[entry.subject]
     // `site` is a filter criterion, not a program item. It arrives here too
     // because the contract keeps the same fact in both functional views, and
     // printing it twice is exactly what the renderer is supposed to prevent.
-    if (!text || seen.has(entry.subject) || filtered.has(entry.subject)) continue
-    seen.add(entry.subject)
-    programLines.push({ agent: upper(text), buyer: upper(text), concept: entry.subject })
+    if (filtered.has(entry.subject)) continue
+    addProgram(entry.subject, entry.qualifier)
   }
   add('program', programLines, 'no functional requirement was established')
 

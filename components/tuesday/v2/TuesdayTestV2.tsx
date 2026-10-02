@@ -2,7 +2,9 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { tuesdayV2 } from '@/lib/content/tuesdayV2'
+import { tuesdayTestPage } from '@/lib/content/pages'
 import { attributeById } from '@/lib/tuesday/v2/model'
 import { decode, encode } from '@/lib/tuesday/v2/encode'
 import { MAP } from '@/lib/tuesday/v2/tradeoff'
@@ -115,6 +117,11 @@ export function TuesdayTestV2() {
             ? tuesdayV2.qualifier.many
             : tuesdayV2.qualifier.one
         }
+        help={
+          qualifierNeeds(answers, step.question).length > 1
+            ? tuesdayV2.qualifier.manyHelp
+            : undefined
+        }
       >
         <QualifierScreen
           answers={answers}
@@ -207,19 +214,24 @@ export function TuesdayTestV2() {
                     }`}
                   >
                     {/*
-                      The rank badge is the same shape and weight for both, so
-                      nothing implies the second choice is the weaker one. On
-                      the daily question it genuinely is weighted lower, and
-                      the help text above says so in words rather than through
-                      a smaller chip.
+                      THE MARK SAYS WHICH RULE IS IN FORCE.
+                      Two identical numbered badges made an equal-weight
+                      question look like a ranked one. Where both answers count
+                      the same the two marks are identical; where the first is
+                      weighted higher it says "most" and carries the solid
+                      chip, and the second sits back.
                     */}
                     <span
                       aria-hidden="true"
-                      className={`mt-[1px] grid h-[21px] w-[21px] shrink-0 place-items-center rounded-badge border-[1.5px] font-sans text-[12px] font-bold tabular-nums ${
-                        isChosen ? 'border-brown bg-brown text-cream' : 'border-taupe'
+                      className={`mt-[2px] grid h-[19px] shrink-0 place-items-center rounded-badge px-2 font-sans text-[10px] font-bold uppercase tracking-label ${
+                        isChosen
+                          ? copy.weighted && rank === 1
+                            ? 'border border-brown text-brown'
+                            : 'bg-brown text-cream'
+                          : 'w-[19px] border border-taupe px-0'
                       }`}
                     >
-                      {isChosen ? rank + 1 : ''}
+                      {isChosen ? copy.marks[rank] ?? copy.marks[1] : ''}
                     </span>
                     <span>{option.label}</span>
                   </span>
@@ -232,6 +244,18 @@ export function TuesdayTestV2() {
               )
             })}
           </div>
+          {/*
+            Eight cards going inert with no explanation reads as a fault. One
+            line, in normal words, saying what happened and how to undo it.
+          */}
+          {picks.length >= 2 ? (
+            <p
+              role="status"
+              className="mt-4 font-sans text-[14.5px] leading-[1.45] text-onbrown-body"
+            >
+              {copy.full}
+            </p>
+          ) : null}
         </fieldset>
         <Actions
           onContinue={advance}
@@ -270,6 +294,15 @@ export function TuesdayTestV2() {
 // Pieces
 // ---------------------------------------------------------------------------
 
+/**
+ * THE HERO IS NOT PART OF THE QUESTION.
+ *
+ * The page title, the standfirst and the hairline belong to arriving. They
+ * were re-rendered above every screen, which on a phone meant 458px of
+ * unchanged header before the question, eight to ten times, with Continue
+ * always below the fold. Once answering begins the screen carries the question
+ * and nothing else; the title comes back on the result.
+ */
 function Shell({
   kicker, position, prompt, help, children,
 }: {
@@ -279,47 +312,66 @@ function Shell({
   help?: string
   children: React.ReactNode
 }) {
+  const opening = position === 0
   return (
-    <section aria-labelledby="question" className="wrap pt-12 mobile:pt-8">
-      <div className="rounded-block bg-brown px-12 py-14 text-onbrown mobile:rounded-[16px] mobile:px-6 mobile:py-9">
-        <div className="grid grid-cols-[0.8fr_1.2fr] gap-x-16 tablet:grid-cols-1 tablet:gap-y-8">
-          <div>
-            <div className="flex items-baseline justify-between gap-6">
-              <p className="text-[11.5px] font-bold uppercase tracking-label text-onbrown-label">
-                {kicker}
-              </p>
-              {/*
-                A position and no total. The route's length depends on the
-                answers, so a denominator here would be a number we would have
-                to go back and correct.
-              */}
-              <p className="font-sans text-[13px] tabular-nums text-onbrown-fine tablet:hidden">
-                Question {String(position + 1).padStart(2, '0')}
+    <>
+      {opening ? (
+        <PageHeader
+          eyebrow={tuesdayTestPage.eyebrow}
+          heading={tuesdayTestPage.heading}
+          intro={tuesdayTestPage.intro}
+          headingFont="mark"
+        />
+      ) : null}
+      <section
+        aria-labelledby="question"
+        className={opening ? 'wrap pt-12 mobile:pt-8' : 'wrap pt-8 mobile:pt-5'}
+      >
+        {/* Where you are, once the title has gone. One line, the site eyebrow. */}
+        {opening ? null : (
+          <p className="mb-4 text-[11.5px] font-bold uppercase tracking-label text-taupe mobile:mb-3">
+            {tuesdayTestPage.eyebrow}
+          </p>
+        )}
+        <div className="rounded-block bg-brown px-12 py-14 text-onbrown mobile:rounded-[16px] mobile:px-6 mobile:py-8 mobile:pb-[104px]">
+          <div className="grid grid-cols-[0.8fr_1.2fr] gap-x-16 tablet:grid-cols-1 tablet:gap-y-8">
+            <div>
+              <div className="flex items-baseline justify-between gap-6">
+                <p className="text-[11.5px] font-bold uppercase tracking-label text-onbrown-label">
+                  {kicker}
+                </p>
+                {/*
+                  A position and no total. The route's length depends on the
+                  answers, so a denominator here would be a number we would
+                  have to go back and correct.
+                */}
+                <p className="font-sans text-[13px] tabular-nums text-onbrown-fine tablet:hidden">
+                  Question {position + 1}
+                </p>
+              </div>
+              <h2
+                id="question"
+                className="mt-5 font-display text-[34px] leading-[1.18] tablet:max-w-[720px] mobile:mt-3 mobile:text-[24px]"
+              >
+                {prompt}
+              </h2>
+
+              {help ? (
+                <p className="mt-3 max-w-[460px] font-sans text-[15px] leading-[1.5] text-onbrown-body">
+                  {help}
+                </p>
+              ) : null}
+
+              <p className="mt-5 hidden font-sans text-[13px] tabular-nums text-onbrown-fine tablet:block mobile:mt-4">
+                Question {position + 1}
               </p>
             </div>
 
-            <h2
-              id="question"
-              className="mt-5 font-display text-[34px] leading-[1.18] tablet:max-w-[720px] mobile:text-[24px]"
-            >
-              {prompt}
-            </h2>
-
-            {help ? (
-              <p className="mt-3 max-w-[460px] font-sans text-[15px] leading-[1.5] text-onbrown-body">
-                {help}
-              </p>
-            ) : null}
-
-            <p className="mt-5 hidden font-sans text-[13px] tabular-nums text-onbrown-fine tablet:block">
-              Question {String(position + 1).padStart(2, '0')}
-            </p>
+            <div>{children}</div>
           </div>
-
-          <div>{children}</div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
@@ -434,6 +486,18 @@ function QualifierScreen({
   )
 }
 
+/**
+ * Continue and Back.
+ *
+ * ON A PHONE THEY ARE PINNED. Every question screen ran two and a half
+ * viewports tall, so Continue sat below the fold on all ten of them and
+ * answering meant scroll, choose, scroll back. The bar is the quiz's own brown
+ * with its own rule above it, it clears the home indicator, and the card above
+ * carries matching bottom padding so it never covers the last answer. There is
+ * no text input on a question screen, so no keyboard can push it anywhere.
+ *
+ * ON A DESKTOP NOTHING MOVES. The controls stay in the flow, where they fit.
+ */
 function Actions({
   onContinue, disabled, onBack, last,
 }: {
@@ -443,15 +507,24 @@ function Actions({
   last: boolean
 }) {
   return (
-    <div className="mt-8 flex flex-wrap items-center gap-7">
+    <div
+      className={
+        'mt-8 flex flex-wrap items-center gap-7 ' +
+        'mobile:fixed mobile:inset-x-0 mobile:bottom-0 mobile:z-30 mobile:mt-0 mobile:flex-nowrap ' +
+        'mobile:justify-between mobile:gap-4 mobile:border-t mobile:border-onbrown-rule ' +
+        'mobile:bg-brown mobile:px-gutter-mobile mobile:pt-3.5 ' +
+        'mobile:pb-[calc(14px+env(safe-area-inset-bottom))]'
+      }
+    >
       <button
         type="button"
         onClick={onContinue}
         disabled={disabled}
         className={
-          disabled
-            ? 'cursor-not-allowed rounded-button border border-dashed border-onbrown-rule px-6 py-[13px] font-sans text-[15px] font-semibold text-onbrown-fine mobile:min-h-[44px]'
-            : 'rounded-button bg-butter-field px-6 py-[13px] font-sans text-[15px] font-semibold text-brown hover:bg-butter-deep mobile:min-h-[44px]'
+          (disabled
+            ? 'cursor-not-allowed rounded-button border border-dashed border-onbrown-rule px-6 py-[13px] font-sans text-[15px] font-semibold text-onbrown-fine '
+            : 'rounded-button bg-butter-field px-6 py-[13px] font-sans text-[15px] font-semibold text-brown hover:bg-butter-deep ') +
+          'mobile:order-2 mobile:min-h-[46px] mobile:flex-1 mobile:px-5'
         }
       >
         {last ? 'See the result' : 'Continue'}
@@ -461,7 +534,7 @@ function Actions({
         <button
           type="button"
           onClick={onBack}
-          className="rounded-button px-1 py-2 font-sans text-[15px] font-medium text-onbrown-body underline underline-offset-4 hover:text-onbrown focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-butter-field mobile:min-h-[44px]"
+          className="rounded-button px-1 py-2 font-sans text-[15px] font-medium text-onbrown-body underline underline-offset-4 hover:text-onbrown focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-butter-field mobile:order-1 mobile:min-h-[46px] mobile:shrink-0 mobile:px-2"
         >
           Back
         </button>
