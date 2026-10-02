@@ -574,8 +574,16 @@ export const NO_SUBSTITUTE: Readonly<Record<string, Phrase>> = {
 /** The one tension worth watching. Never a prediction about a specific house. */
 export const TRADEOFF: Readonly<Record<string, Phrase>> = {
   bothProtectedAndOrderedByForcedChoice: {
-    agent: 'Both still matter. This is just the pair most likely to come up first when real houses start forcing a choice.',
-    buyer: 'Both still matter to me. This is just the pair most likely to come up first.',
+    /*
+     * NO PREDICTION. This used to end "the pair most likely to come up first
+     * when real houses start forcing a choice", which claims this tension is
+     * more probable than another, or more probable in inventory. The test
+     * establishes which two concepts were put to the buyer, which one they
+     * kept, and that the other still counts. It establishes nothing about
+     * frequency, and the market layer is still empty.
+     */
+    agent: 'Both still matter.',
+    buyer: 'Both still matter to me.',
   },
   wantsTheOutsideButNotTheMaintenance: {
     /*

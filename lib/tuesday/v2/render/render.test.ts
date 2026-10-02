@@ -736,3 +736,63 @@ test('a conditional project appetite never renders as a major one', () => {
   assert.equal(new Set(leads.values()).size, 4, 'the four follow-ups produce the same lead')
   assert.match(leads.get('scale')!, /moving walls/, 'the scale limit is not stated')
 })
+
+test('the tradeoff never predicts how often this tension will come up', () => {
+  /*
+   * WHAT THE FORCED CHOICE ESTABLISHES: which two concepts were put to the
+   * buyer, which one they kept, and that the other still counts. Not that this
+   * tension is more probable than another, more probable in inventory, or
+   * first. The market layer is empty, so a sentence about frequency is a claim
+   * nothing in the system supports.
+   *
+   * Scoped to the tradeoff section only, and to generated copy only: a buyer
+   * who types "this usually comes up for us" is quoted, not scanned.
+   */
+  const PREDICTION = [
+    /most likely/i, /likely to come up/i, /likely to happen/i, /usually comes? up/i,
+    /tends? to come up/i, /will come up first/i, /most common/i, /comes? up first/i,
+    /more often/i, /in most cases/i,
+  ]
+  const result = score(FIXTURES.turnkey.answers)
+  const base = assembleBrief(result, strategyFor(result))
+  const concepts = Object.keys(CRITERION)
+  let checked = 0
+  for (const sideA of concepts) {
+    for (const sideB of concepts) {
+      if (sideA === sideB) continue
+      for (const why of Object.keys(TRADEOFF)) {
+        for (const ordering of ['sideAWins', 'none'] as const) {
+          const brief: StructuredBrief = {
+            ...base,
+            expectedTradeoff: {
+              sideA, sideB, ordering, why, confidence: 'established',
+              trace: { layer: 'derived', sources: [] },
+            },
+          }
+          const section = compose(brief).sections.find((entry) => entry.id === 'tradeoff')
+          if (!section) continue
+          for (const entry of section.lines) {
+            for (const register of [entry.agent, entry.buyer]) {
+              for (const pattern of PREDICTION) {
+                assert.ok(
+                  !pattern.test(register),
+                  `${sideA}/${sideB}/${why}: the tradeoff predicts: "${register}"`,
+                )
+              }
+            }
+            checked += 1
+          }
+        }
+      }
+    }
+  }
+  assert.ok(checked > 500, `only ${checked} tradeoff sentences were generated`)
+  // And the catalogue itself, so a new reason cannot reintroduce one.
+  for (const [why, phrase] of Object.entries(TRADEOFF)) {
+    for (const register of [phrase.agent, phrase.buyer ?? phrase.agent]) {
+      for (const pattern of PREDICTION) {
+        assert.ok(!pattern.test(register), `TRADEOFF.${why} predicts: "${register}"`)
+      }
+    }
+  }
+})
