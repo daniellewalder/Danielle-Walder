@@ -10,7 +10,8 @@ import { getEssays, type EssayEntry } from '@/lib/essays'
  * collage becomes a slider with two arrows.
  *
  * Every title and cover comes from the Substack feed. An essay without a
- * cover keeps a tonal frame; nothing is borrowed to fill it. With no essays
+ * cover gets a typeset one — its own title on espresso — never a borrowed
+ * picture. With no essays
  * at all the section is not rendered.
  */
 
@@ -37,14 +38,20 @@ function EssayCard({
         {entry.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- arbitrary feed host; see ImageSlot
           <img className="pcard__image" src={entry.imageUrl} alt="" loading="lazy" />
-        ) : null}
+        ) : (
+          <span className="pcard__cover" aria-hidden="true">
+            <span className="pcard__cover-mark">{overthinking.title}</span>
+            <span className="pcard__cover-title">{entry.title}</span>
+          </span>
+        )}
       </span>
       <span className="pcard__badge" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" focusable="false">
           <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
         </svg>
       </span>
-      <p className="pcard__label">{entry.title}</p>
+      {/* A typeset cover already carries the title; don't print it twice. */}
+      {entry.imageUrl ? <p className="pcard__label">{entry.title}</p> : <span className="sr-only">{entry.title}</span>}
     </>
   )
 
