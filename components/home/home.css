@@ -854,9 +854,14 @@ html.lenis body {
 /* ---- About -------------------------------------------------------------- */
 
 .home .about__inner {
+  /* The portrait frame's size, in the canvas's own width, so the heading can
+     sit on its baseline and the canvas can end just under it. */
+  --frame-top: 20rem;
+  --frame-w: calc(50cqw - 0.75rem - var(--container-padding));
+  --frame-h: calc(var(--frame-w) * 3 / 4);
   position: relative;
   container-type: inline-size;
-  min-height: 46.8125rem;
+  min-height: calc(var(--frame-top) + var(--frame-h) + 5rem);
 }
 
 .home .about__label {
@@ -876,7 +881,8 @@ html.lenis body {
 
 .home .about__heading {
   position: absolute;
-  top: 27.125rem;
+  /* Bottom-aligned with the portrait: the name and the face read together. */
+  top: calc(var(--frame-top) + var(--frame-h) - 1.04em);
   left: var(--container-padding);
   width: min(41.75rem, calc(50% - 4.25rem));
   color: var(--ink);
@@ -921,10 +927,11 @@ html.lenis body {
 .home .about__frame {
   --pan: 4%;
   position: absolute;
-  top: 23.6875rem;
+  top: var(--frame-top);
   left: calc(50% + 0.75rem);
-  width: calc(50% - 2.1078rem);
-  aspect-ratio: 1373 / 700;
+  width: var(--frame-w);
+  /* A portrait crop: head and shoulders with room above, not a letterbox. */
+  aspect-ratio: 4 / 3;
   border-radius: var(--radius-card);
   overflow: hidden;
   background-color: var(--butter-field);
@@ -938,6 +945,7 @@ html.lenis body {
   height: calc(100% + 2 * var(--pan));
   max-width: none;
   object-fit: cover;
+  object-position: 50% 22%;
 }
 
 @media (max-width: 991px) {
@@ -963,7 +971,7 @@ html.lenis body {
     top: auto;
     left: auto;
     width: 100%;
-    aspect-ratio: 686 / 350;
+    aspect-ratio: 4 / 3;
   }
 }
 
@@ -985,7 +993,7 @@ html.lenis body {
   }
 
   .home .about__frame {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
   }
 }
 

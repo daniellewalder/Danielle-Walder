@@ -45,8 +45,8 @@ export const about = {
   copy: "I'm a Los Angeles real-estate agent and the person behind Overthinking Real Estate. I help people make big housing decisions with local context, honest analysis, and the recognition that buying a home is never only about the house.",
   portrait: {
     label: '[ADD DANIELLE PHOTO]',
-    alt: 'Danielle Walder',
-    src: null,
+    alt: 'Danielle Walder, smiling, in front of a wall of green leaves',
+    src: '/media/danielle/portrait.webp',
   },
   primaryCta: { label: "Tell me what you're trying to figure out", href: '/contact' },
   secondaryCta: { label: 'More about me', href: '/about' },

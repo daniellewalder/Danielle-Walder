@@ -71,8 +71,8 @@ export const aboutPage = {
   heading: "hi, I'm Danielle",
   portrait: {
     label: '[ADD DANIELLE PHOTO]',
-    alt: 'Danielle Walder',
-    src: null,
+    alt: 'Danielle Walder, smiling, in front of a wall of green leaves',
+    src: '/media/danielle/portrait.webp',
   },
   sections: [
     {
