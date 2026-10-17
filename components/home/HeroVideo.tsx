@@ -40,6 +40,9 @@ export function HeroVideo({ asset }: { asset: EditorialVideoAsset }) {
       />
       {showVideo ? (
         <video
+          // Stays transparent until frames are actually playing, so the poster
+          // underneath is never covered by an empty black box while it loads.
+          onPlaying={(event) => event.currentTarget.classList.add('is-playing')}
           className="hero__back hero__back--media"
           src={asset.src}
           poster={asset.poster}

@@ -286,7 +286,8 @@ function heroIntro(lenis: Lenis | null) {
       height: rect.height,
       '--hero-floor': `${floor}px`,
       x: 0,
-      borderRadius: getComputedStyle(hero).getPropertyValue('--radius-container').trim() || '20px',
+      // The hero runs full bleed, so the slot opens to square corners.
+      borderRadius: '0px',
       duration: 1.1,
       ease: 'power3.inOut',
     },
