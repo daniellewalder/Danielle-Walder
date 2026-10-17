@@ -1,3 +1,4 @@
+import { editorialMedia } from '@/lib/content/editorialMedia'
 import {
   homeValuationPage,
   laActuallyPage,
@@ -36,6 +37,12 @@ export const hero = {
    * it must be cut from the real portrait above, never a different image.
    */
   cutout: { src: null as string | null },
+  /**
+   * The hero footage: the aerial coast from LA, Actually. Editorial stock —
+   * it stands for Los Angeles, never for Danielle's listing or a named place,
+   * so it carries no caption and no location.
+   */
+  video: editorialMedia.coastalAerial,
   /** The hero clock. Danielle works in Los Angeles. */
   clock: { label: 'LA', timeZone: 'America/Los_Angeles' },
 }

@@ -677,6 +677,27 @@ html.lenis body {
   clip-path: inset(0 0 var(--hero-reveal, 0%) 0);
 }
 
+/* Footage holds its own crop: the mountains and far coast above the type,
+   rather than the focal slide the opening uses for a photograph. */
+.home .hero__back--media {
+  object-position: 50% 38%;
+}
+
+@media (max-width: 767px) {
+  .home .hero__back--media {
+    object-position: 78% 42%;
+  }
+}
+
+.home .hero__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--espresso);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
 .home .hero__back.slot-fill {
   background-color: var(--blue-ink);
 }

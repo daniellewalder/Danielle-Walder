@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { HeroClock } from '@/components/home/HeroClock'
+import { HeroVideo } from '@/components/home/HeroVideo'
 import { Photo } from '@/components/home/Photo'
 import { hero, homeNav } from '@/lib/content/home'
 import { siteName } from '@/lib/content/site'
@@ -14,8 +15,8 @@ import { siteName } from '@/lib/content/site'
  * slot grows into the card — see HomeMotion. Without the script, or under
  * reduced motion, the page renders finished.
  *
- * Until her portrait exists the card is the hero's blue field and the type is
- * blue ink. A supplied photograph switches the ink to cream; an optional
+ * The card carries the aerial coast footage from LA, Actually under a flat
+ * espresso wash. Without it, the card is the hero's deep blue field. An optional
  * cut-out of the same photograph is layered over the headline so the subject
  * stands in front of the letters. Nothing is drawn in place of either.
  *
@@ -23,7 +24,7 @@ import { siteName } from '@/lib/content/site'
  * hidden and nothing replaces them — the footer carries every route.
  */
 export function Hero() {
-  const hasPhoto = Boolean(hero.portrait.src)
+  const hasPhoto = Boolean(hero.video || hero.portrait.src)
   const words = siteName.split(' ')
 
   return (
@@ -46,7 +47,16 @@ export function Hero() {
           <HeroClock label={hero.clock.label} timeZone={hero.clock.timeZone} />
         </header>
 
-        <Photo image={hero.portrait} className="hero__back" priority />
+        {hero.video ? (
+          <>
+            <HeroVideo asset={hero.video} />
+            {/* One flat espresso wash so cream type holds over bright footage —
+                the same treatment and value as the LA, Actually opening. */}
+            <span className="hero__wash" aria-hidden="true" />
+          </>
+        ) : (
+          <Photo image={hero.portrait} className="hero__back" priority />
+        )}
 
         <h1 className="hero__title t-display">
           {hero.headlineLines.map((line, index) => (
