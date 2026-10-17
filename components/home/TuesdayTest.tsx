@@ -1,81 +1,41 @@
-import { CtaLink } from '@/components/ui/CtaLink'
+import Link from 'next/link'
 import { tuesdayTest } from '@/lib/content/home'
 
 /**
- * The one full-bleed dark section in the page body.
+ * The Tuesday Test: the label on the left, then a wide column with the
+ * heading, a butter preview panel and the invitation set right-aligned beside
+ * it.
  *
- * The right column is a static editorial preview. The options are styled text
- * in a plain list — not buttons, inputs, links, or focusable elements. Nothing
- * is selected, scored, saved, or returned, and they carry no hover state so
- * they never read as interactive. The single CTA is the only action here.
+ * The panel is a static editorial preview — the first question as text. It is
+ * not a button, a link or a form, and it has no hover state, so it never
+ * reads as interactive. The one link is the way into the real quiz.
  */
 export function TuesdayTest() {
   return (
-    <section
-      aria-labelledby="tuesday-test"
-      className="mt-[88px] grid grid-cols-[0.95fr_1.05fr] items-center gap-16 bg-brown px-gutter py-24 text-onbrown tablet:grid-cols-1 tablet:gap-10 tablet:px-gutter-tablet tablet:py-16 mobile:mt-16 mobile:gap-8 mobile:px-gutter-mobile mobile:py-14"
-    >
-      <div className="flex min-w-0 flex-col gap-5">
-        <span className="self-start rounded-badge bg-butter-field px-[13px] py-[7px] text-[11.5px] font-bold uppercase tracking-label text-brown">
+    <section className="testimonial" id="tuesday-test" aria-labelledby="tuesday-test-heading">
+      <div className="testimonial__inner home-container">
+        <p className="testimonial__label section-label" data-anim="rise">
           {tuesdayTest.badge}
-        </span>
-        {/*
-          The approved quiz Statement role: Unbounded 600 at 54px / 0.94 /
-          -0.055em (handoff §8). This was Rozha One — font-display — which is
-          the section-header role, not the statement one.
-        */}
-        <h2
-          id="tuesday-test"
-          className="max-w-[15ch] font-mark text-[34px] font-semibold leading-[1.06] tracking-display tablet:text-[30px] mobile:text-[26px]"
-        >
-          {tuesdayTest.heading}
-        </h2>
-        <p className="max-w-[42ch] font-sans text-[17.5px] leading-[1.55] text-onbrown-body">
-          {tuesdayTest.intro}
         </p>
-        <CtaLink
-          href={tuesdayTest.cta.href}
-          variant="primary"
-          className="mt-2 self-start border-[1.5px] border-butter-field bg-transparent text-butter-field hover:border-butter-field hover:bg-butter-field hover:text-brown"
-        >
-          {tuesdayTest.cta.label}
-        </CtaLink>
-      </div>
-
-      {/*
-        The preview reads as a product moment, so it sits in a paper panel
-        rather than loose on the brown. The panel takes the 12px button radius,
-        not the 20px block radius: the handoff reserves 20px for the two or
-        three soft colour blocks — hero, about, subscribe row — and this is UI,
-        not a fourth soft block.
-
-        The options are list items. Not buttons, not links, not focusable, no
-        hover state. Nothing is selected, scored, saved, or returned.
-      */}
-      <div className="min-w-0 rounded-button bg-paper px-9 py-8 mobile:px-6 mobile:py-6">
-        <div className="flex items-baseline justify-between gap-4 border-b border-hairline pb-4">
-          <p className="text-[11.5px] font-bold uppercase tracking-label text-taupe">
-            {tuesdayTest.preview.label}
-          </p>
-          <span className="font-sans text-[13px] text-taupe">
-            1 / {tuesdayTest.preview.options.length}
-          </span>
+        <div className="testimonial__column">
+          <h2 id="tuesday-test-heading" className="testimonial__heading t-heading" data-anim="lines">
+            {tuesdayTest.heading}
+          </h2>
+          <div className="testimonial__figure">
+            <div className="testimonial__frame" data-anim="pop">
+              <p className="section-label">{tuesdayTest.preview.label}</p>
+              <p className="testimonial__question">{tuesdayTest.preview.question}</p>
+            </div>
+            <div className="testimonial__quote">
+              <p className="testimonial__text t-quote" data-anim="lines">
+                {tuesdayTest.intro}
+              </p>
+              <Link className="testimonial__author" href={tuesdayTest.cta.href} data-anim="rise">
+                {tuesdayTest.cta.label}&nbsp;<span aria-hidden="true">&rarr;</span>
+              </Link>
+            </div>
+          </div>
         </div>
-
-        <p className="mt-6 font-display text-[23px] leading-[1.25] text-espresso mobile:text-[20px]">
-          {tuesdayTest.preview.question}
-        </p>
-
-        <ul className="mt-6 flex flex-col gap-[10px]">
-          {tuesdayTest.preview.options.map((option) => (
-            <li
-              key={option}
-              className="rounded-button bg-cream px-5 py-[15px] font-sans text-[15.5px] leading-[1.45] text-espresso"
-            >
-              {option}
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   )

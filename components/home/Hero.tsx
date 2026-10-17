@@ -1,63 +1,103 @@
-import { SimpleSearch } from '@/components/realscout/RealScout'
-import { CtaLink } from '@/components/ui/CtaLink'
-import { ImageSlot } from '@/components/ui/ImageSlot'
-import { hero } from '@/lib/content/home'
+import Link from 'next/link'
+import { HeroClock } from '@/components/home/HeroClock'
+import { Photo } from '@/components/home/Photo'
+import { hero, homeNav } from '@/lib/content/home'
+import { siteName } from '@/lib/content/site'
 
 /**
- * Hero A — Danielle-led. Her portrait, not a house.
+ * The opening screen: one inset card the height of the viewport, with the
+ * site's own bar inside it, the headline on two display lines, and the lede
+ * and one action at its foot.
  *
- * Composed as an opening spread rather than two columns of equal weight. The
- * type column is deliberately narrow so the headline wraps to three lines and
- * reads as a masthead; the portrait is a tall vertical slice bleeding to the
- * top, right and bottom edges of the block, so it reads as a crop rather than
- * a rectangle sitting in padding. Its corners come from the block's own radius.
+ * On load (motion permitting) Danielle's name rises letter by letter, a slot
+ * opens between the two words, three tonal panels flash through it, and the
+ * slot grows into the card — see HomeMotion. Without the script, or under
+ * reduced motion, the page renders finished.
  *
- * A blue-steel rule divides statement from utility: everything above is the
- * claim, everything below is the practical way in. The search field is
- * RealScout's — nothing here implies behaviour it does not have.
+ * Until her portrait exists the card is the hero's blue field and the type is
+ * blue ink. A supplied photograph switches the ink to cream; an optional
+ * cut-out of the same photograph is layered over the headline so the subject
+ * stands in front of the letters. Nothing is drawn in place of either.
  *
- * The portrait aspect is roughly 2:3. That is the crop Danielle's real
- * photograph needs; the placeholder holds it exactly so the composition can be
- * judged before the photo exists.
+ * The nav here is anchors to this page's own sections. Below 992px they are
+ * hidden and nothing replaces them — the footer carries every route.
  */
 export function Hero() {
+  const hasPhoto = Boolean(hero.portrait.src)
+  const words = siteName.split(' ')
+
   return (
-    <header className="wrap pt-[22px]">
-      <div className="grid grid-cols-[1.34fr_0.66fr] items-stretch overflow-hidden rounded-block bg-blue-field tablet:grid-cols-1 mobile:rounded-[16px]">
-        <div className="flex min-w-0 flex-col justify-between py-16 pl-[52px] pr-16 tablet:px-9 tablet:pb-12 tablet:pt-12 mobile:px-6 mobile:pb-10 mobile:pt-9">
-          <div>
-            <p className="text-[11.5px] font-bold uppercase tracking-attribution text-blue-deep">
-              {hero.eyebrow}
-            </p>
+    <section className={`hero${hasPhoto ? ' hero--photo' : ''}`} id="top">
+      <div className="hero__photo">
+        <header className="nav" data-anim="rise">
+          <Link className="nav__brand" href="/">
+            <span className="t-logo">{siteName}</span>
+          </Link>
 
-            <h1 className="mt-8 max-w-[13ch] font-mark text-hero font-semibold tracking-display text-blue-ink tablet:text-hero-tablet mobile:text-hero-mobile">
-              {hero.headline}
-            </h1>
-          </div>
+          <nav className="nav__links" aria-label="On this page">
+            {homeNav.map((link) => (
+              <a key={link.href} className="nav__link t-ui" href={link.href}>
+                {link.label}
+                <span className="nav__link-rule rule-dotted" aria-hidden="true" />
+              </a>
+            ))}
+          </nav>
 
-          <div className="mt-14 tablet:mt-10">
-            <p className="max-w-[46ch] border-t border-blue-steel pt-8 font-sans text-[18px] leading-[1.55] text-blue-deep tablet:pt-7">
-              {hero.intro}
-            </p>
+          <HeroClock label={hero.clock.label} timeZone={hero.clock.timeZone} />
+        </header>
 
-            <div className="mt-8">
-              <SimpleSearch />
-            </div>
+        <Photo image={hero.portrait} className="hero__back" priority />
 
-            <CtaLink href={hero.secondaryCta.href} variant="editorial" className="mt-8">
-              {hero.secondaryCta.label} &rarr;
-            </CtaLink>
-          </div>
+        <h1 className="hero__title t-display">
+          {hero.headlineLines.map((line, index) => (
+            <span key={line} className="hero__line">
+              <span className="hero__ink">
+                {line}
+                {/* Keeps the words apart for anything reading the text. */}
+                {index < hero.headlineLines.length - 1 ? ' ' : null}
+              </span>
+            </span>
+          ))}
+        </h1>
+
+        {hero.cutout.src ? (
+          // eslint-disable-next-line @next/next/no-img-element -- layered cut-out, sized with the back photo
+          <img className="hero__front" src={hero.cutout.src} alt="" aria-hidden="true" fetchPriority="high" />
+        ) : null}
+
+        {/* Tonal panels that flash through the opening slot. Decoration only. */}
+        <span className="hero__flash hero__flash--1" aria-hidden="true" />
+        <span className="hero__flash hero__flash--2" aria-hidden="true" />
+        <span className="hero__flash hero__flash--3" aria-hidden="true" />
+
+        <div className="hero__foot">
+          <p className="hero__lede t-lede" data-anim="rise">
+            {hero.intro}
+          </p>
+          <Link className="btn btn--pill hero__cta" href={hero.primaryCta.href} data-anim="rise">
+            <span className="btn__fill" aria-hidden="true" />
+            <span className="btn__label">{hero.primaryCta.label}</span>
+          </Link>
         </div>
-
-        <ImageSlot
-          image={hero.portrait}
-          priority
-          tone="bg-blue-steel"
-          sizes="(max-width: 1024px) 100vw, 34vw"
-          className="h-full min-h-[620px] tablet:h-[440px] tablet:min-h-0 mobile:h-[380px]"
-        />
       </div>
-    </header>
+
+      <div className="hero__loader" aria-hidden="true">
+        <span className="hero__word t-loader">
+          {Array.from(words[0] ?? '').map((glyph, index) => (
+            <span key={index} className="hero__glyph">
+              {glyph}
+            </span>
+          ))}
+        </span>
+        <span className="hero__gap" />
+        <span className="hero__word t-loader">
+          {Array.from(words.slice(1).join(' ')).map((glyph, index) => (
+            <span key={index} className="hero__glyph">
+              {glyph}
+            </span>
+          ))}
+        </span>
+      </div>
+    </section>
   )
 }

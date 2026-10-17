@@ -1,4 +1,9 @@
-import { tuesdayTestPage } from '@/lib/content/pages'
+import {
+  homeValuationPage,
+  laActuallyPage,
+  searchPage,
+  tuesdayTestPage,
+} from '@/lib/content/pages'
 
 /**
  * Homepage copy.
@@ -11,6 +16,11 @@ import { tuesdayTestPage } from '@/lib/content/pages'
 export const hero = {
   eyebrow: 'Los Angeles real estate, with a counterpoint',
   headline: 'A home is never just a home.',
+  /**
+   * The headline set as the hero's two display lines. Same words as
+   * `headline`, only broken for the composition.
+   */
+  headlineLines: ['A home is never', 'just a home.'],
   intro:
     'It is a commute, a Tuesday night, a monthly payment, a neighborhood, a negotiation, and the particular life you want to have once the keys are yours.',
   primaryCta: { label: 'Search Homes', href: '/search' },
@@ -20,6 +30,14 @@ export const hero = {
     alt: 'Danielle Walder',
     src: null,
   },
+  /**
+   * Optional cut-out of the same photograph with the background removed, so
+   * the subject stands in front of the headline. Only rendered when supplied —
+   * it must be cut from the real portrait above, never a different image.
+   */
+  cutout: { src: null as string | null },
+  /** The hero clock. Danielle works in Los Angeles. */
+  clock: { label: 'LA', timeZone: 'America/Los_Angeles' },
 }
 
 export const about = {
@@ -77,4 +95,52 @@ export const subscribe = {
   /** Shown until SUBSTACK_URL is set. No email field, no fake form. */
   pending:
     'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
+}
+
+/** The homepage section labels, in page order. Nav anchors use the same ids. */
+export const homeNav = [
+  { label: 'about', href: '#about' },
+  { label: 'overthinking real estate', href: '#read' },
+  { label: 'the tuesday test', href: '#tuesday-test' },
+  { label: 'contact', href: '#contact' },
+] as const
+
+export const aboutSection = {
+  label: 'about danielle',
+}
+
+/**
+ * "Start here" — the practical ways in, numbered. Every title is a real route
+ * and every line under it is that page's own approved copy, so the two never
+ * drift. The heading is the hero eyebrow Danielle approved.
+ *
+ * `note` is the justified paragraph beside the grid. It stays null — and is
+ * not rendered — until Danielle writes one.
+ */
+export const startHere = {
+  label: 'start here',
+  heading: hero.eyebrow,
+  features: [
+    { label: 'search homes', href: '/search', body: searchPage.heading },
+    { label: "what's my home worth?", href: '/home-valuation', body: homeValuationPage.followUp.body },
+    { label: 'la, actually', href: '/la-actually', body: laActuallyPage.heading },
+    {
+      label: 'send me a house',
+      href: '/contact?intent=showing',
+      body: searchPage.showingHandoff.heading,
+    },
+  ],
+  note: null as string | null,
+}
+
+/** The closing contact block. Heading and action are approved copy. */
+export const contactSection = {
+  label: 'contact',
+  headingLines: ["Tell me what", "you're trying", 'to figure out'],
+  cta: { label: 'Say hello', href: '/contact' },
+  photo: {
+    label: '[ADD CONTACT PHOTO]',
+    alt: 'Danielle Walder',
+    src: null,
+  },
 }

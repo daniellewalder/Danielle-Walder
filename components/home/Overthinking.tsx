@@ -1,58 +1,98 @@
 import Link from 'next/link'
-import { ImageSlot } from '@/components/ui/ImageSlot'
+import { EssaySlider } from '@/components/home/EssaySlider'
 import { overthinking } from '@/lib/content/home'
 import { getEssays, type EssayEntry } from '@/lib/essays'
 
 /**
- * Overthinking Real Estate, composed as a magazine spread.
+ * Overthinking Real Estate, as the dark card: the masthead top-left, the
+ * eyebrow top-right, a dotted rule, and a collage of the four latest essays
+ * at fixed slots, repeated three times so the track can loop. Below 992px the
+ * collage becomes a slider with two arrows.
  *
- * A full-width masthead, then a deliberately unequal spread: one dominant lead
- * story with a tall image, and supporting stories at descending scale — the
- * first with a wide image of its own, the rest as text with small crops. No
- * equal-width card grid, no rounded card per story, no news template.
- *
- * Every title, date and image comes from the Substack feed or Danielle's
- * curated deks. Nothing is invented to balance the composition: a story with
- * no cover stays text-only and a story with no dek shows none.
+ * Every title and cover comes from the Substack feed. An essay without a
+ * cover keeps a tonal frame; nothing is borrowed to fill it. With no essays
+ * at all the section is not rendered.
  */
-function EssayLink({
+
+const SLOTS = [
+  { name: 'one', width: '32.125rem', ratio: '514 / 303' },
+  { name: 'two', width: '20rem', ratio: '320 / 207' },
+  { name: 'three', width: '16rem', ratio: '256 / 173' },
+  { name: 'four', width: '16rem', ratio: '256 / 173' },
+] as const
+
+function EssayCard({
   entry,
-  className,
-  children,
+  slot,
+  hidden,
 }: {
   entry: EssayEntry
-  className: string
-  children: React.ReactNode
+  slot: (typeof SLOTS)[number]
+  hidden: boolean
 }) {
+  const style = { '--pcard-w': slot.width, '--pcard-ratio': slot.ratio } as React.CSSProperties
+  const inner = (
+    <>
+      <span className="pcard__frame">
+        {entry.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- arbitrary feed host; see ImageSlot
+          <img className="pcard__image" src={entry.imageUrl} alt="" loading="lazy" />
+        ) : null}
+      </span>
+      <span className="pcard__badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" focusable="false">
+          <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+        </svg>
+      </span>
+      <p className="pcard__label">{entry.title}</p>
+    </>
+  )
+
+  const a11y = hidden ? { tabIndex: -1, 'aria-hidden': true as const } : {}
+
   if (entry.slug) {
     return (
-      <Link href={`/read/${entry.slug}`} className={className}>
-        {children}
+      <Link className="pcard" href={`/read/${entry.slug}`} style={style} {...a11y}>
+        {inner}
       </Link>
     )
   }
 
-  if (!entry.substackUrl) return <span className={className}>{children}</span>
+  if (entry.substackUrl) {
+    return (
+      <a
+        className="pcard"
+        href={entry.substackUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={style}
+        {...a11y}
+      >
+        {inner}
+        <span className="sr-only"> (opens on Substack)</span>
+      </a>
+    )
+  }
 
   return (
-    <a href={entry.substackUrl} target="_blank" rel="noopener noreferrer" className={className}>
-      {children}
-      <span className="sr-only"> (opens on Substack)</span>
-    </a>
+    <span className="pcard" style={style} {...a11y}>
+      {inner}
+    </span>
   )
 }
 
-function PublishedAt({ value, className }: { value: string | null; className: string }) {
-  if (!value) return null
-
+function Group({ entries, clone }: { entries: EssayEntry[]; clone: boolean }) {
   return (
-    <time dateTime={new Date(value).toISOString()} className={className}>
-      {new Date(value).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })}
-    </time>
+    <div
+      className={`properties__group ${clone ? 'properties__group--clone' : 'properties__group--lead'}`}
+      aria-hidden={clone || undefined}
+    >
+      {entries.map((entry, index) => (
+        <div key={entry.title} className={`properties__slot properties__slot--${SLOTS[index].name}`}>
+          <EssayCard entry={entry} slot={SLOTS[index]} hidden={clone} />
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -60,115 +100,57 @@ export async function Overthinking() {
   const { lead, more } = await getEssays()
   if (!lead) return null
 
-  const [second, ...rest] = more
-  const tail = rest.slice(0, 2)
+  const entries = [lead, ...more].slice(0, SLOTS.length)
 
   return (
-    <section aria-labelledby="overthinking" className="wrap pt-[88px] mobile:pt-16">
-      {/* Masthead */}
-      <div className="border-b border-espresso pb-8">
-        <p className="eyebrow text-sage-olive">{overthinking.eyebrow}</p>
-        <div className="mt-5 flex items-end justify-between gap-12 tablet:flex-col tablet:items-start tablet:gap-6">
-          <h2
-            id="overthinking"
-            className="max-w-[16ch] font-serif text-[46px] leading-[1.02] text-wine tablet:max-w-none tablet:text-[38px] mobile:text-[30px]"
-          >
+    <section className="properties section--carded" id="read" aria-labelledby="read-heading">
+      <div className="properties__card card">
+        <div className="properties__head">
+          <h2 id="read-heading" className="properties__heading t-heading-md" data-anim="lines">
             {overthinking.title}
           </h2>
-          <div className="max-w-[46ch] shrink-0 pb-2 tablet:pb-0">
-            <p className="font-sans text-[15.5px] leading-[1.6] text-warmgray">{overthinking.dek}</p>
-            <Link href="/read" className="more-link mt-5 inline-flex">
-              {overthinking.moreLabel} <span aria-hidden="true">&nbsp;&rarr;</span>
-            </Link>
+          <p className="properties__dek t-body" data-anim="rise">
+            {overthinking.dek}
+          </p>
+          <Link className="properties__more" href="/read" data-anim="rise">
+            {overthinking.moreLabel}&nbsp;<span aria-hidden="true">&rarr;</span>
+          </Link>
+        </div>
+        <p className="properties__eyebrow section-label" data-anim="rise">
+          {overthinking.eyebrow}
+        </p>
+        <div className="properties__rule rule-dotted rule-dotted--dark" role="presentation" data-anim="rule" />
+
+        <div className="properties__collage">
+          <div className="properties__track">
+            <Group entries={entries} clone={false} />
+            <Group entries={entries} clone />
+            <Group entries={entries} clone />
           </div>
         </div>
-      </div>
 
-      {/* The spread: one dominant story, then descending scale. */}
-      <div className="mt-12 grid grid-cols-[1.45fr_1fr] gap-14 tablet:grid-cols-1 tablet:gap-12">
-        <article className="min-w-0">
-          <EssayLink entry={lead} className="group block">
-            {lead.imageUrl ? (
-              <ImageSlot
-                image={{ label: '[ADD ESSAY IMAGE]', alt: lead.title, src: lead.imageUrl }}
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="h-[520px] rounded-block tablet:h-[420px] mobile:h-[280px]"
+        <div className="properties__nav">
+          <button className="btn btn--nav properties__arrow" type="button" data-slider="prev" aria-label="Previous essays">
+            <span className="btn__fill" aria-hidden="true" />
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path
+                d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"
+                fill="currentColor"
               />
-            ) : null}
-            <p className="eyebrow mt-7 tracking-label">{overthinking.leadLabel}</p>
-            <h3 className="mt-4 max-w-[22ch] font-serif text-[32px] leading-[1.12] text-espresso group-hover:text-wine tablet:text-[28px] mobile:text-[24px]">
-              {lead.title}
-            </h3>
-            {lead.dek ? (
-              <p className="mt-5 max-w-[52ch] font-sans text-[17px] leading-[1.6] text-warmgray">
-                {lead.dek}
-              </p>
-            ) : null}
-            <PublishedAt value={lead.publishedAt} className="mt-5 block font-sans text-[13px] text-taupe" />
-          </EssayLink>
-        </article>
-
-        <div className="min-w-0">
-          {/* Second story keeps an image, at a smaller scale than the lead. */}
-          {second ? (
-            <article className="min-w-0 border-b border-hairline pb-9">
-              <EssayLink entry={second} className="group block">
-                {second.imageUrl ? (
-                  <ImageSlot
-                    image={{ label: '[ADD ESSAY IMAGE]', alt: second.title, src: second.imageUrl }}
-                    sizes="(max-width: 1024px) 100vw, 34vw"
-                    className="h-[240px] rounded-block mobile:h-[170px]"
-                  />
-                ) : null}
-                <h3 className="mt-6 font-serif text-[23px] leading-[1.16] text-espresso group-hover:text-wine mobile:text-[21px]">
-                  {second.title}
-                </h3>
-                {second.dek ? (
-                  <p className="mt-3 font-sans text-[15.5px] leading-[1.55] text-warmgray">
-                    {second.dek}
-                  </p>
-                ) : null}
-                <PublishedAt
-                  value={second.publishedAt}
-                  className="mt-4 block font-sans text-[13px] text-taupe"
-                />
-              </EssayLink>
-            </article>
-          ) : null}
-
-          {/* The tail runs as text with a small crop — smallest scale. */}
-          <ul className="min-w-0">
-            {tail.map((entry) => (
-              <li key={entry.title} className="min-w-0 border-b border-hairline">
-                <EssayLink entry={entry} className="group flex min-w-0 items-start gap-5 py-7">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-serif text-[19px] leading-[1.2] text-espresso group-hover:text-wine">
-                      {entry.title}
-                    </h3>
-                    <PublishedAt
-                      value={entry.publishedAt}
-                      className="mt-2 block font-sans text-[13px] text-taupe"
-                    />
-                  </div>
-                  {/*
-                    ImageSlot is always w-full, so the size lives on a wrapper.
-                    12px corners: soft per the editorial rule, but not the 20px
-                    block radius, which at this scale reads as a bubble.
-                  */}
-                  {entry.imageUrl ? (
-                    <div className="h-[76px] w-[76px] shrink-0">
-                      <ImageSlot
-                        image={{ label: '[ADD ESSAY IMAGE]', alt: entry.title, src: entry.imageUrl }}
-                        sizes="90px"
-                        className="h-full rounded-[12px]"
-                      />
-                    </div>
-                  ) : null}
-                </EssayLink>
-              </li>
-            ))}
-          </ul>
+            </svg>
+          </button>
+          <button className="btn btn--nav properties__arrow" type="button" data-slider="next" aria-label="Next essays">
+            <span className="btn__fill" aria-hidden="true" />
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path
+                d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
         </div>
+
+        <EssaySlider />
       </div>
     </section>
   )

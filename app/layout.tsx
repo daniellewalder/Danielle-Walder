@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Figtree, Kalnia, Rozha_One, Unbounded } from 'next/font/google'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteNav } from '@/components/SiteNav'
+import { ChromeGate } from '@/components/ChromeGate'
 import { siteUrl } from '@/lib/config'
 import './globals.css'
 
@@ -48,12 +49,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
+      // The homepage's motion sets classes and a data attribute on <html>
+      // before hydration (see components/home/ArmMotion).
+      suppressHydrationWarning
       className={`${unbounded.variable} ${rozhaOne.variable} ${kalnia.variable} ${figtree.variable}`}
     >
       <body>
-        <SiteNav />
+        <ChromeGate>
+          <SiteNav />
+        </ChromeGate>
         <main>{children}</main>
-        <SiteFooter />
+        <ChromeGate>
+          <SiteFooter />
+        </ChromeGate>
       </body>
     </html>
   )
