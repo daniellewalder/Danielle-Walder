@@ -25,6 +25,7 @@ export function TuesdayTest() {
             <div className="testimonial__frame" data-anim="pop">
               <p className="section-label">{tuesdayTest.preview.label}</p>
               <p className="testimonial__question">{tuesdayTest.preview.question}</p>
+              <p className="testimonial__count">1 / {tuesdayTest.preview.options.length}</p>
             </div>
             <div className="testimonial__quote">
               <p className="testimonial__text t-quote" data-anim="lines">

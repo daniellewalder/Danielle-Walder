@@ -1450,8 +1450,8 @@ html.lenis body {
   min-height: 23.1875rem;
   flex-shrink: 0;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 1.5rem;
+  justify-content: flex-start;
+  gap: 1.25rem;
   padding: 1.75rem;
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -1460,6 +1460,12 @@ html.lenis body {
 }
 
 .home .testimonial__frame .section-label {
+  color: var(--bronze);
+}
+
+.home .testimonial__count {
+  margin-top: auto;
+  font-size: 0.8125rem;
   color: var(--bronze);
 }
 
