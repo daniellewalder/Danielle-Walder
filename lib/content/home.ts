@@ -1,10 +1,5 @@
 import { editorialMedia } from '@/lib/content/editorialMedia'
-import {
-  homeValuationPage,
-  laActuallyPage,
-  searchPage,
-  tuesdayTestPage,
-} from '@/lib/content/pages'
+import { tuesdayTestPage } from '@/lib/content/pages'
 
 /**
  * Homepage copy.
@@ -114,30 +109,6 @@ export const homeNav = [
 
 export const aboutSection = {
   label: 'about danielle',
-}
-
-/**
- * "Start here" — the practical ways in, numbered. Every title is a real route
- * and every line under it is that page's own approved copy, so the two never
- * drift. The heading is the hero eyebrow Danielle approved.
- *
- * `note` is the justified paragraph beside the grid. It stays null — and is
- * not rendered — until Danielle writes one.
- */
-export const startHere = {
-  label: 'start here',
-  heading: hero.eyebrow,
-  features: [
-    { label: 'search homes', href: '/search', body: searchPage.heading },
-    { label: "what's my home worth?", href: '/home-valuation', body: homeValuationPage.followUp.body },
-    { label: 'la, actually', href: '/la-actually', body: laActuallyPage.heading },
-    {
-      label: 'send me a house',
-      href: '/contact?intent=showing',
-      body: searchPage.showingHandoff.heading,
-    },
-  ],
-  note: null as string | null,
 }
 
 /** The closing contact block. Heading and action are approved copy. */

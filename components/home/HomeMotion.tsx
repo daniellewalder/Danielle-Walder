@@ -346,16 +346,6 @@ function sections() {
     drawRule(q('.properties__rule', read))
   }
 
-  const start = q('.home .approach')
-  if (start) {
-    rise([q('.approach__label', start)], { trigger: q('.approach__label', start) })
-    lines(q('.approach__heading', start), { trigger: q('.approach__heading', start) })
-    drawRule(q('.rule-dotted', start))
-    riseBatch(qa('.feature', start), { stagger: 0.09 })
-    const note = q('.approach__note', start)
-    if (note) rise([note], { trigger: note })
-  }
-
   const tuesday = q('.home .testimonial')
   if (tuesday) {
     rise([q('.testimonial__label', tuesday)], { trigger: q('.testimonial__label', tuesday) })

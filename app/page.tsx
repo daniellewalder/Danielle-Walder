@@ -5,7 +5,6 @@ import { Hero } from '@/components/home/Hero'
 import { HomeFooter } from '@/components/home/HomeFooter'
 import { HomeMotion } from '@/components/home/HomeMotion'
 import { Overthinking } from '@/components/home/Overthinking'
-import { StartHere } from '@/components/home/StartHere'
 import { TuesdayTest } from '@/components/home/TuesdayTest'
 import '@/components/home/home.css'
 
@@ -22,7 +21,7 @@ export const revalidate = 300
 
 /**
  * Homepage flow, after the landing-page reference Danielle chose:
- *   hero → about → Overthinking Real Estate (the dark card) → start here →
+ *   hero → about → Overthinking Real Estate (the dark card) →
  *   the Tuesday Test → contact → footer card
  *
  * The reference's listings, testimonial and stock photography are not carried
@@ -38,7 +37,6 @@ export default function HomePage() {
       <Hero />
       <About />
       <Overthinking />
-      <StartHere />
       <TuesdayTest />
       <Contact />
       <HomeFooter />
