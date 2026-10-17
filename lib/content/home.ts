@@ -145,6 +145,15 @@ export const contactSection = {
   label: 'contact',
   headingLines: ["Tell me what", "you're trying", 'to figure out'],
   cta: { label: 'Say hello', href: '/contact' },
+  /**
+   * The other ways in, beside the heading while there is no photograph:
+   * the published address, and two real routes. The phone number is not
+   * here on purpose — its one approved place is the showing handoff.
+   */
+  more: [
+    { label: 'send me a house', href: '/contact?intent=showing' },
+    { label: "what's my home worth?", href: '/home-valuation' },
+  ],
   photo: {
     label: '[ADD CONTACT PHOTO]',
     alt: 'Danielle Walder',

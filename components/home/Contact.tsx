@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Photo } from '@/components/home/Photo'
+import { contactEmail } from '@/lib/config'
+import { contactPage } from '@/lib/content/contact'
 import { contactSection } from '@/lib/content/home'
 
 /**
@@ -43,6 +45,26 @@ export function Contact() {
             <span className="btn__label">{contactSection.cta.label}</span>
           </Link>
         </div>
+
+        {contactSection.photo.src ? null : (
+          <ul className="contact__more" data-anim="rise">
+            {contactEmail ? (
+              <li>
+                <span className="section-label">{contactPage.emailLabel}</span>
+                <a className="contact__email" href={`mailto:${contactEmail}`}>
+                  {contactEmail}
+                </a>
+              </li>
+            ) : null}
+            {contactSection.more.map((link) => (
+              <li key={link.href}>
+                <Link className="contact__link" href={link.href}>
+                  {link.label}&nbsp;<span aria-hidden="true">&rarr;</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   )

@@ -291,7 +291,7 @@ html.lenis body {
 .home .t-heading {
   font-family: var(--f-display);
   font-weight: 400;
-  font-size: 5rem;
+  font-size: clamp(3.5rem, 5.2vw, 5rem);
   line-height: 1.02;
   letter-spacing: 0;
 }
@@ -885,85 +885,45 @@ html.lenis body {
 
 /* ---- About -------------------------------------------------------------- */
 
+/* Two columns: on the left the label at the top, then the heading and the
+   copy settling to the bottom of the portrait; on the right the portrait,
+   square, as she was photographed. Without the portrait the copy takes the
+   right column instead. */
 .home .about__inner {
-  /* The portrait frame's size, in the canvas's own width, so the heading can
-     sit on its baseline and the canvas can end just under it. */
-  --frame-top: 20rem;
-  --frame-w: calc(50cqw - 0.75rem - var(--container-padding));
-  --frame-h: calc(var(--frame-w) * 3 / 4);
-  position: relative;
-  container-type: inline-size;
-  min-height: calc(var(--frame-top) + var(--frame-h) + 5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: 4rem;
+  row-gap: 2rem;
+  padding: 7rem var(--container-padding) 6rem;
 }
 
 .home .about__label {
-  position: absolute;
-  top: 2.1875rem;
-  left: var(--container-padding);
-}
-
-.home .about__intro {
-  position: absolute;
-  top: 2.1875rem;
-  left: calc(50% + 0.75rem);
-  width: 19.375rem;
-  text-align: justify;
-  text-indent: 5rem;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .home .about__heading {
-  position: absolute;
-  /* Bottom-aligned with the portrait: the name and the face read together. */
-  top: calc(var(--frame-top) + var(--frame-h) - 1.04em);
-  left: var(--container-padding);
-  width: min(41.75rem, calc(50% - 4.25rem));
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
   color: var(--ink);
 }
 
-@media (min-width: 992px) {
-  .home .about__heading {
-    font-size: min(5rem, 5.5556cqw);
-  }
-}
-
-/* Without the portrait the canvas closes up: label and heading on the left,
-   the copy on the right, no empty frame. The full canvas returns with the
-   photograph. */
-.home .about--no-photo .about__inner {
-  display: grid;
-  min-height: 0;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 1.5rem;
-  row-gap: 5rem;
-  padding: 8rem var(--container-padding) 6rem;
-}
-
-.home .about--no-photo .about__label,
-.home .about--no-photo .about__intro,
-.home .about--no-photo .about__heading {
-  position: static;
-  width: auto;
-}
-
-.home .about--no-photo .about__label { grid-column: 1; grid-row: 1; }
-.home .about--no-photo .about__heading { grid-column: 1; grid-row: 2; align-self: end; }
-
-.home .about--no-photo .about__intro {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: end;
-  max-width: 24rem;
-  padding-left: 0.75rem;
+.home .about__intro {
+  grid-column: 1;
+  grid-row: 3;
+  max-width: 30rem;
+  font-size: 1.125rem;
 }
 
 .home .about__frame {
   --pan: 4%;
-  position: absolute;
-  top: var(--frame-top);
-  left: calc(50% + 0.75rem);
-  width: var(--frame-w);
-  /* A portrait crop: head and shoulders with room above, not a letterbox. */
-  aspect-ratio: 4 / 3;
+  position: relative;
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-card);
   overflow: hidden;
   background-color: var(--butter-field);
@@ -980,29 +940,27 @@ html.lenis body {
   object-position: 50% 22%;
 }
 
+.home .about--no-photo .about__inner {
+  row-gap: 5rem;
+}
+
+.home .about--no-photo .about__intro {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+}
+
 @media (max-width: 991px) {
   .home .about__inner {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 1.5rem;
-    min-height: 0;
     padding: 4rem var(--container-padding);
-  }
-
-  .home .about__label,
-  .home .about__intro,
-  .home .about__heading {
-    position: static;
-    width: 100%;
   }
 
   .home .about__frame {
     --pan: 0%;
-    position: relative;
-    top: auto;
-    left: auto;
-    width: 100%;
     aspect-ratio: 4 / 3;
   }
 }
@@ -1012,18 +970,9 @@ html.lenis body {
     gap: 1rem;
     padding-block: 3rem;
   }
-
-  .home .about__intro {
-    text-align: left;
-    text-indent: 3rem;
-  }
 }
 
 @media (max-width: 479px) {
-  .home .about__intro {
-    text-indent: 2rem;
-  }
-
   .home .about__frame {
     aspect-ratio: 1 / 1;
   }
@@ -1168,18 +1117,19 @@ html.lenis body {
 }
 
 .home .properties__card {
-  min-height: 63.625rem;
+  /* In flow, not a fixed-height canvas: masthead and eyebrow on one row, the
+     rule, then the collage running edge to edge of the card. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 2rem;
+  row-gap: 3rem;
+  padding-block: 4rem 4.5rem;
   background-color: var(--brown);
-  padding: 0;
 }
 
 .home .properties__head {
-  position: absolute;
-  top: var(--card-padding);
-  left: calc(var(--card-padding) + var(--overflow-side));
   display: flex;
-  width: 41.75rem;
-  max-width: calc(100% - 2 * var(--card-padding) - 12rem);
+  max-width: 41.75rem;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.25rem;
@@ -1210,26 +1160,17 @@ html.lenis body {
 }
 
 .home .properties__eyebrow {
-  position: absolute;
-  top: var(--card-padding);
-  right: calc(var(--card-padding) + var(--overflow-side));
   color: var(--on-brown-label);
   text-align: right;
 }
 
 .home .properties__rule {
-  position: absolute;
-  top: 21rem;
-  right: calc(var(--card-padding) + var(--overflow-side));
-  left: calc(var(--card-padding) + var(--overflow-side));
-  width: auto;
+  grid-column: 1 / -1;
 }
 
 .home .properties__collage {
-  position: absolute;
-  top: 26.25rem;
-  right: 0;
-  left: 0;
+  grid-column: 1 / -1;
+  margin-inline: calc(-1 * (var(--card-padding) + var(--overflow-side)));
   overflow: hidden;
 }
 
@@ -1239,21 +1180,28 @@ html.lenis body {
   transform: translate(-33.3333%);
 }
 
+/* One row of covers at a shared height, each its own width, the second and
+   fourth set a step lower so the row has a rhythm rather than a grid. The
+   trailing padding keeps the gap constant across the loop seam. */
 .home .properties__group {
-  position: relative;
-  width: 89.8125rem;
-  height: 32.5rem;
+  display: flex;
   flex: none;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
 }
 
-.home .properties__slot {
-  position: absolute;
+.home .properties__slot--two,
+.home .properties__slot--four {
+  margin-top: 3.5rem;
 }
 
-.home .properties__slot--one { top: 0; left: 2.75rem; }
-.home .properties__slot--three { top: 18.9375rem; left: 36.375rem; }
-.home .properties__slot--two { top: 0; left: 53.5625rem; }
-.home .properties__slot--four { top: 17.5625rem; left: 75.0625rem; }
+@media (min-width: 992px) {
+  .home .properties__group .pcard__frame {
+    height: 19rem;
+    aspect-ratio: auto;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .home .properties__track {
@@ -1295,7 +1243,13 @@ html.lenis body {
   }
 
   .home .properties__collage {
+    margin-inline: 0;
     overflow: visible;
+  }
+
+  .home .properties__slot--two,
+  .home .properties__slot--four {
+    margin-top: 0;
   }
 
   .home .properties__track {
@@ -1400,8 +1354,8 @@ html.lenis body {
 .home .approach__inner {
   display: flex;
   flex-direction: column;
-  gap: 6.25rem;
-  padding: var(--container-padding);
+  gap: 3.5rem;
+  padding: 6rem var(--container-padding);
 }
 
 .home .approach__head {
@@ -1413,7 +1367,7 @@ html.lenis body {
 
 .home .approach__heading {
   min-width: 0;
-  flex: 0 1 40.25rem;
+  flex: 0 1 52rem;
   color: var(--ink);
   text-align: right;
 }
@@ -1426,18 +1380,25 @@ html.lenis body {
 }
 
 .home .approach__grid {
+  /* Four across the full width: no empty half beside the grid. */
   display: grid;
   min-width: 0;
-  flex: 0 1 40.25rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: minmax(5.5rem, auto) minmax(7rem, auto);
-  gap: 1.5rem;
+  flex: 1 1 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2.5rem 2rem;
 }
 
 .home .feature {
   display: flex;
-  gap: 1.25rem;
+  flex-direction: column;
+  gap: 0.75rem;
   align-items: flex-start;
+}
+
+@media (max-width: 1199px) {
+  .home .approach__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .home .feature__number {
@@ -1545,7 +1506,7 @@ html.lenis body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 2.5rem;
-  padding: var(--container-padding);
+  padding: 6rem var(--container-padding);
 }
 
 .home .testimonial__label {
@@ -1558,7 +1519,7 @@ html.lenis body {
   min-width: 0;
   flex: 0 1 61.125rem;
   flex-direction: column;
-  gap: 4rem;
+  gap: 3rem;
 }
 
 .home .testimonial__heading {
@@ -1568,7 +1529,7 @@ html.lenis body {
 
 .home .testimonial__figure {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 2rem;
   width: 100%;
@@ -1578,13 +1539,12 @@ html.lenis body {
 .home .testimonial__frame {
   position: relative;
   display: flex;
-  width: 19.375rem;
-  min-height: 23.1875rem;
+  width: 22rem;
   flex-shrink: 0;
   flex-direction: column;
   justify-content: flex-start;
   gap: 1.25rem;
-  padding: 1.75rem;
+  padding: 2rem;
   border-radius: var(--radius-card);
   overflow: hidden;
   background-color: var(--butter-field);
@@ -1596,7 +1556,7 @@ html.lenis body {
 }
 
 .home .testimonial__count {
-  margin-top: auto;
+  margin-top: 1.5rem;
   font-size: 0.8125rem;
   color: var(--bronze);
 }
@@ -1715,9 +1675,59 @@ html.lenis body {
   object-fit: cover;
 }
 
+/* Without the photograph: the heading and button on the left, the other ways
+   in on the right, settled to the button's baseline — no empty half. */
 .home .contact--no-photo .contact__inner {
-  gap: 3rem;
-  padding-top: 7rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  column-gap: 4rem;
+  row-gap: 2.5rem;
+  padding-top: 6rem;
+}
+
+.home .contact--no-photo .contact__label { grid-column: 1; grid-row: 1; }
+.home .contact--no-photo .contact__block { grid-column: 1; grid-row: 2; }
+
+.home .contact__more {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--hairline);
+}
+
+.home .contact__more li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.home .contact__email,
+.home .contact__link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.home .contact__email:hover,
+.home .contact__link:hover {
+  color: var(--wine);
+}
+
+@media (max-width: 991px) {
+  .home .contact--no-photo .contact__inner {
+    display: flex;
+  }
+
+  .home .contact__more {
+    width: 100%;
+  }
 }
 
 .home .contact__block {

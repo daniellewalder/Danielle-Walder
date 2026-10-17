@@ -5,8 +5,8 @@ import { getEssays, type EssayEntry } from '@/lib/essays'
 
 /**
  * Overthinking Real Estate, as the dark card: the masthead top-left, the
- * eyebrow top-right, a dotted rule, and a collage of the four latest essays
- * at fixed slots, repeated three times so the track can loop. Below 992px the
+ * eyebrow top-right, a dotted rule, and a row of the four latest essays,
+ * repeated three times so the track can loop. Below 992px the
  * collage becomes a slider with two arrows.
  *
  * Every title and cover comes from the Substack feed. An essay without a
@@ -16,10 +16,10 @@ import { getEssays, type EssayEntry } from '@/lib/essays'
  */
 
 const SLOTS = [
-  { name: 'one', width: '32.125rem', ratio: '514 / 303' },
-  { name: 'two', width: '20rem', ratio: '320 / 207' },
-  { name: 'three', width: '16rem', ratio: '256 / 173' },
-  { name: 'four', width: '16rem', ratio: '256 / 173' },
+  { name: 'one', width: '30rem', ratio: '514 / 303' },
+  { name: 'two', width: '21rem', ratio: '320 / 207' },
+  { name: 'three', width: '25rem', ratio: '256 / 173' },
+  { name: 'four', width: '18rem', ratio: '256 / 173' },
 ] as const
 
 function EssayCard({
