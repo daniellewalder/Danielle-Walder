@@ -1,3 +1,4 @@
+import { editorialMedia } from '@/lib/content/editorialMedia'
 import { tuesdayTestPage } from '@/lib/content/pages'
 
 /**
@@ -10,9 +11,16 @@ import { tuesdayTestPage } from '@/lib/content/pages'
 
 export const hero = {
   eyebrow: 'Los Angeles real estate, with a counterpoint',
-  headline: 'A home is never just a home.',
+  headline: 'Be picky. You’re going to live there.',
+  /**
+   * The headline set as the hero's two display lines. Same words as
+   * `headline`, only broken for the composition.
+   */
+  headlineLines: ['Be picky.', 'You’re going to', 'live there.'],
   intro:
-    'It is a commute, a Tuesday night, a monthly payment, a neighborhood, a negotiation, and the particular life you want to have once the keys are yours.',
+    'Finding the right place takes time, and I don’t think you should settle just to get it over with. Ask questions, explore your options, and change your mind along the way. It’s okay to be picky. It’s your house, after all.',
+  /** The one word in the intro Danielle sets in italics. */
+  introEmphasis: 'your',
   primaryCta: { label: 'Search Homes', href: '/search' },
   secondaryCta: { label: 'Read Overthinking Real Estate', href: '/read' },
   portrait: {
@@ -20,6 +28,20 @@ export const hero = {
     alt: 'Danielle Walder',
     src: null,
   },
+  /**
+   * Optional cut-out of the same photograph with the background removed, so
+   * the subject stands in front of the headline. Only rendered when supplied —
+   * it must be cut from the real portrait above, never a different image.
+   */
+  cutout: { src: null as string | null },
+  /**
+   * The hero footage: the aerial coast from LA, Actually. Editorial stock —
+   * it stands for Los Angeles, never for Danielle's listing or a named place,
+   * so it carries no caption and no location.
+   */
+  video: editorialMedia.coastalAerial,
+  /** The hero clock. Danielle works in Los Angeles. */
+  clock: { label: 'LA', timeZone: 'America/Los_Angeles' },
 }
 
 export const about = {
@@ -27,8 +49,8 @@ export const about = {
   copy: "I'm a Los Angeles real-estate agent and the person behind Overthinking Real Estate. I help people make big housing decisions with local context, honest analysis, and the recognition that buying a home is never only about the house.",
   portrait: {
     label: '[ADD DANIELLE PHOTO]',
-    alt: 'Danielle Walder',
-    src: null,
+    alt: 'Danielle Walder, smiling, in front of a wall of green leaves',
+    src: '/media/danielle/portrait.webp',
   },
   primaryCta: { label: "Tell me what you're trying to figure out", href: '/contact' },
   secondaryCta: { label: 'More about me', href: '/about' },
@@ -77,4 +99,37 @@ export const subscribe = {
   /** Shown until SUBSTACK_URL is set. No email field, no fake form. */
   pending:
     'Overthinking Real Estate is published on Substack. The subscribe link goes live as soon as the publication is connected.',
+}
+
+/** The homepage section labels, in page order. Nav anchors use the same ids. */
+export const homeNav = [
+  { label: 'about', href: '#about' },
+  { label: 'overthinking real estate', href: '#read' },
+  { label: 'the tuesday test', href: '#tuesday-test' },
+  { label: 'contact', href: '#contact' },
+] as const
+
+export const aboutSection = {
+  label: 'about danielle',
+}
+
+/** The closing contact block. Heading and action are approved copy. */
+export const contactSection = {
+  label: 'contact',
+  headingLines: ["Tell me what", "you're trying", 'to figure out'],
+  cta: { label: 'Say hello', href: '/contact' },
+  /**
+   * The other ways in, beside the heading while there is no photograph:
+   * the published address, and two real routes. The phone number is not
+   * here on purpose — its one approved place is the showing handoff.
+   */
+  more: [
+    { label: 'send me a house', href: '/contact?intent=showing' },
+    { label: "what's my home worth?", href: '/home-valuation' },
+  ],
+  photo: {
+    label: '[ADD CONTACT PHOTO]',
+    alt: 'Danielle Walder',
+    src: null,
+  },
 }

@@ -4,6 +4,7 @@ import { ImageSlot } from '@/components/ui/ImageSlot'
 import { substackSubscribeUrl } from '@/lib/config'
 import { readPage } from '@/lib/content/pages'
 import { getEssays, type EssayEntry } from '@/lib/essays'
+import { liveLinks } from '@/lib/launch'
 
 export const metadata: Metadata = {
   title: 'Essays · Overthinking Real Estate',
@@ -189,13 +190,15 @@ export default async function ReadPage() {
             </div>
           </div>
 
-          {/* The Counter — a recurring feature, Danielle's placeholder until written. */}
+          {/* The Counter — a recurring feature, shown once Danielle writes one. */}
+          {readPage.counter.body ? (
           <div className="mt-11 border-t border-hairline pt-7">
             <p className="eyebrow tracking-label">{readPage.counter.label}</p>
             <p className="mt-4 max-w-measure font-serif text-[19px] leading-[1.4] text-espresso mobile:text-[17px]">
               {readPage.counter.body}
             </p>
           </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -299,7 +302,7 @@ export default async function ReadPage() {
         </div>
 
         <ul className="flex flex-col gap-3">
-          {readPage.helpBand.links.map((link) => (
+          {liveLinks(readPage.helpBand.links).map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}

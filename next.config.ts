@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   /**
+   * Which sections are public is decided per deploy: production hides the
+   * ones not yet launched, previews show everything. Inlined at build so the
+   * server and the client read the same value. See lib/launch.ts.
+   */
+  env: {
+    LAUNCH_STAGE: process.env.VERCEL_ENV ?? 'development',
+  },
+
+  /**
    * The public route vocabulary is /read, /search, /tuesday-test, /about and
    * /contact. Anything that ever pointed at the old internal routes lands on
    * the right page instead of a 404.

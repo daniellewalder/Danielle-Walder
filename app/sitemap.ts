@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getPublishedAreas } from '@/lib/areas'
 import { siteUrl } from '@/lib/config'
+import { isLive, isLiveHref } from '@/lib/launch'
 
 /**
  * Promoted routes only. `/homes` and `/sold` are intentional empty states that
@@ -28,7 +29,8 @@ const routes = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
 
-  const staticRoutes: MetadataRoute.Sitemap = routes.map((route) => ({
+  // Sections not yet launched are left out — see lib/launch.ts.
+  const staticRoutes: MetadataRoute.Sitemap = routes.filter((route) => isLiveHref(route || '/')).map((route) => ({
     url: `${siteUrl}${route}`,
     lastModified,
     changeFrequency: route === '/read' ? 'weekly' : 'monthly',
@@ -43,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * time, so the sitemap says when the content actually changed instead of
    * when the site last deployed.
    */
-  const areaRoutes: MetadataRoute.Sitemap = getPublishedAreas().map((area) => ({
+  const areaRoutes: MetadataRoute.Sitemap = (isLive('laActually') ? getPublishedAreas() : []).map((area) => ({
     url: `${siteUrl}/la-actually/areas/${area.slug}`,
     lastModified: area.provenance.lastVerified
       ? new Date(`${area.provenance.lastVerified}T00:00:00Z`)

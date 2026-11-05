@@ -11,6 +11,7 @@ import {
   siteName,
   type NavLink,
 } from '@/lib/content/site'
+import { isLiveHref, liveLinks } from '@/lib/launch'
 
 /**
  * Site header and menu drawer.
@@ -109,7 +110,7 @@ export function SiteNav() {
             aria-label="Primary"
             className="flex items-center gap-7 whitespace-nowrap navstack:hidden"
           >
-            {headerNav.map((link) => (
+            {liveLinks(headerNav).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -130,6 +131,7 @@ export function SiteNav() {
             it is the one thing people arrive looking for. On a phone it drops
             rather than crowd the wordmark, and the drawer carries it.
           */}
+          {isLiveHref(headerSearch.href) ? (
           <Link
             href={headerSearch.href}
             data-compact-search=""
@@ -137,6 +139,7 @@ export function SiteNav() {
           >
             {headerSearch.label}
           </Link>
+          ) : null}
 
           <button
             ref={triggerRef}
@@ -215,7 +218,10 @@ export function SiteNav() {
           </div>
 
           <nav aria-label="Menu" className="flex flex-col px-8 mobile:px-6">
-            {drawerGroups.map((group) => (
+            {drawerGroups
+              .map((group) => ({ ...group, links: liveLinks(group.links) }))
+              .filter((group) => group.links.length > 0)
+              .map((group) => (
               <div
                 key={group.heading}
                 className="flex flex-col gap-3 border-b border-hairline py-7 mobile:py-6"
