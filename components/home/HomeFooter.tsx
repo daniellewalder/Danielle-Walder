@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { subscribe } from '@/lib/content/home'
 import { substackSubscribeUrl } from '@/lib/config'
 import { footerGroups, legal, publicationWordmark, siteName } from '@/lib/content/site'
+import { liveLinks } from '@/lib/launch'
 
 /**
  * The homepage footer, as a dark card: a dashed brand block with the name,
@@ -15,7 +16,7 @@ import { footerGroups, legal, publicationWordmark, siteName } from '@/lib/conten
  * The licence lines and disclosure are rendered VERBATIM, as on every page.
  */
 export function HomeFooter() {
-  const links: { label: string; href: string }[] = footerGroups.flatMap((group) => [...group.links])
+  const links: { label: string; href: string }[] = liveLinks(footerGroups.flatMap((group) => [...group.links]))
 
   return (
     <footer className="footer section--carded">

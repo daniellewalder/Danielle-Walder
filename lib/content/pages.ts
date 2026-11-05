@@ -36,12 +36,13 @@ export const readPage = {
   moreLabel: 'More to overthink',
 
   /**
-   * A recurring editorial feature. Danielle's own bracketed placeholder, kept
-   * visible exactly as it appears in her design until she writes the first one.
+   * A recurring editorial feature. Not rendered until Danielle writes the
+   * first one — her placeholder was "[A concise counterargument or
+   * complication of the featured essay goes here.]". Set `body` to launch it.
    */
   counter: {
     label: 'the counter',
-    body: '[A concise counterargument or complication of the featured essay goes here.]',
+    body: null as string | null,
   },
 
   /** Blue owns this band. */

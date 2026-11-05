@@ -11,14 +11,16 @@ import { tuesdayTestPage } from '@/lib/content/pages'
 
 export const hero = {
   eyebrow: 'Los Angeles real estate, with a counterpoint',
-  headline: 'A home is never just a home.',
+  headline: 'Be picky. You’re going to live there.',
   /**
    * The headline set as the hero's two display lines. Same words as
    * `headline`, only broken for the composition.
    */
-  headlineLines: ['A home is never', 'just a home.'],
+  headlineLines: ['Be picky.', 'You’re going to', 'live there.'],
   intro:
-    'It is a commute, a Tuesday night, a monthly payment, a neighborhood, a negotiation, and the particular life you want to have once the keys are yours.',
+    'Finding the right place takes time, and I don’t think you should settle just to get it over with. Ask questions, explore your options, and change your mind along the way. It’s okay to be picky. It’s your house, after all.',
+  /** The one word in the intro Danielle sets in italics. */
+  introEmphasis: 'your',
   primaryCta: { label: 'Search Homes', href: '/search' },
   secondaryCta: { label: 'Read Overthinking Real Estate', href: '/read' },
   portrait: {

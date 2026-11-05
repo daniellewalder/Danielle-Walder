@@ -6,6 +6,7 @@ import { HomeFooter } from '@/components/home/HomeFooter'
 import { HomeMotion } from '@/components/home/HomeMotion'
 import { Overthinking } from '@/components/home/Overthinking'
 import { TuesdayTest } from '@/components/home/TuesdayTest'
+import { isLive } from '@/lib/launch'
 import '@/components/home/home.css'
 
 /**
@@ -37,7 +38,7 @@ export default function HomePage() {
       <Hero />
       <About />
       <Overthinking />
-      <TuesdayTest />
+      {isLive('tuesdayTest') ? <TuesdayTest /> : null}
       <Contact />
       <HomeFooter />
       <HomeMotion />

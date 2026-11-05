@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { footerGroups, legal, publicationWordmark, siteName } from '@/lib/content/site'
+import { liveLinks } from '@/lib/launch'
 
 export function SiteFooter() {
   return (
@@ -39,7 +40,10 @@ export function SiteFooter() {
       */}
       <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,1.7fr)] gap-x-12 gap-y-9 pt-8 tablet:grid-cols-2 mobile:grid-cols-1 mobile:gap-y-7">
         <nav aria-label="Footer" className="contents">
-          {footerGroups.map((group) => (
+          {footerGroups
+            .map((group) => ({ ...group, links: liveLinks<{ label: string; href: string }>(group.links) }))
+            .filter((group) => group.links.length > 0)
+            .map((group) => (
             <div key={group.heading} className="flex min-w-0 flex-col gap-[14px]">
               <h2 className="text-[11.5px] font-bold uppercase tracking-label text-onbrown-fine">
                 {group.heading}

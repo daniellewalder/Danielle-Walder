@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { notFoundPage } from '@/lib/content/pages'
+import { liveLinks } from '@/lib/launch'
 
 export default function NotFound() {
   return (
@@ -13,7 +14,7 @@ export default function NotFound() {
 
       <section aria-label="Go to" className="wrap pt-10 mobile:pt-8">
         <ul className="flex flex-col border-t border-hairline">
-          {notFoundPage.links.map((link) => (
+          {liveLinks(notFoundPage.links).map((link) => (
             <li key={link.href} className="border-b border-hairline">
               <Link
                 href={link.href}

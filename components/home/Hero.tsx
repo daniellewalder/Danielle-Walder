@@ -4,6 +4,7 @@ import { HeroVideo } from '@/components/home/HeroVideo'
 import { Photo } from '@/components/home/Photo'
 import { hero, homeNav } from '@/lib/content/home'
 import { siteName } from '@/lib/content/site'
+import { isLive, isLiveHref } from '@/lib/launch'
 
 /**
  * The opening screen: one inset card the height of the viewport, with the
@@ -26,6 +27,8 @@ import { siteName } from '@/lib/content/site'
 export function Hero() {
   const hasPhoto = Boolean(hero.video || hero.portrait.src)
   const words = siteName.split(' ')
+  // While home search is not public, the one action goes to the publication.
+  const cta = isLiveHref(hero.primaryCta.href) ? hero.primaryCta : hero.secondaryCta
 
   return (
     <section className={`hero${hasPhoto ? ' hero--photo' : ''}`} id="top">
@@ -36,7 +39,9 @@ export function Hero() {
           </Link>
 
           <nav className="nav__links" aria-label="On this page">
-            {homeNav.map((link) => (
+            {homeNav
+              .filter((link) => link.href !== '#tuesday-test' || isLive('tuesdayTest'))
+              .map((link) => (
               <a key={link.href} className="nav__link t-ui" href={link.href}>
                 {link.label}
                 <span className="nav__link-rule rule-dotted" aria-hidden="true" />
@@ -82,11 +87,11 @@ export function Hero() {
 
         <div className="hero__foot">
           <p className="hero__lede t-lede" data-anim="rise">
-            {hero.intro}
+            <Emphasised text={hero.intro} word={hero.introEmphasis} />
           </p>
-          <Link className="btn btn--pill hero__cta" href={hero.primaryCta.href} data-anim="rise">
+          <Link className="btn btn--pill hero__cta" href={cta.href} data-anim="rise">
             <span className="btn__fill" aria-hidden="true" />
-            <span className="btn__label">{hero.primaryCta.label}</span>
+            <span className="btn__label">{cta.label}</span>
           </Link>
         </div>
       </div>
@@ -109,5 +114,18 @@ export function Hero() {
         </span>
       </div>
     </section>
+  )
+}
+
+/** The intro with Danielle's one italic word — its last occurrence. */
+function Emphasised({ text, word }: { text: string; word: string }) {
+  const at = text.lastIndexOf(` ${word} `)
+  if (at < 0) return <>{text}</>
+  return (
+    <>
+      {text.slice(0, at + 1)}
+      <em>{word}</em>
+      {text.slice(at + 1 + word.length)}
+    </>
   )
 }

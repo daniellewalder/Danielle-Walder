@@ -3,6 +3,7 @@ import { Photo } from '@/components/home/Photo'
 import { contactEmail } from '@/lib/config'
 import { contactPage } from '@/lib/content/contact'
 import { contactSection } from '@/lib/content/home'
+import { liveLinks } from '@/lib/launch'
 
 /**
  * The closing ask: a photo frame anchored top-right, then the label, a
@@ -56,7 +57,7 @@ export function Contact() {
                 </a>
               </li>
             ) : null}
-            {contactSection.more.map((link) => (
+            {liveLinks(contactSection.more).map((link) => (
               <li key={link.href}>
                 <Link className="contact__link" href={link.href}>
                   {link.label}&nbsp;<span aria-hidden="true">&rarr;</span>

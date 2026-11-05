@@ -4,15 +4,31 @@ Personal real estate site for Danielle Walder, a Los Angeles agent, and home of
 her publication *Overthinking Real Estate*. Next.js (App Router) + TypeScript +
 Tailwind CSS.
 
-## 🚨 Blocks public launch
+## Launch stage
 
-**Do not put this on a public domain until all three are resolved.**
+The site launches in stages. `lib/launch.ts` decides which sections are public
+on **production**; previews and local dev always show everything. A section
+switched off there 404s on production and every link to it disappears — nav,
+drawer, both footers, the homepage, the sitemap.
+
+| Section | Routes | Live? | Waiting on |
+|---|---|---|---|
+| Homepage, Overthinking Real Estate, About, Contact | `/`, `/read`, `/read/[slug]`, `/about`, `/contact` | ✅ | — |
+| Home search (RealScout) | `/search`, `/home-valuation`, `/homes` | ❌ | Blockers 1 and 2 below |
+| LA, Actually | `/la-actually`, area guides | ❌ | Danielle: not ready |
+| The Tuesday Test | `/tuesday-test`, result | ❌ | Danielle: not ready |
+
+To launch a section, flip it to `true` in `lib/launch.ts`.
+
+## 🚨 Blocks launching home search
 
 | # | Blocker |
 |---|---|
-| 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies, which makes this a genuine public-launch requirement. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. |
-| 2 | **RealScout has not been observed working in a real browser.** Search and listings are public core functionality, so all four widgets must be watched running before launch. DOM structure and a clean build are not evidence of runtime behaviour. Checklist below. |
-| 3 | **No photograph of Danielle anywhere on the site.** The homepage hero, the homepage About block and `/about` each reserve a portrait and none of them has one. The slot name is now development-only, so a public page shows a quiet tonal block rather than `[ADD DANIELLE PHOTO]` — **that is cosmetic and clears nothing.** A site whose whole premise is that Danielle is the reason to stay cannot launch without her face on it. The conditional essay-image fallback does **not** block launch as long as real Substack cover images are loading. |
+| 1 | **No privacy policy.** RealScout introduces third-party lead capture, data collection, and cookies. **Do not draft legal language.** Danielle needs approved wording from Coldwell Banker / compliance or another appropriate legal source. Once supplied: create the page and put a conspicuous link in the footer. Without RealScout the live site collects nothing (contact is email and text links), which is why the rest can launch first. |
+| 2 | **RealScout has not been observed working in a real browser.** All of its widgets must be watched running before the section launches. DOM structure and a clean build are not evidence of runtime behaviour. Checklist below. |
+
+~~No photograph of Danielle~~ — resolved: her portrait is on the homepage About
+and `/about`.
 
 ## Real-browser testing
 
